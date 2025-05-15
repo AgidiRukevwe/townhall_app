@@ -21,7 +21,7 @@ type AuthContextType = {
 };
 
 type LoginData = {
-  email: string;
+  username: string;
   password: string;
 };
 

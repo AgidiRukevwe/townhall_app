@@ -20,6 +20,7 @@ export interface IStorage {
   // User methods
   getUserById(id: string): Promise<SelectUser | undefined>;
   getUserByEmail(email: string): Promise<SelectUser | undefined>;
+  getUserByUsername(username: string): Promise<SelectUser | undefined>;
   createUser(userData: InsertUser): Promise<SelectUser>;
   
   // Officials methods
@@ -127,6 +128,17 @@ export class SupabaseStorage implements IStorage {
       return users.length > 0 ? users[0] : undefined;
     } catch (error) {
       console.error("Error fetching user by email:", error);
+      throw error;
+    }
+  }
+  
+  async getUserByUsername(username: string): Promise<SelectUser | undefined> {
+    try {
+      const users = await this.db.select().from(schema.users)
+        .where(eq(schema.users.username, username));
+      return users.length > 0 ? users[0] : undefined;
+    } catch (error) {
+      console.error("Error fetching user by username:", error);
       throw error;
     }
   }
@@ -408,6 +420,10 @@ export class MemStorage implements IStorage {
   
   async getUserByEmail(email: string): Promise<SelectUser | undefined> {
     return this.users.find(user => user.email === email);
+  }
+
+  async getUserByUsername(username: string): Promise<SelectUser | undefined> {
+    return this.users.find(user => user.username === username);
   }
   
   async createUser(userData: InsertUser): Promise<SelectUser> {

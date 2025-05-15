@@ -20,12 +20,13 @@ import { useLocation } from "wouter";
 
 // Form validation schemas
 const loginSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  username: z.string().min(3, "Username must be at least 3 characters"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-const registerSchema = loginSchema.extend({
-  name: z.string().min(2, "Name must be at least 2 characters"),
+const registerSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
 }).refine((data) => data.password === data.confirmPassword, {
@@ -52,7 +53,7 @@ export default function AuthPage() {
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
@@ -61,7 +62,7 @@ export default function AuthPage() {
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      name: "",
+      username: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -85,7 +86,7 @@ export default function AuthPage() {
       {
         email: data.email,
         password: data.password,
-        username: data.name,
+        username: data.username,
       },
       {
         onError: (error) => {
