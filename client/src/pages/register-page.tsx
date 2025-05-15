@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -42,9 +43,10 @@ export default function RegisterPage() {
   React.useEffect(() => {
     // If user is already logged in, redirect to home
     if (user) {
-      navigate("/");
+      console.log("User is already logged in, redirecting to home page...");
+      window.location.href = '/';
     }
-  }, [user, navigate]);
+  }, [user]);
 
   // Check for mutations in auth object safely
   const registerMutation = auth && 'registerMutation' in auth ? auth.registerMutation : null;
@@ -76,10 +78,16 @@ export default function RegisterPage() {
               variant: "default",
             });
             
-            // Add a small delay before redirecting to ensure toast is seen
+            console.log("Registration successful, user data:", user);
+          
+            // Directly set the data instead of trying to navigate
+            queryClient.setQueryData(["/api/user"], user);
+            
+            // Use direct browser navigation instead of React navigation
             setTimeout(() => {
-              navigate("/");
-            }, 1500);
+              console.log("Forcing redirect to home page...");
+              window.location.href = '/';
+            }, 1000);
           },
           onError: (error) => {
             toast({

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
+import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -37,9 +38,10 @@ export default function LoginPage() {
   React.useEffect(() => {
     // If user is already logged in, redirect to home
     if (user) {
-      navigate("/");
+      console.log("User is already logged in, redirecting to home page...");
+      window.location.href = '/';
     }
-  }, [user, navigate]);
+  }, [user]);
 
   // Check for mutations in auth object safely
   const loginMutation = auth && 'loginMutation' in auth ? auth.loginMutation : null;
@@ -65,11 +67,15 @@ export default function LoginPage() {
           
           console.log("Login successful, user:", user);
           
-          // Add a small delay before redirecting to ensure toast is seen
+          // Directly set the data instead of trying to navigate
+          // The auth provider will handle updating state across components
+          queryClient.setQueryData(["/api/user"], user);
+          
+          // Use direct browser navigation instead of React navigation
           setTimeout(() => {
-            console.log("Redirecting to home page...");
-            navigate("/");
-          }, 1500);
+            console.log("Forcing redirect to home page...");
+            window.location.href = '/';
+          }, 1000);
         },
         onError: (error) => {
           toast({
