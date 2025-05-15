@@ -4,7 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
-import AuthPage from "./pages/auth-page-new";
+import LoginPage from "./pages/login-page";
+import RegisterPage from "./pages/register-page";
 import Navbar from "./components/layout/navbar";
 import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -16,7 +17,9 @@ function Router() {
       <Switch>
         <ProtectedRoute path="/" component={Home} />
         <ProtectedRoute path="/profile/:id" component={Profile} />
-        <Route path="/auth" component={AuthPage} />
+        <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/auth" component={LoginPage} />
         <Route component={NotFound} />
       </Switch>
     </div>
