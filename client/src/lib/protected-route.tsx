@@ -14,6 +14,9 @@ export function ProtectedRoute({
   // Handle both auth implementations (isLoading from username/password auth and loading from anonymous auth)
   const isLoading = 'isLoading' in auth ? auth.isLoading : ('loading' in auth ? auth.loading : false);
   const user = auth.user;
+  
+  // Debug auth state
+  console.log("ProtectedRoute - Auth state:", { isLoading, user });
 
   if (isLoading) {
     return (

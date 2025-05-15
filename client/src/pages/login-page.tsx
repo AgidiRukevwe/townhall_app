@@ -63,8 +63,11 @@ export default function LoginPage() {
             variant: "default",
           });
           
+          console.log("Login successful, user:", user);
+          
           // Add a small delay before redirecting to ensure toast is seen
           setTimeout(() => {
+            console.log("Redirecting to home page...");
             navigate("/");
           }, 1500);
         },
