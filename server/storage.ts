@@ -4,7 +4,9 @@ import {
   RatingSummary,
   Sector,
   Election,
-  Career
+  Career,
+  User as SelectUser,
+  InsertUser
 } from "../shared/schema";
 import { drizzle } from "drizzle-orm/postgres-js";
 import { eq, ilike, or, and, sql } from "drizzle-orm";
@@ -12,6 +14,12 @@ import postgres from "postgres";
 import * as schema from "../shared/schema";
 
 export interface IStorage {
+  // User methods
+  getUserById(id: string): Promise<SelectUser | undefined>;
+  getUserByEmail(email: string): Promise<SelectUser | undefined>;
+  createUser(userData: InsertUser): Promise<SelectUser>;
+  
+  // Officials methods
   getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]>;
   getOfficialById(id: string): Promise<Official | undefined>;
   getOfficialRatings(officialId: string): Promise<RatingSummary>;
@@ -26,6 +34,44 @@ export class SupabaseStorage implements IStorage {
     const connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/postgres';
     const client = postgres(connectionString);
     this.db = drizzle(client, { schema });
+  }
+  
+  // User methods
+  async getUserById(id: string): Promise<SelectUser | undefined> {
+    try {
+      const users = await this.db.select().from(schema.users)
+        .where(eq(schema.users.id, id));
+      return users.length > 0 ? users[0] : undefined;
+    } catch (error) {
+      console.error("Error fetching user by ID:", error);
+      throw error;
+    }
+  }
+  
+  async getUserByEmail(email: string): Promise<SelectUser | undefined> {
+    try {
+      const users = await this.db.select().from(schema.users)
+        .where(eq(schema.users.email, email));
+      return users.length > 0 ? users[0] : undefined;
+    } catch (error) {
+      console.error("Error fetching user by email:", error);
+      throw error;
+    }
+  }
+  
+  async createUser(userData: InsertUser): Promise<SelectUser> {
+    try {
+      const [newUser] = await this.db.insert(schema.users)
+        .values({
+          ...userData,
+          updatedAt: new Date(),
+        })
+        .returning();
+      return newUser;
+    } catch (error) {
+      console.error("Error creating user:", error);
+      throw error;
+    }
   }
   
   async getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]> {
@@ -274,6 +320,7 @@ export class SupabaseStorage implements IStorage {
 
 // In-memory fallback for development
 export class MemStorage implements IStorage {
+  private users: SelectUser[] = [];
   private officials: Official[] = [
     {
       id: "1",

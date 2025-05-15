@@ -2,9 +2,21 @@ import { pgTable, text, uuid, integer, timestamp, boolean } from "drizzle-orm/pg
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Users Table
+export const users = pgTable("users", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  username: text("username").notNull(),
+  email: text("email").notNull().unique(),
+  password: text("password").notNull(),
+  isAnonymous: boolean("is_anonymous").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // User Profiles Table
 export const userProfiles = pgTable("user_profiles", {
   id: text("id").primaryKey(),
+  userId: uuid("user_id").references(() => users.id),
   deviceId: text("device_id").notNull(),
   ipAddress: text("ip_address"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -94,6 +106,7 @@ export const petitions = pgTable("petitions", {
 });
 
 // Zod Schemas
+export const userSchema = createInsertSchema(users);
 export const userProfileSchema = createInsertSchema(userProfiles);
 export const officialSchema = createInsertSchema(officials);
 export const sectorSchema = createInsertSchema(sectors);
@@ -104,6 +117,9 @@ export const careerSchema = createInsertSchema(careers);
 export const petitionSchema = createInsertSchema(petitions);
 
 // Type definitions
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof userSchema>;
+
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = z.infer<typeof userProfileSchema>;
 
@@ -163,6 +179,11 @@ export interface RatingSummary {
 export interface Database {
   public: {
     Tables: {
+      users: {
+        Row: User;
+        Insert: InsertUser;
+        Update: Partial<InsertUser>;
+      };
       user_profiles: {
         Row: UserProfile;
         Insert: InsertUserProfile;
