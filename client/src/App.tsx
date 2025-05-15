@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
-import AuthPage from "./pages/auth-page";
+import AuthPage from "./pages/auth-page-new";
 import Navbar from "./components/layout/navbar";
 import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
