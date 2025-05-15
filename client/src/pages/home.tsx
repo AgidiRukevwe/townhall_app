@@ -3,13 +3,13 @@ import { OfficialsGrid } from "@/components/officials/officials-grid";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { useEffect, useState } from "react";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState("all");
   const { officials, isLoading, error } = useOfficials();
-  const { user } = useAuthStore();
-  const userName = "Citizen"; // Default name for anonymous users
+  const { user } = useAuth();
+  const userName = user?.username || "Citizen"; // Default name for anonymous users
 
   // Get search params
   const searchParams = new URLSearchParams(window.location.search);

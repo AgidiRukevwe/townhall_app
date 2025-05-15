@@ -132,15 +132,15 @@ export default function AuthPage() {
                 >
                   <FormField
                     control={loginForm.control}
-                    name="email"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email address</FormLabel>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="you@example.com"
-                            type="email"
-                            autoComplete="email"
+                            placeholder="Your username"
+                            type="text"
+                            autoComplete="username"
                             {...field}
                           />
                         </FormControl>
@@ -191,12 +191,12 @@ export default function AuthPage() {
                 >
                   <FormField
                     control={registerForm.control}
-                    name="name"
+                    name="username"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Full name</FormLabel>
+                        <FormLabel>Username</FormLabel>
                         <FormControl>
-                          <Input placeholder="John Doe" {...field} />
+                          <Input placeholder="Choose a username" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
