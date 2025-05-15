@@ -42,8 +42,13 @@ export default function AuthPage() {
   const auth = useAuth();
   // Handle both auth implementations
   const user = auth.user;
-  const loginMutation = 'loginMutation' in auth ? auth.loginMutation : undefined;
-  const registerMutation = 'registerMutation' in auth ? auth.registerMutation : undefined;
+  
+  // Simple check for whether we have the mutation-based auth or not
+  const hasMutations = typeof auth === 'object' && auth !== null && 'loginMutation' in auth;
+  
+  // Safely access mutations or provide dummy functions if they don't exist
+  const loginMutation = hasMutations ? auth.loginMutation : null;
+  const registerMutation = hasMutations ? auth.registerMutation : null;
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -190,9 +195,9 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={loginMutation?.isPending}
+                    disabled={loginMutation ? loginMutation.isPending : false}
                   >
-                    {loginMutation?.isPending ? (
+                    {loginMutation && loginMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Signing in...
@@ -281,9 +286,9 @@ export default function AuthPage() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={registerMutation?.isPending}
+                    disabled={registerMutation && registerMutation.isPending}
                   >
-                    {registerMutation?.isPending ? (
+                    {registerMutation && registerMutation.isPending ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Creating account...
