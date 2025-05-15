@@ -56,9 +56,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/ratings", async (req, res) => {
     try {
+      // Get userId from authenticated user or request body
+      let userId = req.body.userId;
+      
+      // If user is authenticated, use their ID
+      if (req.isAuthenticated()) {
+        userId = req.user.id;
+      } else if (!userId) {
+        // If no userId provided and not authenticated
+        return res.status(401).json({ message: "Authentication required" });
+      }
+      
       // Validate request body
       const ratingPayloadSchema = z.object({
-        userId: z.string(),
         officialId: z.string().uuid(),
         overallRating: z.number().min(0).max(100),
         sectorRatings: z.array(z.object({
@@ -67,10 +77,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }))
       });
       
-      const validatedData = ratingPayloadSchema.parse(req.body);
+      const validatedData = ratingPayloadSchema.parse({
+        officialId: req.body.officialId,
+        overallRating: req.body.overallRating,
+        sectorRatings: req.body.sectorRatings
+      });
       
-      // Submit rating
-      const result = await storage.submitRating(validatedData);
+      // Submit rating with userId
+      const result = await storage.submitRating({
+        ...validatedData,
+        userId
+      });
       
       res.status(201).json(result);
     } catch (error) {

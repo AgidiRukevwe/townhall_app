@@ -1,23 +1,30 @@
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { SearchBar } from "./search-bar";
-import { Menu, User } from "lucide-react";
+import { LogOut, LogIn, Menu, User } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { useAuthStore } from "@/store/auth-store";
+import { useAuth } from "../../hooks/use-auth.tsx";
+import { Loader2 } from "lucide-react";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user } = useAuthStore();
+  const { user, isLoading, logoutMutation } = useAuth();
+  const [, navigate] = useLocation();
   
-  const userInitial = user ? 'A' : 'G'; // A for authenticated, G for guest
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+  
+  const userInitial = user ? user.username.charAt(0).toUpperCase() : 'G';
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -72,10 +79,33 @@ export default function Navbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>{user ? 'Anonymous User' : 'Guest'}</span>
-              </DropdownMenuItem>
+              {isLoading ? (
+                <DropdownMenuItem disabled>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <span>Loading...</span>
+                </DropdownMenuItem>
+              ) : user ? (
+                <>
+                  <DropdownMenuItem>
+                    <User className="mr-2 h-4 w-4" />
+                    <span>{user.username}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout} disabled={logoutMutation.isPending}>
+                    {logoutMutation.isPending ? (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    ) : (
+                      <LogOut className="mr-2 h-4 w-4" />
+                    )}
+                    <span>Logout</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <DropdownMenuItem onClick={() => navigate("/auth")}>
+                  <LogIn className="mr-2 h-4 w-4" />
+                  <span>Login / Register</span>
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

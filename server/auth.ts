@@ -5,8 +5,9 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
-import createMemoryStore from "memorystore";
+import { User as SelectUser } from "../shared/schema";
+import connectPg from "connect-pg-simple";
+import postgres from "postgres";
 
 declare global {
   namespace Express {
@@ -14,7 +15,6 @@ declare global {
   }
 }
 
-const MemoryStore = createMemoryStore(session);
 const scryptAsync = promisify(scrypt);
 
 async function hashPassword(password: string) {
@@ -31,16 +31,34 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  // Session setup
+  const secret = process.env.SESSION_SECRET || 'developmentsecret';
+  let sessionStore;
+
+  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+    // Use PostgreSQL session store in production
+    const PostgresStore = connectPg(session);
+    const connectionString = process.env.DATABASE_URL;
+    const client = postgres(connectionString);
+    
+    sessionStore = new PostgresStore({ 
+      pool: client,
+      createTableIfMissing: true 
+    });
+  } else {
+    // Use in-memory session store for development
+    const MemoryStore = session.MemoryStore;
+    sessionStore = new MemoryStore();
+  }
+
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.SESSION_SECRET || 'townhall-session-secret',
+    secret,
     resave: false,
     saveUninitialized: false,
-    store: new MemoryStore({
-      checkPeriod: 86400000, // prune expired entries every 24h
-    }),
+    store: sessionStore,
     cookie: {
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
       secure: process.env.NODE_ENV === 'production',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
     }
   };
 
@@ -49,41 +67,49 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
+  // Configure passport strategy
   passport.use(
     new LocalStrategy(
       {
         usernameField: 'email',
-        passwordField: 'password',
+        passwordField: 'password'
       },
       async (email, password, done) => {
         try {
           const user = await storage.getUserByEmail(email);
           if (!user || !(await comparePasswords(password, user.password))) {
             return done(null, false, { message: "Invalid email or password" });
-          } else {
-            return done(null, user);
           }
-        } catch (err) {
-          return done(err);
+          return done(null, user);
+        } catch (error) {
+          return done(error);
         }
-      },
-    ),
+      }
+    )
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  // Serialize and deserialize user
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+  
   passport.deserializeUser(async (id: string, done) => {
     try {
       const user = await storage.getUserById(id);
+      if (!user) {
+        return done(new Error('User not found'));
+      }
       done(null, user);
-    } catch (err) {
-      done(err);
+    } catch (error) {
+      done(error);
     }
   });
 
+  // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {
       const { email, username, password } = req.body;
-
+      
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(email);
       if (existingUser) {
@@ -91,37 +117,41 @@ export function setupAuth(app: Express) {
       }
 
       // Create new user with hashed password
-      const hashedPassword = await hashPassword(password);
       const user = await storage.createUser({
         email,
         username,
-        password: hashedPassword,
+        password: await hashPassword(password),
+        isAnonymous: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       });
+
+      // Remove password from response
+      const { password: _, ...userWithoutPassword } = user;
 
       // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
-        return res.status(201).json(user);
+        res.status(201).json(userWithoutPassword);
       });
     } catch (error) {
-      console.error("Registration error:", error);
-      return res.status(500).json({ message: "Registration failed" });
+      next(error);
     }
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: Express.User | false, info: any) => {
-      if (err) {
-        return next(err);
-      }
+    passport.authenticate("local", (err, user, info) => {
+      if (err) return next(err);
       if (!user) {
-        return res.status(401).json({ message: info?.message || "Invalid credentials" });
+        return res.status(401).json({ message: info?.message || "Authentication failed" });
       }
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          return next(loginErr);
-        }
-        return res.json(user);
+      
+      req.login(user, (err) => {
+        if (err) return next(err);
+        
+        // Remove password from response
+        const { password: _, ...userWithoutPassword } = user;
+        res.status(200).json(userWithoutPassword);
       });
     })(req, res, next);
   });
@@ -137,6 +167,9 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ message: "Not authenticated" });
     }
-    res.json(req.user);
+    
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = req.user as SelectUser;
+    res.json(userWithoutPassword);
   });
 }
