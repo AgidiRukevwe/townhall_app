@@ -35,18 +35,22 @@ export function setupAuth(app: Express) {
   const secret = process.env.SESSION_SECRET || 'developmentsecret';
   let sessionStore;
 
-  if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
+  // Check for valid DATABASE_URL or construct one
+  let connectionString;
+  if (process.env.DATABASE_URL && 
+      (process.env.DATABASE_URL.startsWith('postgres://') || process.env.DATABASE_URL.startsWith('postgresql://'))) {
+    connectionString = process.env.DATABASE_URL;
+    console.log("Auth: Using properly formatted DATABASE_URL for session store");
+  } 
+  else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
+    const port = process.env.PGPORT || '5432';
+    connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}`;
+    console.log("Auth: Constructed connection string from PG environment variables");
+  }
+  
+  if (connectionString) {
     // Use PostgreSQL session store with database
     const PostgresStore = connectPg(session);
-    
-    let connectionString;
-    if (process.env.DATABASE_URL) {
-      connectionString = process.env.DATABASE_URL;
-    } else {
-      connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
-    }
-    
-    const client = postgres(connectionString);
     
     // Create a db connection options object
     const dbOptions = {
@@ -57,6 +61,8 @@ export function setupAuth(app: Express) {
       conObject: dbOptions,
       createTableIfMissing: true 
     });
+    
+    console.log("Auth: Using PostgreSQL session store");
   } else {
     // Use in-memory session store for development
     const MemoryStore = session.MemoryStore;

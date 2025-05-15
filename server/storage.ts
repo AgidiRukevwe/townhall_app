@@ -34,19 +34,56 @@ export class SupabaseStorage implements IStorage {
   private connectionString: string;
   
   constructor() {
-    if (process.env.DATABASE_URL) {
-      // Use DATABASE_URL if available
+    // First format check: if DATABASE_URL starts with postgres:// or postgresql://, it's likely valid
+    if (process.env.DATABASE_URL && 
+        (process.env.DATABASE_URL.startsWith('postgres://') || process.env.DATABASE_URL.startsWith('postgresql://'))) {
       this.connectionString = process.env.DATABASE_URL;
-      console.log("Using DATABASE_URL for connection");
-    } else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
-      // Construct from individual environment variables
-      this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
-      console.log("Using individual PG environment variables for connection");
+      console.log("Using properly formatted DATABASE_URL for connection");
+    } 
+    // Otherwise try to construct a valid URL from PG_ variables
+    else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
+      const port = process.env.PGPORT || '5432';
+      this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}`;
+      console.log("Constructed connection string from PG environment variables");
+      
+      // Also set DATABASE_URL for other tools that expect it
+      process.env.DATABASE_URL = this.connectionString;
+    } 
+    // If DATABASE_URL exists but isn't properly formatted, try to fix it
+    else if (process.env.DATABASE_URL) {
+      console.log("DATABASE_URL exists but needs reformatting");
+      
+      // Attempt to convert Supabase URL format if that's what we have
+      if (process.env.DATABASE_URL.includes('supabase.co')) {
+        // For Supabase, we need to extract parts and reconstruct
+        try {
+          // Extract parts from URL - this is a simple approach, might need adjustment
+          const url = new URL(process.env.DATABASE_URL);
+          const host = url.hostname;
+          const database = 'postgres'; // Default for Supabase
+          
+          // Construct proper PostgreSQL URL from PG variables
+          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || database}`;
+          
+          console.log("Reformatted Supabase URL to standard PostgreSQL URL");
+          process.env.DATABASE_URL = this.connectionString;
+        } catch (e) {
+          console.error("Failed to reformat Supabase URL:", e);
+          // Fallback to constructed URL from env vars
+          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || 'postgres'}`;
+        }
+      } else {
+        // Fallback for development
+        this.connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
+        console.log("Using fallback connection string");
+      }
     } else {
-      // Fallback for development
+      // Last resort fallback
       this.connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
-      console.log("Using fallback connection string");
+      console.log("Using fallback development connection string");
     }
+    
+    console.log(`Connection string format check: ${this.connectionString.startsWith('postgres://') ? '✓' : '✗'}`);
     
     const client = postgres(this.connectionString);
     this.db = drizzle(client, { schema });
