@@ -6,8 +6,8 @@ import Home from "./pages/home";
 import Profile from "./pages/profile";
 import AuthPage from "./pages/auth-page";
 import Navbar from "./components/layout/navbar";
-import { AuthProvider, useAuth } from "./hooks/use-auth.tsx";
-import { ProtectedRoute } from "./lib/protected-route.tsx";
+import { AuthProvider } from "./hooks/use-auth.tsx";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
