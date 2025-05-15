@@ -10,7 +10,10 @@ export function ProtectedRoute({
   path: string;
   component: () => React.JSX.Element;
 }) {
-  const { user, isLoading } = useAuth();
+  const auth = useAuth();
+  // Handle both auth implementations (isLoading from username/password auth and loading from anonymous auth)
+  const isLoading = 'isLoading' in auth ? auth.isLoading : ('loading' in auth ? auth.loading : false);
+  const user = auth.user;
 
   if (isLoading) {
     return (

@@ -39,7 +39,11 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
-  const { loginMutation, registerMutation, user } = useAuth();
+  const auth = useAuth();
+  // Handle both auth implementations
+  const user = auth.user;
+  const loginMutation = 'loginMutation' in auth ? auth.loginMutation : undefined;
+  const registerMutation = 'registerMutation' in auth ? auth.registerMutation : undefined;
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
@@ -70,34 +74,50 @@ export default function AuthPage() {
   });
 
   const onLoginSubmit = (data: LoginFormValues) => {
-    loginMutation.mutate(data, {
-      onError: (error) => {
-        toast({
-          title: "Login failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      },
-    });
-  };
-
-  const onRegisterSubmit = (data: RegisterFormValues) => {
-    registerMutation.mutate(
-      {
-        email: data.email,
-        password: data.password,
-        username: data.username,
-      },
-      {
+    if (loginMutation) {
+      loginMutation.mutate(data, {
         onError: (error) => {
           toast({
-            title: "Registration failed",
+            title: "Login failed",
             description: error.message,
             variant: "destructive",
           });
         },
-      }
-    );
+      });
+    } else {
+      toast({
+        title: "Login not available",
+        description: "The login functionality is not currently available.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const onRegisterSubmit = (data: RegisterFormValues) => {
+    if (registerMutation) {
+      registerMutation.mutate(
+        {
+          email: data.email,
+          password: data.password,
+          username: data.username,
+        },
+        {
+          onError: (error) => {
+            toast({
+              title: "Registration failed",
+              description: error.message,
+              variant: "destructive",
+            });
+          },
+        }
+      );
+    } else {
+      toast({
+        title: "Registration not available",
+        description: "The registration functionality is not currently available.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
