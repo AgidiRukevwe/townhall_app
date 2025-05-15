@@ -120,11 +120,15 @@ export function setupAuth(app: Express) {
     try {
       const user = await storage.getUserById(id);
       if (!user) {
-        return done(new Error('User not found'));
+        // Instead of generating an error, just return null
+        // This prevents error logs from filling up
+        return done(null, null);
       }
       done(null, user);
     } catch (error) {
-      done(error);
+      // Log the error but don't throw it
+      console.error("Error deserializing user:", error);
+      done(null, null);
     }
   });
 
