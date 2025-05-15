@@ -8,6 +8,22 @@ import { setupAuth } from "./auth";
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
   setupAuth(app);
+  
+  // Test endpoint for database connection
+  app.get('/api/db-test', async (req, res) => {
+    try {
+      // Just a ping to check database connectivity
+      await storage.checkDatabaseConnection();
+      res.json({ success: true, message: 'Database connection successful' });
+    } catch (error) {
+      console.error('Database connection test failed:', error);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Database connection failed',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
   // Officials routes
   app.get("/api/officials", async (req, res) => {
     try {

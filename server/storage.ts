@@ -14,6 +14,9 @@ import postgres from "postgres";
 import * as schema from "../shared/schema";
 
 export interface IStorage {
+  // Database utilities
+  checkDatabaseConnection(): Promise<boolean>;
+  
   // User methods
   getUserById(id: string): Promise<SelectUser | undefined>;
   getUserByEmail(email: string): Promise<SelectUser | undefined>;
@@ -28,26 +31,39 @@ export interface IStorage {
 
 export class SupabaseStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
+  private connectionString: string;
   
   constructor() {
-    let connectionString;
-    
     if (process.env.DATABASE_URL) {
       // Use DATABASE_URL if available
-      connectionString = process.env.DATABASE_URL;
+      this.connectionString = process.env.DATABASE_URL;
       console.log("Using DATABASE_URL for connection");
     } else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
       // Construct from individual environment variables
-      connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
+      this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
       console.log("Using individual PG environment variables for connection");
     } else {
       // Fallback for development
-      connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
+      this.connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
       console.log("Using fallback connection string");
     }
     
-    const client = postgres(connectionString);
+    const client = postgres(this.connectionString);
     this.db = drizzle(client, { schema });
+  }
+  
+  // Database utilities
+  async checkDatabaseConnection(): Promise<boolean> {
+    try {
+      // Use the existing db client to run a query through Drizzle
+      const result = await this.db.execute(sql`SELECT 1 as connected`);
+      
+      console.log("✅ Database connection test successful");
+      return true;
+    } catch (error) {
+      console.error("❌ Database connection test failed:", error);
+      throw error;
+    }
   }
   
   // User methods
@@ -335,6 +351,13 @@ export class SupabaseStorage implements IStorage {
 // In-memory fallback for development
 export class MemStorage implements IStorage {
   private users: SelectUser[] = [];
+  
+  // Database utilities
+  async checkDatabaseConnection(): Promise<boolean> {
+    // In-memory storage - no database to check
+    console.log("✅ Using in-memory storage, no database connection needed");
+    return true;
+  }
   
   // User methods
   async getUserById(id: string): Promise<SelectUser | undefined> {
