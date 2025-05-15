@@ -66,6 +66,18 @@ export default function RegisterPage() {
           password: data.password,
         },
         {
+          onSuccess: (user) => {
+            toast({
+              title: "Registration successful",
+              description: "Your account has been created. Redirecting to home page...",
+              variant: "default",
+            });
+            
+            // Add a small delay before redirecting to ensure toast is seen
+            setTimeout(() => {
+              navigate("/");
+            }, 1500);
+          },
           onError: (error) => {
             toast({
               title: "Registration failed",

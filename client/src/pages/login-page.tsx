@@ -53,6 +53,18 @@ export default function LoginPage() {
   const onSubmit = (data: LoginFormValues) => {
     if (loginMutation) {
       loginMutation.mutate(data, {
+        onSuccess: (user) => {
+          toast({
+            title: "Login successful",
+            description: "Welcome back! Redirecting to home page...",
+            variant: "default",
+          });
+          
+          // Add a small delay before redirecting to ensure toast is seen
+          setTimeout(() => {
+            navigate("/");
+          }, 1500);
+        },
         onError: (error) => {
           toast({
             title: "Login failed",
