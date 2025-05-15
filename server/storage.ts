@@ -321,6 +321,28 @@ export class SupabaseStorage implements IStorage {
 // In-memory fallback for development
 export class MemStorage implements IStorage {
   private users: SelectUser[] = [];
+  
+  // User methods
+  async getUserById(id: string): Promise<SelectUser | undefined> {
+    return this.users.find(user => user.id === id);
+  }
+  
+  async getUserByEmail(email: string): Promise<SelectUser | undefined> {
+    return this.users.find(user => user.email === email);
+  }
+  
+  async createUser(userData: InsertUser): Promise<SelectUser> {
+    const newUser: SelectUser = {
+      id: crypto.randomUUID(),
+      ...userData,
+      isAnonymous: userData.isAnonymous || false,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    this.users.push(newUser);
+    return newUser;
+  }
+  
   private officials: Official[] = [
     {
       id: "1",

@@ -1,13 +1,13 @@
 import { Switch, Route } from "wouter";
-import { queryClient } from "./lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
-import { useEffect } from "react";
-import { useAuthStore } from "./store/auth-store";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
+import AuthPage from "./pages/auth-page";
 import Navbar from "./components/layout/navbar";
+import { AuthProvider, useAuth } from "./hooks/use-auth.tsx";
+import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
   return (
@@ -16,6 +16,7 @@ function Router() {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/profile/:id" component={Profile} />
+        <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
     </div>
@@ -23,16 +24,12 @@ function Router() {
 }
 
 function App() {
-  const { initialize } = useAuthStore();
-
-  useEffect(() => {
-    initialize();
-  }, [initialize]);
-
   return (
     <TooltipProvider>
-      <Toaster />
-      <Router />
+      <AuthProvider>
+        <Toaster />
+        <Router />
+      </AuthProvider>
     </TooltipProvider>
   );
 }
