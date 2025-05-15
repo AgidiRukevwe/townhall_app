@@ -39,13 +39,18 @@ export function setupAuth(app: Express) {
   let connectionString;
   if (process.env.DATABASE_URL && 
       (process.env.DATABASE_URL.startsWith('postgres://') || process.env.DATABASE_URL.startsWith('postgresql://'))) {
-    connectionString = process.env.DATABASE_URL;
-    console.log("Auth: Using properly formatted DATABASE_URL for session store");
+    // Make sure the URL includes SSL mode if it doesn't already have it
+    if (!process.env.DATABASE_URL.includes('sslmode=')) {
+      connectionString = process.env.DATABASE_URL + '?sslmode=require';
+    } else {
+      connectionString = process.env.DATABASE_URL;
+    }
+    console.log("Auth: Using properly formatted DATABASE_URL for session store with SSL enabled");
   } 
   else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
     const port = process.env.PGPORT || '5432';
-    connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}`;
-    console.log("Auth: Constructed connection string from PG environment variables");
+    connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=require`;
+    console.log("Auth: Constructed connection string from PG environment variables with SSL enabled");
   }
   
   if (connectionString) {

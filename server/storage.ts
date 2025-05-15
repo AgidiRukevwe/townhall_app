@@ -37,14 +37,19 @@ export class SupabaseStorage implements IStorage {
     // First format check: if DATABASE_URL starts with postgres:// or postgresql://, it's likely valid
     if (process.env.DATABASE_URL && 
         (process.env.DATABASE_URL.startsWith('postgres://') || process.env.DATABASE_URL.startsWith('postgresql://'))) {
-      this.connectionString = process.env.DATABASE_URL;
-      console.log("Using properly formatted DATABASE_URL for connection");
+      // Make sure the URL includes SSL mode if it doesn't already have it
+      if (!process.env.DATABASE_URL.includes('sslmode=')) {
+        this.connectionString = process.env.DATABASE_URL + '?sslmode=require';
+      } else {
+        this.connectionString = process.env.DATABASE_URL;
+      }
+      console.log("Using properly formatted DATABASE_URL for connection with SSL enabled");
     } 
     // Otherwise try to construct a valid URL from PG_ variables
     else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
       const port = process.env.PGPORT || '5432';
-      this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}`;
-      console.log("Constructed connection string from PG environment variables");
+      this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=require`;
+      console.log("Constructed connection string from PG environment variables with SSL enabled");
       
       // Also set DATABASE_URL for other tools that expect it
       process.env.DATABASE_URL = this.connectionString;
@@ -62,20 +67,20 @@ export class SupabaseStorage implements IStorage {
           const host = url.hostname;
           const database = 'postgres'; // Default for Supabase
           
-          // Construct proper PostgreSQL URL from PG variables
-          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || database}`;
+          // Construct proper PostgreSQL URL from PG variables with SSL enabled
+          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || database}?sslmode=require`;
           
-          console.log("Reformatted Supabase URL to standard PostgreSQL URL");
+          console.log("Reformatted Supabase URL to standard PostgreSQL URL with SSL enabled");
           process.env.DATABASE_URL = this.connectionString;
         } catch (e) {
           console.error("Failed to reformat Supabase URL:", e);
-          // Fallback to constructed URL from env vars
-          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || 'postgres'}`;
+          // Fallback to constructed URL from env vars with SSL enabled
+          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || 'postgres'}?sslmode=require`;
         }
       } else {
-        // Fallback for development
+        // Fallback for development - local development doesn't need SSL
         this.connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
-        console.log("Using fallback connection string");
+        console.log("Using fallback connection string for local development");
       }
     } else {
       // Last resort fallback
