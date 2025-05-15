@@ -35,14 +35,26 @@ export function setupAuth(app: Express) {
   const secret = process.env.SESSION_SECRET || 'developmentsecret';
   let sessionStore;
 
-  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
-    // Use PostgreSQL session store in production
+  if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
+    // Use PostgreSQL session store with database
     const PostgresStore = connectPg(session);
-    const connectionString = process.env.DATABASE_URL;
+    
+    let connectionString;
+    if (process.env.DATABASE_URL) {
+      connectionString = process.env.DATABASE_URL;
+    } else {
+      connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
+    }
+    
     const client = postgres(connectionString);
     
+    // Create a db connection options object
+    const dbOptions = {
+      connectionString: connectionString
+    };
+    
     sessionStore = new PostgresStore({ 
-      pool: client,
+      conObject: dbOptions,
       createTableIfMissing: true 
     });
   } else {

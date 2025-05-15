@@ -30,8 +30,22 @@ export class SupabaseStorage implements IStorage {
   private db: ReturnType<typeof drizzle>;
   
   constructor() {
-    // Connect to PostgreSQL via connection string from Supabase
-    const connectionString = process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/postgres';
+    let connectionString;
+    
+    if (process.env.DATABASE_URL) {
+      // Use DATABASE_URL if available
+      connectionString = process.env.DATABASE_URL;
+      console.log("Using DATABASE_URL for connection");
+    } else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
+      // Construct from individual environment variables
+      connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT}/${process.env.PGDATABASE}`;
+      console.log("Using individual PG environment variables for connection");
+    } else {
+      // Fallback for development
+      connectionString = 'postgres://postgres:postgres@localhost:5432/postgres';
+      console.log("Using fallback connection string");
+    }
+    
     const client = postgres(connectionString);
     this.db = drizzle(client, { schema });
   }
