@@ -14,8 +14,8 @@ function Router() {
     <div className="flex flex-col min-h-screen">
       <Navbar />
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/profile/:id" component={Profile} />
+        <ProtectedRoute path="/" component={Home} />
+        <ProtectedRoute path="/profile/:id" component={Profile} />
         <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
