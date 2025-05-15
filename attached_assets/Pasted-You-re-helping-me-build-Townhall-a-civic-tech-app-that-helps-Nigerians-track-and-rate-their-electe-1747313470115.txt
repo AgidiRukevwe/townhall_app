@@ -1,0 +1,142 @@
+You're helping me build Townhall — a civic tech app that helps Nigerians track and rate their elected officials.
+
+I'm building solo, handling design and code, and I want you to help scaffold and implement the app based on what I’ve built so far.
+
+🧠 Goal:
+To test if Nigerians will engage with a fast, transparent, anonymous tool to hold elected officials accountable, by letting them:
+
+Rate officials by performance (overall & sectoral)
+
+Track sentiment over time
+
+Search and view basic info on who represents them
+
+📦 What I have:
+React frontend (use standard React)
+
+UI screens (I'll upload them)
+
+A Supabase DB already seeded with:
+
+Senators
+
+House of Representatives
+
+(Will add Governors, LGAs, etc. later)
+
+Each leader already has:
+
+name, office, constituency, state, party, term, start_year, gender, career_history, education_history
+
+✅ MVP Features:
+Authentication
+
+Anonymous login only (via Supabase)
+
+No email/password
+
+Use device fingerprinting + IP for lightweight integrity
+
+Rate Officials
+
+One modal, two steps:
+
+Step 1: Overall sentiment: 👍🏽 Positive / 😐 Neutral / 👎🏽 Negative
+
+Step 2: Rate by sectors (unique per office)
+e.g. Senators get: Lawmaking, Oversight, Constituency Projects
+Governors get: Education, Security, Infrastructure, Economy, Health, etc.
+
+Store each rating tied to:
+
+Leader ID
+
+Timestamp
+
+Device/user fingerprint
+
+View Public Sentiment
+
+Show aggregated ratings over time
+
+Show breakdown by sector
+
+Display weekly/monthly change indicators
+
+Leader Profile
+
+Display:
+
+Name, Office, State/Constituency, Party, Gender, Term (e.g. First Term)
+
+Career History
+
+Education History
+
+Sentiment breakdown below
+
+Search + Location Lookup
+
+“Who represents me?”: User inputs state or LGA, gets their officials
+
+🧰 Tech Stack:
+Frontend: React
+
+State Management: Zustand
+
+Data Fetching: React Query
+
+Backend: Supabase
+
+Database: Supabase Postgres
+
+Use the following credentials:
+
+Supabase URL: https://your-supabase-url.supabase.co
+
+Supabase anon key: your-anon-key-goes-here
+
+🧩 Not in MVP (but plan to add later):
+Petitions and leader responses
+
+Profile view & rating history
+
+Full NIN/BVN verification
+
+Email/password login
+
+Career validation via public data
+
+🧭 Flow:
+Anonymous onboarding
+
+User searches leaders or enters location
+
+Views a leader’s profile
+
+Taps “Rate”
+
+Modal step 1: Overall sentiment
+
+Modal step 2: Rate by sector
+
+Rating saved, sentiment updates
+
+User can explore other profiles or return later
+
+💡 What I want from you:
+Scaffold the project with React, Zustand, React Query
+
+Connect Supabase (auth + DB)
+
+Create the 2-step rating modal
+
+Pull data from DB (including education/career history)
+
+Create profile, sentiment chart components
+
+Add caching via React Query
+
+Allow future modular feature additions
+
+Let me know what else you need to get started.
