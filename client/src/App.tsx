@@ -19,7 +19,11 @@ function Router() {
         <ProtectedRoute path="/profile/:id" component={Profile} />
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
-        <Route path="/auth" component={LoginPage} />
+        <Route path="/auth">
+          <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+            <LoginPage />
+          </div>
+        </Route>
         <Route component={NotFound} />
       </Switch>
     </div>

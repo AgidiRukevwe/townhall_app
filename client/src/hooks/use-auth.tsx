@@ -66,8 +66,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: `Welcome back, ${user.username}!`,
       });
       
-      // Force a refetch of the user data
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Force a refetch of the user data and redirect to home page
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] })
+        .then(() => {
+          // Use browser navigation after a short delay
+          setTimeout(() => {
+            console.log("Forcing redirect to home page from auth hook...");
+            window.location.href = '/';
+          }, 500);
+        });
     },
     onError: (error: Error) => {
       console.error("Login error:", error);
@@ -95,8 +102,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         description: `Welcome to Townhall, ${user.username}!`,
       });
       
-      // Force a refetch of the user data
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+      // Force a refetch of the user data and redirect to home page
+      queryClient.invalidateQueries({ queryKey: ["/api/user"] })
+        .then(() => {
+          // Use browser navigation after a short delay
+          setTimeout(() => {
+            console.log("Forcing redirect to home page from auth hook...");
+            window.location.href = '/';
+          }, 500);
+        });
     },
     onError: (error: Error) => {
       console.error("Registration error:", error);
