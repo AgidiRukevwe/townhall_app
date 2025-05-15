@@ -1,3 +1,4 @@
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -37,11 +38,13 @@ export default function RegisterPage() {
   // Get user safely
   const user = auth?.user || null;
   
-  // If user is already logged in, redirect to home
-  if (user) {
-    navigate("/");
-    return null;
-  }
+  // We'll use an effect for navigation to avoid React hook rules violation
+  React.useEffect(() => {
+    // If user is already logged in, redirect to home
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   // Check for mutations in auth object safely
   const registerMutation = auth && 'registerMutation' in auth ? auth.registerMutation : null;
