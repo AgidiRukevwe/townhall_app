@@ -117,10 +117,17 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
       
       {/* Officials grid */}
       {sortedOfficials.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedOfficials.map(official => (
-            <OfficialCard key={official.id} official={official} />
-          ))}
+        <div>
+          <div className="mb-4">
+            <p className="text-green-600 font-bold">Debug: Found {sortedOfficials.length} officials to display</p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {sortedOfficials.map((official, index) => (
+              <div key={official.id || index}>
+                <OfficialCard official={official} />
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="flex justify-center py-12">
