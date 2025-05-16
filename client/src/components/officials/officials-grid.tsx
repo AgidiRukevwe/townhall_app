@@ -1,6 +1,6 @@
 import { OfficialCard } from "./official-card";
 import { Official } from "@shared/schema";
-import { Filter, SortAsc } from "lucide-react";
+import { Filter, SortAsc, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Select, 
@@ -30,7 +30,9 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
   // Filter officials based on location
   const filteredOfficials = locationFilter === "all" 
     ? officials 
-    : officials.filter(official => official.location === locationFilter);
+    : officials.filter(official => 
+        official.location && official.location.toLowerCase() === locationFilter.toLowerCase()
+      );
   
   // Sort officials based on sortBy value
   const sortedOfficials = [...filteredOfficials].sort((a, b) => {
@@ -38,21 +40,33 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
       case "name":
         return a.name.localeCompare(b.name);
       case "rating-high":
-        return b.approvalRating - a.approvalRating;
+        return (b.approvalRating || 0) - (a.approvalRating || 0);
       case "rating-low":
-        return a.approvalRating - b.approvalRating;
+        return (a.approvalRating || 0) - (b.approvalRating || 0);
       default:
         return 0; // Default sort from API
     }
   });
   
-  // Get unique locations for filtering
-  const locations = ["all", ...new Set(officials.map(official => official.location))];
+  // Get unique locations for filtering (filter out undefined/null values)
+  const availableLocations = officials
+    .map(official => official.location)
+    .filter((location): location is string => !!location);
+  
+  // Create unique locations array manually to avoid Set iteration issues
+  const uniqueLocations: string[] = [];
+  availableLocations.forEach(location => {
+    if (!uniqueLocations.includes(location)) {
+      uniqueLocations.push(location);
+    }
+  });
+  
+  const locations = ["all", ...uniqueLocations];
   
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
-        <p>Loading officials...</p>
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -96,7 +110,7 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
       
       {/* Officials grid */}
       {sortedOfficials.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sortedOfficials.map(official => (
             <OfficialCard key={official.id} official={official} />
           ))}
