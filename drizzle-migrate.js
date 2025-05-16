@@ -3,8 +3,19 @@ import 'dotenv/config';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 
-// Connection string for Supabase
-const connectionString = `postgresql://postgres:${process.env.SUPABASE_DB_PASSWORD}@db.buenrbnwgxewfqvwovta.supabase.co:5432/postgres?sslmode=require`;
+// Use the same connection string as the app
+// Use environment variables that are already properly set up
+const host = process.env.PGHOST || 'ep-hidden-wildflower-a6jptslg.us-west-2.aws.neon.tech';
+const user = process.env.PGUSER || 'neondb_owner';
+const database = process.env.PGDATABASE || 'neondb';
+const port = process.env.PGPORT || '5432';
+const password = process.env.PGPASSWORD || process.env.SUPABASE_DB_PASSWORD;
+
+if (!password) {
+  throw new Error('Database password is required but not found in environment variables');
+}
+
+const connectionString = `postgres://${user}:${password}@${host}:${port}/${database}?sslmode=require`;
 
 async function runMigration() {
   console.log('Starting database migration...');
