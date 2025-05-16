@@ -23,11 +23,18 @@ export function useOfficials(filters?: { location?: string; category?: string })
         url.searchParams.append('search', searchQuery);
       }
       
+      console.log("Fetching officials from:", url.toString());
       const res = await apiRequest('GET', url.toString());
       const data = await res.json();
+      console.log("Officials data received:", data);
       return data as Official[];
     },
   });
+
+  // Add some debugging to check if we have officials data
+  console.log("Officials hook data:", data);
+  console.log("Officials loading state:", isLoading);
+  console.log("Officials error state:", error);
 
   return { 
     officials: data || [], 

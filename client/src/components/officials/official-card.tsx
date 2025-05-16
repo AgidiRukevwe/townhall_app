@@ -8,19 +8,45 @@ interface OfficialCardProps {
 }
 
 export function OfficialCard({ official }: OfficialCardProps) {
+  if (!official) {
+    console.error("Official card received null or undefined official");
+    return null;
+  }
+  
+  console.log("OfficialCard - Rendering official:", official.name);
+  
   const approvalTrend = official.approvalTrend || 0;
   
-  // Default image placeholder if no image URL is available
-  const placeholderImage = "https://img.freepik.com/free-vector/illustration-user-avatar-icon_53876-5907.jpg";
+  // Fix for Wikipedia URLs that aren't direct image links
+  const getValidImageUrl = (url: string | null) => {
+    if (!url) return null;
+    if (url.includes('wikipedia.org') && !url.endsWith('.jpg') && !url.endsWith('.png')) {
+      // This is a fallback placeholder as Wikipedia URLs need special handling
+      return "https://via.placeholder.com/400x600";
+    }
+    return url;
+  };
+  
+  const validImageUrl = getValidImageUrl(official.imageUrl);
   
   return (
-    <Card className="overflow-hidden transition-shadow duration-300 hover:shadow-md">
+    <Card className="overflow-hidden transition-shadow duration-300 hover:shadow-md border border-gray-200">
       <div className="relative">
-        {official.imageUrl ? (
+        {validImageUrl ? (
           <img 
-            src={official.imageUrl} 
+            src={validImageUrl} 
             alt={official.name} 
             className="w-full h-48 object-cover"
+            onError={(e) => {
+              // If image fails to load, replace with user icon
+              console.log(`Image failed to load for ${official.name}`);
+              e.currentTarget.style.display = 'none';
+              const parent = e.currentTarget.parentElement;
+              if (parent) {
+                parent.classList.add('bg-gray-100', 'flex', 'items-center', 'justify-center');
+                parent.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-16 w-16 text-gray-400"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>';
+              }
+            }}
           />
         ) : (
           <div className="w-full h-48 bg-gray-100 flex items-center justify-center">

@@ -27,12 +27,17 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
   const [locationFilter, setLocationFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("default");
   
+  console.log("OfficialsGrid Component - Officials received:", officials);
+  console.log("OfficialsGrid Component - Officials count:", officials.length);
+  
   // Filter officials based on location
   const filteredOfficials = locationFilter === "all" 
     ? officials 
     : officials.filter(official => 
         official.location && official.location.toLowerCase() === locationFilter.toLowerCase()
       );
+  
+  console.log("OfficialsGrid Component - Filtered officials:", filteredOfficials);
   
   // Sort officials based on sortBy value
   const sortedOfficials = [...filteredOfficials].sort((a, b) => {
@@ -47,6 +52,8 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
         return 0; // Default sort from API
     }
   });
+  
+  console.log("OfficialsGrid Component - Sorted officials:", sortedOfficials);
   
   // Get unique locations for filtering (filter out undefined/null values)
   const availableLocations = officials

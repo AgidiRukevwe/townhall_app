@@ -10,26 +10,30 @@ export default function Home() {
   const { officials, isLoading, error } = useOfficials();
   const { user } = useAuth();
   // Get username or use default
-  const userName = user && 'username' in user ? user.username : "Citizen";
+  const userName: string = user && user !== null && typeof user === 'object' && 'username' in user ? 
+    (user.username as string) : "Citizen";
 
   // Get search params
   const searchParams = new URLSearchParams(window.location.search);
   const searchQuery = searchParams.get("search");
 
+  console.log("Home component officials:", officials);
+  console.log("Home component officials count:", officials.length);
+
   // Filter officials based on search query
   const filteredOfficials = searchQuery
     ? officials.filter(
         (official) =>
-          official.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          official.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          official.location.toLowerCase().includes(searchQuery.toLowerCase())
+          official.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          official.position?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (official.location && official.location.toLowerCase().includes(searchQuery.toLowerCase()))
       )
     : officials;
 
   if (error) {
     return (
       <div className="flex justify-center py-12">
-        <p className="text-red-500">Error loading officials: {error.toString()}</p>
+        <p className="text-red-500">Error loading officials: {error instanceof Error ? error.message : String(error)}</p>
       </div>
     );
   }
@@ -39,7 +43,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold mb-1">
-            Welcome {userName} <span className="inline-block">👋</span>
+            Welcome {typeof userName === 'string' ? userName : 'Citizen'} <span className="inline-block">👋</span>
           </h2>
           <p className="text-gray-600">Meet the People Who Represent You</p>
         </div>
