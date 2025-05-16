@@ -23,18 +23,23 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Officials Table
-export const officials = pgTable("officials", {
+// Leaders Table (replacing Officials)
+export const leaders = pgTable("leaders", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
-  position: text("position").notNull(),
-  location: text("location").notNull(),
+  avatarUrl: text("avatar_url"),
+  office: text("office").notNull(), // role/position
   party: text("party"),
-  gender: text("gender"),
-  term: text("term"),
-  imageUrl: text("image_url"),
-  approvalRating: integer("approval_rating").default(50),
-  approvalTrend: integer("approval_trend").default(0),
+  chamber: text("chamber"),
+  jurisdiction: text("jurisdiction"),
+  dob: text("dob"),
+  targetAchievements: text("target_achievements"),
+  phone: text("phone"),
+  email: text("email"),
+  parliamentAddress: text("parliament_address"),
+  education: text("education"),
+  awards: text("awards"),
+  career: text("career"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -44,16 +49,15 @@ export const sectors = pgTable("sectors", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   color: text("color").default("blue"),
-  officialId: uuid("official_id").references(() => officials.id),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Ratings Table
 export const ratings = pgTable("ratings", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: uuid("user_id").notNull().references(() => users.id),
-  officialId: uuid("official_id").references(() => officials.id),
-  overallRating: integer("overall_rating").notNull(),
+  leaderId: uuid("leader_id").notNull().references(() => leaders.id),
+  sectorId: uuid("sector_id").notNull().references(() => sectors.id),
+  rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -66,31 +70,20 @@ export const sectorRatings = pgTable("sector_ratings", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Elections Table
-export const elections = pgTable("elections", {
+// Offices Table (replaces Elections)
+export const offices = pgTable("offices", {
   id: uuid("id").primaryKey().defaultRandom(),
-  officialId: uuid("official_id").references(() => officials.id),
-  year: integer("year").notNull(),
-  type: text("type").notNull(),
-  party: text("party").notNull(),
-  position: text("position").notNull(),
-  result: text("result").notNull(),
+  name: text("name").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Career History Table
-export const careers = pgTable("careers", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  officialId: uuid("official_id").references(() => officials.id),
-  position: text("position").notNull(),
-  party: text("party"),
-  location: text("location"),
-  startYear: integer("start_year").notNull(),
-  endYear: integer("end_year"),
-  createdAt: timestamp("created_at").defaultNow(),
+// Office Sectors Table (replacing careers)
+export const officeSectors = pgTable("office_sectors", {
+  officeId: uuid("office_id").references(() => offices.id),
+  sectorId: uuid("sector_id").references(() => sectors.id),
 });
 
-// Petitions Table
+// Petitions Table - maintain for future implementation
 export const petitions = pgTable("petitions", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title").notNull(),
@@ -98,7 +91,7 @@ export const petitions = pgTable("petitions", {
   location: text("location"),
   category: text("category"),
   userId: uuid("user_id").notNull().references(() => users.id),
-  officialId: uuid("official_id").references(() => officials.id),
+  leaderId: uuid("leader_id").references(() => leaders.id),
   signatureCount: integer("signature_count").default(0),
   status: text("status").default("pending"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -108,12 +101,12 @@ export const petitions = pgTable("petitions", {
 // Zod Schemas
 export const userSchema = createInsertSchema(users);
 export const userProfileSchema = createInsertSchema(userProfiles);
-export const officialSchema = createInsertSchema(officials);
+export const leaderSchema = createInsertSchema(leaders);
 export const sectorSchema = createInsertSchema(sectors);
 export const ratingSchema = createInsertSchema(ratings);
 export const sectorRatingSchema = createInsertSchema(sectorRatings);
-export const electionSchema = createInsertSchema(elections);
-export const careerSchema = createInsertSchema(careers);
+export const officeSchema = createInsertSchema(offices);
+export const officeSectorSchema = createInsertSchema(officeSectors);
 export const petitionSchema = createInsertSchema(petitions);
 
 // Type definitions
@@ -123,12 +116,8 @@ export type InsertUser = z.infer<typeof userSchema>;
 export type UserProfile = typeof userProfiles.$inferSelect;
 export type InsertUserProfile = z.infer<typeof userProfileSchema>;
 
-export type Official = typeof officials.$inferSelect & {
-  sectors: Sector[];
-  electionHistory: Election[];
-  careerHistory: Career[];
-};
-export type InsertOfficial = z.infer<typeof officialSchema>;
+export type Leader = typeof leaders.$inferSelect;
+export type InsertLeader = z.infer<typeof leaderSchema>;
 
 export type Sector = typeof sectors.$inferSelect;
 export type InsertSector = z.infer<typeof sectorSchema>;
@@ -139,11 +128,11 @@ export type InsertRating = z.infer<typeof ratingSchema>;
 export type SectorRating = typeof sectorRatings.$inferSelect;
 export type InsertSectorRating = z.infer<typeof sectorRatingSchema>;
 
-export type Election = typeof elections.$inferSelect;
-export type InsertElection = z.infer<typeof electionSchema>;
+export type Office = typeof offices.$inferSelect;
+export type InsertOffice = z.infer<typeof officeSchema>;
 
-export type Career = typeof careers.$inferSelect;
-export type InsertCareer = z.infer<typeof careerSchema>;
+export type OfficeSector = typeof officeSectors.$inferSelect;
+export type InsertOfficeSector = z.infer<typeof officeSectorSchema>;
 
 export type Petition = typeof petitions.$inferSelect;
 export type InsertPetition = z.infer<typeof petitionSchema>;

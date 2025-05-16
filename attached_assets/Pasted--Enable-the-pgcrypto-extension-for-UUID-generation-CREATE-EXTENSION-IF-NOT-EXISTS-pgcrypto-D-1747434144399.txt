@@ -1,0 +1,110 @@
+
+-- Enable the pgcrypto extension for UUID generation
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Drop existing tables if they exist
+DROP TABLE IF EXISTS ratings CASCADE;
+DROP TABLE IF EXISTS role_sectors CASCADE;
+DROP TABLE IF EXISTS sectors CASCADE;
+DROP TABLE IF EXISTS roles CASCADE;
+DROP TABLE IF EXISTS awards CASCADE;
+DROP TABLE IF EXISTS career CASCADE;
+DROP TABLE IF EXISTS education CASCADE;
+DROP TABLE IF EXISTS leaders CASCADE;
+
+-- Create leaders table
+CREATE TABLE IF NOT EXISTS leaders (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  avatar_url TEXT,
+  office TEXT NOT NULL,
+  party TEXT,
+  chamber TEXT,
+  jurisdiction TEXT,
+  dob TEXT,
+  target_achievements TEXT,
+  phone TEXT,
+  email TEXT,
+  parliament_address TEXT,
+  education JSONB DEFAULT '[]'::jsonb,
+  awards JSONB DEFAULT '[]'::jsonb,
+  career JSONB DEFAULT '[]'::jsonb,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Create offices table (formerly roles)
+CREATE TABLE IF NOT EXISTS offices (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Create sectors table
+CREATE TABLE IF NOT EXISTS sectors (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL
+);
+
+-- Create office_sectors mapping (formerly role_sectors)
+CREATE TABLE IF NOT EXISTS office_sectors (
+  office_id UUID REFERENCES offices(id),
+  sector_id UUID REFERENCES sectors(id),
+  PRIMARY KEY (office_id, sector_id)
+);
+
+-- Create ratings table
+CREATE TABLE IF NOT EXISTS ratings (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  leader_id UUID REFERENCES leaders(id) ON DELETE CASCADE,
+  sector_id UUID REFERENCES sectors(id) ON DELETE CASCADE,
+  rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW()) NOT NULL,
+  UNIQUE(leader_id, sector_id)
+);
+
+-- Insert common offices
+INSERT INTO offices (name) VALUES 
+  ('Senator'),
+  ('Governor'),
+  ('House Member'),
+  ('Local Government Chairman')
+ON CONFLICT (name) DO NOTHING;
+
+-- Insert sectors
+INSERT INTO sectors (name) VALUES 
+  ('Health'),
+  ('Education'),
+  ('Infrastructure'),
+  ('Economy'),
+  ('Security'),
+  ('Agriculture'),
+  ('Technology'),
+  ('Environment'),
+  ('Transportation')
+ON CONFLICT (name) DO NOTHING;
+
+-- Map sectors to offices
+INSERT INTO office_sectors (office_id, sector_id)
+SELECT o.id, s.id
+FROM offices o, sectors s
+WHERE 
+  (o.name = 'Senator' AND s.name IN ('Health', 'Education', 'Infrastructure', 'Security', 'Economy')) OR
+  (o.name = 'Governor' AND s.name IN ('Health', 'Education', 'Infrastructure', 'Security', 'Economy', 'Agriculture', 'Transportation')) OR
+  (o.name = 'House Member' AND s.name IN ('Health', 'Education', 'Infrastructure', 'Security', 'Economy')) OR
+  (o.name = 'Local Government Chairman' AND s.name IN ('Health', 'Education', 'Infrastructure', 'Security', 'Environment'));
+
+-- Enable Row Level Security
+ALTER TABLE leaders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE offices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE sectors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE office_sectors ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ratings ENABLE ROW LEVEL SECURITY;
+
+-- Create policies
+CREATE POLICY "Enable read access for all users" ON leaders FOR SELECT USING (true);
+CREATE POLICY "Enable read access for all users" ON offices FOR SELECT USING (true);
+CREATE POLICY "Enable read access for all users" ON sectors FOR SELECT USING (true);
+CREATE POLICY "Enable read access for all users" ON office_sectors FOR SELECT USING (true);
+CREATE POLICY "Enable read access for all users" ON ratings FOR SELECT USING (true);
