@@ -61,22 +61,20 @@ export class SupabaseStorage implements IStorage {
       
       // Attempt to convert Supabase URL format if that's what we have
       if (process.env.DATABASE_URL.includes('supabase.co')) {
-        // For Supabase, we need to extract parts and reconstruct
-        try {
-          // Extract parts from URL - this is a simple approach, might need adjustment
-          const url = new URL(process.env.DATABASE_URL);
-          const host = url.hostname;
-          const database = 'postgres'; // Default for Supabase
+        console.log("Auth: Detected Supabase URL, ensuring proper connection format");
+        
+        // For Supabase, we should use the PG environment variables which are properly set
+        if (process.env.PGUSER && process.env.PGPASSWORD && process.env.PGHOST && process.env.PGDATABASE) {
+          const port = process.env.PGPORT || '5432';
+          // Use the direct connection variables which are properly formatted for Supabase
+          this.connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=require`;
           
-          // Construct proper PostgreSQL URL from PG variables with SSL enabled
-          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || database}?sslmode=require`;
-          
-          console.log("Reformatted Supabase URL to standard PostgreSQL URL with SSL enabled");
+          console.log("Auth: Using properly formatted Supabase connection with SSL enabled");
+          // Also set DATABASE_URL for other tools that expect it
           process.env.DATABASE_URL = this.connectionString;
-        } catch (e) {
-          console.error("Failed to reformat Supabase URL:", e);
-          // Fallback to constructed URL from env vars with SSL enabled
-          this.connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${process.env.PGPORT || '5432'}/${process.env.PGDATABASE || 'postgres'}?sslmode=require`;
+        } else {
+          console.error("Auth: Missing required Supabase connection environment variables");
+          throw new Error("Missing required Supabase connection environment variables");
         }
       } else {
         // Fallback for development - local development doesn't need SSL
