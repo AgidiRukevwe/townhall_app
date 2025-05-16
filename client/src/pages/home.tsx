@@ -1,5 +1,6 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { OfficialsGrid } from "@/components/officials/officials-grid";
+import { SimpleOfficialsList } from "@/components/officials/simple-officials-list";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { useEffect, useState } from "react";
@@ -73,7 +74,9 @@ export default function Home() {
             {isLoading ? (
               <Loading />
             ) : (
-              <OfficialsGrid officials={filteredOfficials} isLoading={isLoading} />
+              <div>
+                <SimpleOfficialsList officials={filteredOfficials} isLoading={isLoading} />
+              </div>
             )}
           </TabsContent>
 
