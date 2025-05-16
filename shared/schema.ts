@@ -1,4 +1,4 @@
-import { pgTable, text, uuid, integer, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, uuid, integer, timestamp, boolean, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -23,12 +23,12 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Leaders Table (replacing Officials)
+// Leaders Table (from SQL file)
 export const leaders = pgTable("leaders", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
-  office: text("office").notNull(), // role/position
+  office: text("office").notNull(),
   party: text("party"),
   chamber: text("chamber"),
   jurisdiction: text("jurisdiction"),
@@ -37,9 +37,9 @@ export const leaders = pgTable("leaders", {
   phone: text("phone"),
   email: text("email"),
   parliamentAddress: text("parliament_address"),
-  education: text("education"),
-  awards: text("awards"),
-  career: text("career"),
+  education: json("education").default('[]'),
+  awards: json("awards").default('[]'),
+  career: json("career").default('[]'),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -52,6 +52,19 @@ export const sectors = pgTable("sectors", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Offices Table
+export const offices = pgTable("offices", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Office Sectors Table
+export const officeSectors = pgTable("office_sectors", {
+  officeId: uuid("office_id").references(() => offices.id),
+  sectorId: uuid("sector_id").references(() => sectors.id),
+});
+
 // Ratings Table
 export const ratings = pgTable("ratings", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -59,28 +72,6 @@ export const ratings = pgTable("ratings", {
   sectorId: uuid("sector_id").notNull().references(() => sectors.id),
   rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Sector Ratings Table
-export const sectorRatings = pgTable("sector_ratings", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  ratingId: uuid("rating_id").references(() => ratings.id),
-  sectorId: uuid("sector_id").references(() => sectors.id),
-  rating: integer("rating").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Offices Table (replaces Elections)
-export const offices = pgTable("offices", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  name: text("name").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// Office Sectors Table (replacing careers)
-export const officeSectors = pgTable("office_sectors", {
-  officeId: uuid("office_id").references(() => offices.id),
-  sectorId: uuid("sector_id").references(() => sectors.id),
 });
 
 // Petitions Table - maintain for future implementation
@@ -104,7 +95,6 @@ export const userProfileSchema = createInsertSchema(userProfiles);
 export const leaderSchema = createInsertSchema(leaders);
 export const sectorSchema = createInsertSchema(sectors);
 export const ratingSchema = createInsertSchema(ratings);
-export const sectorRatingSchema = createInsertSchema(sectorRatings);
 export const officeSchema = createInsertSchema(offices);
 export const officeSectorSchema = createInsertSchema(officeSectors);
 export const petitionSchema = createInsertSchema(petitions);
@@ -119,14 +109,32 @@ export type InsertUserProfile = z.infer<typeof userProfileSchema>;
 export type Leader = typeof leaders.$inferSelect;
 export type InsertLeader = z.infer<typeof leaderSchema>;
 
+// Compatibility alias for transitioning from officials to leaders
+export type Official = {
+  id: string;
+  name: string;
+  position: string;
+  location: string;
+  party: string;
+  gender: string;
+  term: string;
+  imageUrl: string | null;
+  approvalRating: number;
+  approvalTrend: number;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  sectors: any[];
+  electionHistory: any[];
+  careerHistory: any[];
+};
+
+export type InsertOfficial = InsertLeader;
+
 export type Sector = typeof sectors.$inferSelect;
 export type InsertSector = z.infer<typeof sectorSchema>;
 
 export type Rating = typeof ratings.$inferSelect;
 export type InsertRating = z.infer<typeof ratingSchema>;
-
-export type SectorRating = typeof sectorRatings.$inferSelect;
-export type InsertSectorRating = z.infer<typeof sectorRatingSchema>;
 
 export type Office = typeof offices.$inferSelect;
 export type InsertOffice = z.infer<typeof officeSchema>;
@@ -178,10 +186,10 @@ export interface Database {
         Insert: InsertUserProfile;
         Update: Partial<InsertUserProfile>;
       };
-      officials: {
-        Row: Omit<Official, 'sectors' | 'electionHistory' | 'careerHistory'>;
-        Insert: InsertOfficial;
-        Update: Partial<InsertOfficial>;
+      leaders: {
+        Row: Leader;
+        Insert: InsertLeader;
+        Update: Partial<InsertLeader>;
       };
       sectors: {
         Row: Sector;
@@ -193,20 +201,15 @@ export interface Database {
         Insert: InsertRating;
         Update: Partial<InsertRating>;
       };
-      sector_ratings: {
-        Row: SectorRating;
-        Insert: InsertSectorRating;
-        Update: Partial<InsertSectorRating>;
+      offices: {
+        Row: Office;
+        Insert: InsertOffice;
+        Update: Partial<InsertOffice>;
       };
-      elections: {
-        Row: Election;
-        Insert: InsertElection;
-        Update: Partial<InsertElection>;
-      };
-      careers: {
-        Row: Career;
-        Insert: InsertCareer;
-        Update: Partial<InsertCareer>;
+      office_sectors: {
+        Row: OfficeSector;
+        Insert: InsertOfficeSector;
+        Update: Partial<InsertOfficeSector>;
       };
       petitions: {
         Row: Petition;

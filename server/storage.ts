@@ -156,22 +156,22 @@ export class SupabaseStorage implements IStorage {
   
   async getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]> {
     try {
-      let query = this.db.select().from(schema.officials);
+      let query = this.db.select().from(schema.leaders);
       
       // Apply filters
       if (filters) {
         const conditions = [];
         
         if (filters.location) {
-          conditions.push(eq(schema.officials.location, filters.location));
+          conditions.push(eq(schema.leaders.jurisdiction, filters.location));
         }
         
         if (filters.search) {
           conditions.push(
             or(
-              ilike(schema.officials.name, `%${filters.search}%`),
-              ilike(schema.officials.position, `%${filters.search}%`),
-              ilike(schema.officials.location, `%${filters.search}%`)
+              ilike(schema.leaders.name, `%${filters.search}%`),
+              ilike(schema.leaders.office, `%${filters.search}%`),
+              ilike(schema.leaders.jurisdiction, `%${filters.search}%`)
             )
           );
         }
@@ -181,65 +181,124 @@ export class SupabaseStorage implements IStorage {
         }
       }
       
-      const officials = await query;
+      const leaders = await query;
       
-      // Fetch related data for each official
-      const officialsWithRelations = await Promise.all(
-        officials.map(async (official) => {
-          const sectors = await this.db.select().from(schema.sectors)
-            .where(eq(schema.sectors.officialId, official.id));
-            
-          const electionHistory = await this.db.select().from(schema.elections)
-            .where(eq(schema.elections.officialId, official.id));
-            
-          const careerHistory = await this.db.select().from(schema.careers)
-            .where(eq(schema.careers.officialId, official.id));
-            
-          return {
-            ...official,
-            sectors,
-            electionHistory,
-            careerHistory
-          };
-        })
-      );
+      // Map leaders to the Official format for compatibility
+      const mappedLeaders = leaders.map(leader => {
+        // Parse JSON fields if they exist
+        let education = [];
+        let awards = [];
+        let career = [];
+        
+        try {
+          if (leader.education && typeof leader.education === 'string') {
+            education = JSON.parse(leader.education);
+          }
+          if (leader.awards && typeof leader.awards === 'string') {
+            awards = JSON.parse(leader.awards);
+          }
+          if (leader.career && typeof leader.career === 'string') {
+            career = JSON.parse(leader.career);
+          }
+        } catch (e) {
+          console.error("Error parsing JSON fields:", e);
+        }
+        
+        // Create a leader object that maps to our Official interface
+        return {
+          id: leader.id,
+          name: leader.name,
+          position: leader.office || '',
+          location: leader.jurisdiction || '',
+          party: leader.party ? leader.party.replace('Party: ', '') : '',
+          gender: '', // Not available in leaders table
+          term: '', // Not available in leaders table
+          imageUrl: leader.avatarUrl,
+          approvalRating: 50, // Default value
+          approvalTrend: 0,
+          createdAt: leader.createdAt,
+          updatedAt: leader.updatedAt,
+          sectors: [], // Will be populated in the future
+          electionHistory: [],
+          careerHistory: career.map((c: any) => ({
+            id: crypto.randomUUID(),
+            officialId: leader.id,
+            position: c.position || '',
+            party: c.party || '',
+            location: c.location || '',
+            startYear: c.startYear || 0,
+            endYear: c.endYear || 0,
+            createdAt: new Date()
+          }))
+        };
+      });
       
-      return officialsWithRelations;
+      return mappedLeaders;
     } catch (error) {
-      console.error("Error fetching officials:", error);
+      console.error("Error fetching leaders:", error);
       throw error;
     }
   }
   
   async getOfficialById(id: string): Promise<Official | undefined> {
     try {
-      const officials = await this.db.select().from(schema.officials)
-        .where(eq(schema.officials.id, id));
+      const leaders = await this.db.select().from(schema.leaders)
+        .where(eq(schema.leaders.id, id));
         
-      if (officials.length === 0) {
+      if (leaders.length === 0) {
         return undefined;
       }
       
-      const official = officials[0];
+      const leader = leaders[0];
       
-      // Fetch related data
-      const sectors = await this.db.select().from(schema.sectors)
-        .where(eq(schema.sectors.officialId, id));
-        
-      const electionHistory = await this.db.select().from(schema.elections)
-        .where(eq(schema.elections.officialId, id));
-        
-      const careerHistory = await this.db.select().from(schema.careers)
-        .where(eq(schema.careers.officialId, id));
-        
+      // Parse JSON fields if they exist
+      let education = [];
+      let awards = [];
+      let career = [];
+      
+      try {
+        if (leader.education && typeof leader.education === 'string') {
+          education = JSON.parse(leader.education);
+        }
+        if (leader.awards && typeof leader.awards === 'string') {
+          awards = JSON.parse(leader.awards);
+        }
+        if (leader.career && typeof leader.career === 'string') {
+          career = JSON.parse(leader.career);
+        }
+      } catch (e) {
+        console.error("Error parsing JSON fields:", e);
+      }
+      
+      // Create a leader object that maps to our Official interface
       return {
-        ...official,
-        sectors,
-        electionHistory,
-        careerHistory
+        id: leader.id,
+        name: leader.name,
+        position: leader.office || '',
+        location: leader.jurisdiction || '',
+        party: leader.party ? leader.party.replace('Party: ', '') : '',
+        gender: '', // Not available in leaders table
+        term: '', // Not available in leaders table
+        imageUrl: leader.avatarUrl,
+        approvalRating: 50, // Default value
+        approvalTrend: 0,
+        createdAt: leader.createdAt,
+        updatedAt: leader.updatedAt,
+        sectors: [], // Will be populated in the future
+        electionHistory: [],
+        careerHistory: career.map((c: any) => ({
+          id: crypto.randomUUID(),
+          officialId: leader.id,
+          position: c.position || '',
+          party: c.party || '',
+          location: c.location || '',
+          startYear: c.startYear || 0,
+          endYear: c.endYear || 0,
+          createdAt: new Date()
+        }))
       };
     } catch (error) {
-      console.error("Error fetching official:", error);
+      console.error("Error fetching leader:", error);
       throw error;
     }
   }
