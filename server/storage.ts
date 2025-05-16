@@ -644,8 +644,14 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Determine which storage implementation to use
-// In production, use SupabaseStorage; in development, use MemStorage
-export const storage: IStorage = process.env.NODE_ENV === 'production' && process.env.DATABASE_URL
+// Always use Supabase database storage if we have the database password
+export const storage: IStorage = process.env.SUPABASE_DB_PASSWORD
   ? new SupabaseStorage()
   : new MemStorage();
+
+// Log which storage we're using
+if (process.env.SUPABASE_DB_PASSWORD) {
+  console.log("💾 Using Supabase database storage");
+} else {
+  console.log("✅ Using in-memory storage, no database connection needed");
+}
