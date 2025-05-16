@@ -51,7 +51,7 @@ export const sectors = pgTable("sectors", {
 // Ratings Table
 export const ratings = pgTable("ratings", {
   id: uuid("id").primaryKey().defaultRandom(),
-  userId: text("user_id").notNull(),
+  userId: uuid("user_id").notNull().references(() => users.id),
   officialId: uuid("official_id").references(() => officials.id),
   overallRating: integer("overall_rating").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -97,7 +97,7 @@ export const petitions = pgTable("petitions", {
   description: text("description").notNull(),
   location: text("location"),
   category: text("category"),
-  userId: text("user_id").notNull(),
+  userId: uuid("user_id").notNull().references(() => users.id),
   officialId: uuid("official_id").references(() => officials.id),
   signatureCount: integer("signature_count").default(0),
   status: text("status").default("pending"),

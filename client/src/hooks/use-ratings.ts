@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { RatingSummary, RatingPayload } from '@shared/schema';
-import { useAuthStore } from '@/store/auth-store';
+import { useAuth } from '@/hooks/use-auth.tsx';
 
 export function useRatings(officialId: string) {
   return useQuery({
@@ -16,7 +16,7 @@ export function useRatings(officialId: string) {
 }
 
 export function useSubmitRating() {
-  const { user } = useAuthStore();
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   
   return useMutation({
@@ -26,8 +26,8 @@ export function useSubmitRating() {
       }
       
       const res = await apiRequest('POST', '/api/ratings', {
-        ...ratingData,
-        userId: user.id
+        ...ratingData
+        // userId will be taken from the session on the server
       });
       
       return res.json();

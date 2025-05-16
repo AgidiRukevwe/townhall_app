@@ -357,6 +357,12 @@ export class SupabaseStorage implements IStorage {
   
   async submitRating(ratingData: RatingPayload & { userId: string }): Promise<{ success: boolean }> {
     try {
+      console.log('Submitting rating with data:', {
+        userId: ratingData.userId,
+        officialId: ratingData.officialId,
+        overallRating: ratingData.overallRating,
+      });
+      
       // Start a transaction
       await this.db.transaction(async (tx) => {
         // Insert the main rating
