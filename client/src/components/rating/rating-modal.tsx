@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, ArrowLeft } from "lucide-react";
+import { X, ArrowLeft, LogIn } from "lucide-react";
 import { RatingSlider } from "./rating-slider";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,11 +8,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { useSubmitRating } from "@/hooks/use-ratings";
 import { useToast } from "@/hooks/use-toast";
 import { Sector } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
+import { useAuth } from "@/hooks/use-auth.tsx";
+import { Link } from "wouter";
 
 interface RatingModalProps {
   open: boolean;
@@ -34,6 +37,7 @@ export function RatingModal({
   const [sectorRatings, setSectorRatings] = useState<Record<string, number>>({});
   const { mutate: submitRating, isPending } = useSubmitRating();
   const { toast } = useToast();
+  const { user, isLoading } = useAuth();
 
   // Initialize sector ratings if they haven't been set yet
   if (sectors.length > 0 && Object.keys(sectorRatings).length === 0) {
