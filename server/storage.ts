@@ -59,22 +59,20 @@ export class SupabaseStorage implements IStorage {
     else if (process.env.DATABASE_URL) {
       console.log("DATABASE_URL exists but needs reformatting");
       
-      // Attempt to convert Supabase URL format if that's what we have
-      if (process.env.DATABASE_URL.includes('supabase.co')) {
-        console.log("Auth: Detected Supabase URL, ensuring proper connection format");
+      // Direct Supabase connection string setup
+      if (process.env.DATABASE_URL.includes('supabase.co') || process.env.SUPABASE_DB_PASSWORD) {
+        console.log("Auth: Setting up Supabase connection");
         
-        // For Supabase, we should use the PG environment variables which are properly set
-        if (process.env.PGUSER && process.env.PGPASSWORD && process.env.PGHOST && process.env.PGDATABASE) {
-          const port = process.env.PGPORT || '5432';
-          // Use the direct connection variables which are properly formatted for Supabase
-          this.connectionString = `postgresql://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=require`;
+        // Use the direct Supabase connection string with the password from environment variables
+        if (process.env.SUPABASE_DB_PASSWORD) {
+          this.connectionString = `postgresql://postgres:${process.env.SUPABASE_DB_PASSWORD}@db.buenrbnwgxewfqvwovta.supabase.co:5432/postgres?sslmode=require`;
+          console.log("Auth: Using Supabase direct connection string with SSL enabled");
           
-          console.log("Auth: Using properly formatted Supabase connection with SSL enabled");
           // Also set DATABASE_URL for other tools that expect it
           process.env.DATABASE_URL = this.connectionString;
         } else {
-          console.error("Auth: Missing required Supabase connection environment variables");
-          throw new Error("Missing required Supabase connection environment variables");
+          console.error("Auth: Missing Supabase database password");
+          throw new Error("Missing Supabase database password. Please set SUPABASE_DB_PASSWORD environment variable");
         }
       } else {
         // Fallback for development - local development doesn't need SSL
