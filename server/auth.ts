@@ -5,13 +5,20 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "../shared/schema";
-import connectPg from "connect-pg-simple";
-import postgres from "postgres";
+import { User } from "@shared/schema";
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    // Define the user type for Express session
+    interface User {
+      id: string;
+      username: string;
+      email: string;
+      password: string;
+      isAnonymous?: boolean;
+      createdAt?: Date;
+      updatedAt?: Date;
+    }
   }
 }
 
@@ -31,58 +38,11 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  // Session setup
-  const secret = process.env.SESSION_SECRET || 'developmentsecret';
-  let sessionStore;
-
-  // Check for valid DATABASE_URL or construct one
-  let connectionString;
-  if (process.env.DATABASE_URL && 
-      (process.env.DATABASE_URL.startsWith('postgres://') || process.env.DATABASE_URL.startsWith('postgresql://'))) {
-    // Make sure the URL includes SSL mode if it doesn't already have it
-    if (!process.env.DATABASE_URL.includes('sslmode=')) {
-      connectionString = process.env.DATABASE_URL + '?sslmode=require';
-    } else {
-      connectionString = process.env.DATABASE_URL;
-    }
-    console.log("Auth: Using properly formatted DATABASE_URL for session store with SSL enabled");
-  } 
-  else if (process.env.PGHOST && process.env.PGDATABASE && process.env.PGUSER && process.env.PGPASSWORD) {
-    const port = process.env.PGPORT || '5432';
-    connectionString = `postgres://${process.env.PGUSER}:${process.env.PGPASSWORD}@${process.env.PGHOST}:${port}/${process.env.PGDATABASE}?sslmode=require`;
-    console.log("Auth: Constructed connection string from PG environment variables with SSL enabled");
-  }
-  
-  if (connectionString) {
-    // Use PostgreSQL session store with database
-    const PostgresStore = connectPg(session);
-    
-    // Create a db connection options object
-    const dbOptions = {
-      connectionString: connectionString
-    };
-    
-    sessionStore = new PostgresStore({ 
-      conObject: dbOptions,
-      createTableIfMissing: true 
-    });
-    
-    console.log("Auth: Using PostgreSQL session store");
-  } else {
-    // Use in-memory session store for development
-    const MemoryStore = session.MemoryStore;
-    sessionStore = new MemoryStore();
-  }
-
   const sessionSettings: session.SessionOptions = {
-    secret,
+    secret: process.env.SESSION_SECRET || 'dev-secret-key',
     resave: false,
     saveUninitialized: false,
-    store: sessionStore,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 1 week
-    }
+    store: storage.sessionStore,
   };
 
   app.set("trust proxy", 1);
@@ -90,97 +50,47 @@ export function setupAuth(app: Express) {
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Configure passport strategy
   passport.use(
-    new LocalStrategy(
-      {
-        usernameField: 'username',
-        passwordField: 'password'
-      },
-      async (username, password, done) => {
-        try {
-          const user = await storage.getUserByUsername(username);
-          if (!user || !(await comparePasswords(password, user.password))) {
-            return done(null, false, { message: "Invalid username or password" });
-          }
-          return done(null, user);
-        } catch (error) {
-          return done(error);
-        }
+    new LocalStrategy(async (username, password, done) => {
+      const user = await storage.getUserByUsername(username);
+      if (!user || !(await comparePasswords(password, user.password))) {
+        return done(null, false);
+      } else {
+        return done(null, user);
       }
-    )
+    }),
   );
 
-  // Serialize and deserialize user
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
-  });
-  
+  passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: string, done) => {
-    try {
-      const user = await storage.getUserById(id);
-      if (!user) {
-        // Instead of generating an error, just return null
-        // This prevents error logs from filling up
-        return done(null, null);
-      }
-      done(null, user);
-    } catch (error) {
-      // Log the error but don't throw it
-      console.error("Error deserializing user:", error);
-      done(null, null);
-    }
+    const user = await storage.getUserById(id);
+    done(null, user);
   });
 
-  // Authentication routes
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { email, username, password } = req.body;
-      
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
+      const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
-        return res.status(400).json({ message: "Email already in use" });
+        return res.status(400).json({ message: "Username already exists" });
       }
 
-      // Create new user with hashed password
       const user = await storage.createUser({
-        email,
-        username,
-        password: await hashPassword(password),
-        isAnonymous: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        ...req.body,
+        password: await hashPassword(req.body.password),
       });
 
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = user;
-
-      // Log the user in
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(userWithoutPassword);
+        res.status(201).json(user);
       });
     } catch (error) {
-      next(error);
+      console.error("Registration error:", error);
+      res.status(500).json({ message: "Failed to register user" });
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
-      if (!user) {
-        return res.status(401).json({ message: info?.message || "Authentication failed" });
-      }
-      
-      req.login(user, (err) => {
-        if (err) return next(err);
-        
-        // Remove password from response
-        const { password: _, ...userWithoutPassword } = user;
-        res.status(200).json(userWithoutPassword);
-      });
-    })(req, res, next);
+  app.post("/api/login", passport.authenticate("local"), (req, res) => {
+    res.status(200).json(req.user);
   });
 
   app.post("/api/logout", (req, res, next) => {
@@ -191,12 +101,7 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) {
-      return res.status(401).json({ message: "Not authenticated" });
-    }
-    
-    // Remove password from response
-    const { password: _, ...userWithoutPassword } = req.user as SelectUser;
-    res.json(userWithoutPassword);
+    if (!req.isAuthenticated()) return res.status(401).json({ message: "Not authenticated" });
+    res.json(req.user);
   });
 }
