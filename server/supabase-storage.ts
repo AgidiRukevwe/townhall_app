@@ -58,6 +58,12 @@ export class SupabaseStorage implements IStorage {
         .single();
       
       if (error) {
+        // If the error is "relation does not exist", it means the users table hasn't been created yet
+        if (error.code === '42P01') {
+          console.error("Error: Users table does not exist. Returning undefined.");
+          return undefined;
+        }
+        
         console.error("Error fetching user by ID:", error.message);
         return undefined;
       }
@@ -65,7 +71,7 @@ export class SupabaseStorage implements IStorage {
       return data as User;
     } catch (error) {
       console.error("Error fetching user by ID:", error);
-      throw error;
+      return undefined; // Return undefined instead of throwing to prevent crashes
     }
   }
   
@@ -82,14 +88,19 @@ export class SupabaseStorage implements IStorage {
           // No rows returned - user not found
           return undefined;
         }
+        if (error.code === '42P01') {
+          // Table doesn't exist yet
+          console.error("Error: Users table does not exist. Returning undefined.");
+          return undefined;
+        }
         console.error("Error fetching user by email:", error.message);
-        throw error;
+        return undefined;
       }
       
       return data as User;
     } catch (error) {
       console.error("Error fetching user by email:", error);
-      throw error;
+      return undefined;
     }
   }
   
@@ -106,14 +117,19 @@ export class SupabaseStorage implements IStorage {
           // No rows returned - user not found
           return undefined;
         }
+        if (error.code === '42P01') {
+          // Table doesn't exist yet
+          console.error("Error fetching user by username: relation 'public.users' does not exist");
+          return undefined;
+        }
         console.error("Error fetching user by username:", error.message);
-        throw error;
+        return undefined;
       }
       
       return data as User;
     } catch (error) {
       console.error("Error fetching user by username:", error);
-      throw error;
+      return undefined;
     }
   }
   

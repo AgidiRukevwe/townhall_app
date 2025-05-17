@@ -1,7 +1,17 @@
 import { MemStorage } from "./mem-storage";
 import { SupabaseStorage } from "./supabase-storage";
 
-// For now, use memory storage to ensure the app works
-// We can set up the Supabase database tables later
-console.log('💾 Using in-memory storage for development');
-export const storage = new MemStorage();
+// Determine which storage implementation to use based on environment variables
+// If Supabase credentials are available, use Supabase storage, otherwise use memory storage
+let useSupabase = false;
+
+if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+  useSupabase = true;
+  console.log('💾 Using Supabase client storage');
+} else {
+  console.log('💾 Using in-memory storage for development');
+}
+
+export const storage = useSupabase 
+  ? new SupabaseStorage() 
+  : new MemStorage();
