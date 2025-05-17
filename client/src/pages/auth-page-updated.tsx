@@ -136,14 +136,14 @@ export default function AuthPageUpdated() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#F9FAFB] flex-col items-center justify-center px-4 py-12 font-['Satoshi']">
+    <div className="flex min-h-screen bg-[#FFFFFF] flex-col items-center justify-center px-4 py-12 font-['Satoshi']">
       <div className="w-full max-w-md mx-auto">
         <div className="flex flex-col items-center mb-8">
           <THLogo className="mb-6" />
           <h2 className="text-2xl font-bold text-center text-[#262626]">
             {isLogin ? "Welcome to Townhall" : "Welcome back to Townhall"}
           </h2>
-          <p className="mt-2 text-sm text-center text-[#737373]">
+          <p className="mt-2 text-[14px] md:text-[16px] text-center text-[#737373] font-medium">
             {isLogin ? "Sign up to get started" : "Sign in to continue"}
           </p>
         </div>
