@@ -352,6 +352,17 @@ export class SupabaseStorage implements IStorage {
         console.error("Error parsing JSON fields:", e);
       }
       
+      // Fetch sectors from the database
+      const { data: sectorsData, error: sectorsError } = await supabase
+        .from('sectors')
+        .select('*');
+        
+      if (sectorsError) {
+        console.error("Error fetching sectors:", sectorsError.message);
+      }
+      
+      const sectors = sectorsData || [];
+      
       // Create a leader object that maps to our Official interface
       return {
         id: leader.id,
@@ -367,7 +378,7 @@ export class SupabaseStorage implements IStorage {
         approvalTrend: 0,
         createdAt: leader.created_at ? new Date(leader.created_at) : null,
         updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
-        sectors: [], // Will be populated in the future
+        sectors: sectors, // Now populated with actual sectors from the database
         education: Array.isArray(education) ? education.map((e: any) => ({
           id: randomUUID(),
           officialId: leader.id,
