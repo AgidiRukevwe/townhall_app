@@ -160,18 +160,18 @@ export default function AuthPageUpdated() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-medium">Email</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
-                          className="rounded-[24px] h-14 px-4 bg-white border-[#E5E5E5]"
+                          className="h-14"
                           {...field}
                         />
                       </FormControl>
-                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-xs text-[#EF4444]" />
+                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -181,13 +181,13 @@ export default function AuthPageUpdated() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-medium">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
-                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
+                            className="h-14 pr-10"
                             {...field}
                           />
                           <button
@@ -203,13 +203,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-xs text-[#EF4444]" />
+                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
 
-                <div className="text-sm">
+                <div className="text-[14px] md:text-[16px] font-medium">
                   <button 
                     type="button" 
                     className="text-[#737373] hover:text-[#262626]"
@@ -220,7 +220,9 @@ export default function AuthPageUpdated() {
 
                 <Button
                   type="submit"
-                  className="w-full h-14 rounded-[24px] bg-[#262626] hover:bg-[#404040] text-white font-medium"
+                  variant="black"
+                  size="lg"
+                  className="w-full font-medium"
                   disabled={loginMutation ? loginMutation.isPending : false}
                 >
                   {loginMutation && loginMutation.isPending ? (
@@ -232,7 +234,7 @@ export default function AuthPageUpdated() {
                   )}
                 </Button>
 
-                <div className="text-sm text-center">
+                <div className="text-[14px] md:text-[16px] text-center font-medium">
                   Already have an account ?{" "}
                   <button
                     type="button"
@@ -255,18 +257,18 @@ export default function AuthPageUpdated() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-medium">Email</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
-                          className="rounded-[24px] h-14 px-4 bg-white border-[#E5E5E5]"
+                          className="h-14"
                           {...field}
                         />
                       </FormControl>
-                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-xs text-[#EF4444]" />
+                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -276,13 +278,13 @@ export default function AuthPageUpdated() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-medium">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
+                            className="h-14 pr-10"
                             {...field}
                           />
                           <button
@@ -298,8 +300,8 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-xs text-[#EF4444]" />
+                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -309,13 +311,13 @@ export default function AuthPageUpdated() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-medium">Confirm password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Confirm password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
+                            className="h-14 pr-10"
                             {...field}
                           />
                           <button
@@ -331,13 +333,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-xs text-[#EF4444]" />
+                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
 
-                <div className="text-sm">
+                <div className="text-[14px] md:text-[16px] font-medium">
                   <button 
                     type="button" 
                     className="text-[#737373] hover:text-[#262626]"
@@ -348,7 +350,9 @@ export default function AuthPageUpdated() {
 
                 <Button
                   type="submit"
-                  className="w-full h-14 rounded-[24px] bg-[#262626] hover:bg-[#404040] text-white font-medium"
+                  variant="black"
+                  size="lg"
+                  className="w-full font-medium"
                   disabled={registerMutation ? registerMutation.isPending : false}
                 >
                   {registerMutation && registerMutation.isPending ? (
@@ -358,7 +362,7 @@ export default function AuthPageUpdated() {
                   )}
                 </Button>
 
-                <div className="text-sm text-center">
+                <div className="text-[14px] md:text-[16px] text-center font-medium">
                   Already have an account ?{" "}
                   <button
                     type="button"
