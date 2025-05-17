@@ -29,7 +29,7 @@ export function ApprovalChart({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline mb-6">
-          <div className="text-5xl font-bold mr-4">{approvalRating}%</div>
+          <div className="text-5xl font-bold mr-4">{approvalRating.toFixed(1)}%</div>
           <div
             className={`text-sm font-medium flex items-center ${
               isPositive ? "text-green-500" : "text-red-500"
@@ -56,7 +56,7 @@ export function ApprovalChart({
                 tickLine={false}
               />
               <Tooltip
-                formatter={(value) => [`${value}%`, "Approval"]}
+                formatter={(value) => [`${parseFloat(value).toFixed(1)}%`, "Approval"]}
                 labelFormatter={(label) => `${label}`}
               />
               <Bar

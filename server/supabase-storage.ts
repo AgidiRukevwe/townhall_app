@@ -538,11 +538,11 @@ export class SupabaseStorage implements IStorage {
         }));
       }
       
-      // Calculate sector average using actual sector ratings
-      const sectorAverage = sectorRatings.reduce((sum, s) => sum + s.rating, 0) / sectorRatings.length;
+      // Calculate sector average using actual sector ratings - limited to 1 decimal place
+      const sectorAverage = parseFloat((sectorRatings.reduce((sum, s) => sum + s.rating, 0) / sectorRatings.length).toFixed(1));
       
-      // Use a value related to overall monthly change for sector monthly change
-      const sectorMonthlyChange = Math.round(monthlyChange * 0.8);
+      // Use the actual change calculated from sector ratings
+      const sectorMonthlyChange = parseFloat(monthlyChange.toFixed(1));
       
       return {
         overallRating,

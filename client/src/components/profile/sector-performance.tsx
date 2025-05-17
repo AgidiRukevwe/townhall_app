@@ -52,7 +52,7 @@ export function SectorPerformance({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline mb-6">
-          <div className="text-5xl font-bold mr-4">{averageRating}%</div>
+          <div className="text-5xl font-bold mr-4">{averageRating.toFixed(1)}%</div>
           <div
             className={`text-sm font-medium flex items-center ${
               isPositive ? "text-green-500" : "text-red-500"
