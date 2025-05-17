@@ -562,6 +562,18 @@ export class SupabaseStorage implements IStorage {
     try {
       console.log("Submitting rating:", ratingData);
       
+      // First, delete existing ratings from this user for this official to avoid unique constraint violations
+      const { error: deleteError } = await supabase
+        .from('ratings')
+        .delete()
+        .eq('leader_id', ratingData.officialId)
+        .eq('user_id', ratingData.userId);
+      
+      if (deleteError) {
+        console.error("Error deleting existing ratings:", deleteError.message);
+        // We'll continue anyway, the insert might still succeed
+      }
+      
       // Let's first check if we have the sectors table ready
       const { data: sectorsData, error: sectorsError } = await supabase
         .from('sectors')
@@ -621,42 +633,43 @@ export class SupabaseStorage implements IStorage {
         defaultSectorId = defaultSector.id;
       }
       
-      // Insert the overall rating
-      const { error } = await supabase
-        .from('ratings')
-        .insert({
+      // Prepare all ratings to insert in a single batch
+      const ratingsToInsert = [
+        // Overall rating
+        {
           id: randomUUID(),
           leader_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: ratingData.overallRating,
           sector_id: defaultSectorId,
           created_at: new Date().toISOString()
-        });
+        }
+      ];
       
-      if (error) {
-        console.error("Error submitting overall rating:", error.message);
-        throw error;
+      // Add sector ratings if provided
+      if (ratingData.sectorRatings && ratingData.sectorRatings.length > 0) {
+        const sectorRatings = ratingData.sectorRatings
+          .filter(sr => sr.sectorId !== defaultSectorId) // Avoid duplicates with the overall rating
+          .map(sr => ({
+            id: randomUUID(),
+            leader_id: ratingData.officialId,
+            user_id: ratingData.userId,
+            rating: sr.rating,
+            sector_id: sr.sectorId,
+            created_at: new Date().toISOString()
+          }));
+        
+        ratingsToInsert.push(...sectorRatings);
       }
       
-      // Insert sector ratings if provided
-      if (ratingData.sectorRatings && ratingData.sectorRatings.length > 0) {
-        const sectorRatingsToInsert = ratingData.sectorRatings.map(sr => ({
-          id: randomUUID(),
-          leader_id: ratingData.officialId,
-          user_id: ratingData.userId,
-          rating: sr.rating,
-          sector_id: sr.sectorId,
-          created_at: new Date().toISOString()
-        }));
-        
-        const { error: sectorRatingError } = await supabase
-          .from('ratings')
-          .insert(sectorRatingsToInsert);
-        
-        if (sectorRatingError) {
-          console.error("Error submitting sector ratings:", sectorRatingError.message);
-          // We'll continue since at least the overall rating was submitted
-        }
+      // Insert all ratings in a single operation
+      const { error: ratingsError } = await supabase
+        .from('ratings')
+        .insert(ratingsToInsert);
+      
+      if (ratingsError) {
+        console.error("Error submitting ratings:", ratingsError.message);
+        throw ratingsError;
       }
       
       console.log("Rating submitted successfully");
