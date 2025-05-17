@@ -51,16 +51,6 @@ export class SupabaseStorage implements IStorage {
   
   async getUserById(id: string): Promise<User | undefined> {
     try {
-      // First try to get the user from our in-memory array
-      if (this.memoryUsers && this.memoryUsers.length > 0) {
-        const memoryUser = this.memoryUsers.find(u => u.id === id);
-        if (memoryUser) {
-          console.log(`Found user with ID ${id} in memory store`);
-          return memoryUser;
-        }
-      }
-      
-      // If not found in memory, try the database
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -68,35 +58,36 @@ export class SupabaseStorage implements IStorage {
         .single();
       
       if (error) {
-        // If the error is "relation does not exist", it means the users table hasn't been created yet
-        if (error.code === '42P01') {
-          console.error("Error: Users table does not exist. Returning undefined.");
+        if (error.code === 'PGRST116') {
+          // No rows returned - user not found
           return undefined;
         }
-        
         console.error("Error fetching user by ID:", error.message);
         return undefined;
       }
       
-      return data as User;
+      // Map the database fields to our User type
+      if (data) {
+        return {
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          isAnonymous: data.is_anonymous,
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
+        };
+      }
+      
+      return undefined;
     } catch (error) {
       console.error("Error fetching user by ID:", error);
-      return undefined; // Return undefined instead of throwing to prevent crashes
+      return undefined;
     }
   }
   
   async getUserByEmail(email: string): Promise<User | undefined> {
     try {
-      // First try to get the user from our in-memory array
-      if (this.memoryUsers && this.memoryUsers.length > 0) {
-        const memoryUser = this.memoryUsers.find(u => u.email === email);
-        if (memoryUser) {
-          console.log(`Found user with email ${email} in memory store`);
-          return memoryUser;
-        }
-      }
-      
-      // If not found in memory, try the database
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -108,16 +99,24 @@ export class SupabaseStorage implements IStorage {
           // No rows returned - user not found
           return undefined;
         }
-        if (error.code === '42P01') {
-          // Table doesn't exist yet
-          console.error("Error: Users table does not exist. Returning undefined.");
-          return undefined;
-        }
         console.error("Error fetching user by email:", error.message);
         return undefined;
       }
       
-      return data as User;
+      // Map the database fields to our User type
+      if (data) {
+        return {
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          isAnonymous: data.is_anonymous,
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
+        };
+      }
+      
+      return undefined;
     } catch (error) {
       console.error("Error fetching user by email:", error);
       return undefined;
@@ -126,16 +125,6 @@ export class SupabaseStorage implements IStorage {
   
   async getUserByUsername(username: string): Promise<User | undefined> {
     try {
-      // First try to get the user from our in-memory array
-      if (this.memoryUsers && this.memoryUsers.length > 0) {
-        const memoryUser = this.memoryUsers.find(u => u.username === username);
-        if (memoryUser) {
-          console.log(`Found user ${username} in memory store`);
-          return memoryUser;
-        }
-      }
-      
-      // If not found in memory, try the database
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -147,16 +136,24 @@ export class SupabaseStorage implements IStorage {
           // No rows returned - user not found
           return undefined;
         }
-        if (error.code === '42P01') {
-          // Table doesn't exist yet
-          console.error("Error fetching user by username: relation 'public.users' does not exist");
-          return undefined;
-        }
         console.error("Error fetching user by username:", error.message);
         return undefined;
       }
       
-      return data as User;
+      // Map the database fields to our User type
+      if (data) {
+        return {
+          id: data.id,
+          username: data.username,
+          email: data.email,
+          password: data.password,
+          isAnonymous: data.is_anonymous,
+          createdAt: new Date(data.created_at),
+          updatedAt: new Date(data.updated_at)
+        };
+      }
+      
+      return undefined;
     } catch (error) {
       console.error("Error fetching user by username:", error);
       return undefined;
@@ -165,40 +162,47 @@ export class SupabaseStorage implements IStorage {
   
   async createUser(userData: InsertUser): Promise<User> {
     try {
-      // Since we can't create tables through the Supabase client,
-      // let's use a memory-based fallback for user registration
-      
-      // Create a fake User object for now, which matches the expected structure
-      // This will allow users to register and login in the application
-      const newUser: User = {
+      const newUser = {
+        ...userData,
         id: randomUUID(),
-        username: userData.username,
-        email: userData.email,
-        password: userData.password, // Note: this would normally be hashed
-        isAnonymous: false,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        is_anonymous: false
       };
       
-      console.log("Created new user in memory:", newUser.username);
+      const { data, error } = await supabase
+        .from('users')
+        .insert(newUser)
+        .select('*')
+        .single();
       
-      // Store this user in memory for this session
-      // We'll add it to a temporary in-memory storage
-      if (!this.memoryUsers) {
-        this.memoryUsers = [];
+      if (error) {
+        console.error("Error creating user:", error.message);
+        throw new Error("Failed to create user: " + error.message);
       }
       
-      this.memoryUsers.push(newUser);
+      if (!data) {
+        throw new Error("Failed to retrieve created user");
+      }
       
-      return newUser;
+      // Map the database fields to our User type
+      const user: User = {
+        id: data.id,
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        isAnonymous: data.is_anonymous,
+        createdAt: new Date(data.created_at),
+        updatedAt: new Date(data.updated_at)
+      };
+      
+      console.log("Created new user in Supabase:", user.username);
+      return user;
     } catch (error) {
       console.error("Error creating user:", error);
       throw error;
     }
   }
-  
-  // In-memory users storage as a fallback
-  private memoryUsers: User[] = [];
   
   async getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]> {
     try {
