@@ -15,6 +15,8 @@ interface EducationTimelineProps {
 }
 
 export function EducationTimeline({ education }: EducationTimelineProps) {
+  console.log("Education data received:", education);
+  
   // Return placeholder if no education
   if (!education || education.length === 0) {
     return (
@@ -24,8 +26,15 @@ export function EducationTimeline({ education }: EducationTimelineProps) {
     );
   }
 
-  // Sort education by endYear (most recent first)
-  const sortedEducation = [...education].sort((a, b) => b.endYear - a.endYear);
+  // Sort education by endYear (most recent first) if available
+  const sortedEducation = [...education].sort((a, b) => {
+    if (b.endYear === a.endYear || (!a.endYear && !b.endYear)) {
+      return 0;
+    }
+    if (!a.endYear) return 1;
+    if (!b.endYear) return -1;
+    return b.endYear - a.endYear;
+  });
   
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -37,15 +46,21 @@ export function EducationTimeline({ education }: EducationTimelineProps) {
             </div>
             
             <div>
-              <p className="font-medium text-gray-900">{edu.institution}</p>
-              <p className="text-sm text-gray-700">
+              {edu.institution ? (
+                <p className="font-medium text-gray-900">{edu.institution}</p>
+              ) : null}
+              
+              <p className="text-sm text-gray-700 font-medium">
                 {edu.degree}{edu.field ? `, ${edu.field}` : ''}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
-                {edu.startYear && edu.endYear 
-                  ? `${edu.startYear} - ${edu.endYear}`
-                  : (edu.endYear ? `Graduated ${edu.endYear}` : '')}
-              </p>
+              
+              {(edu.startYear || edu.endYear) ? (
+                <p className="text-xs text-gray-500 mt-1">
+                  {edu.startYear && edu.endYear 
+                    ? `${edu.startYear} - ${edu.endYear}`
+                    : (edu.endYear ? `Graduated ${edu.endYear}` : (edu.startYear ? `Started ${edu.startYear}` : ''))}
+                </p>
+              ) : null}
             </div>
           </li>
         ))}

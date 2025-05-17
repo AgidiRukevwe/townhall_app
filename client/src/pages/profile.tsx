@@ -21,6 +21,11 @@ export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const { toast } = useToast();
   
+  // Debug official data
+  console.log("Profile page - official data:", official);
+  console.log("Profile page - education data:", official?.education);
+  console.log("Profile page - career data:", official?.careerHistory);
+  
   if (isLoading) {
     return <Loading message="Loading official profile..." />;
   }
@@ -154,18 +159,18 @@ export default function Profile() {
                 
                 {/* History Section */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-                  {/* Election history */}
+                  {/* Education section */}
                   <div>
                     <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-medium text-gray-900">Election history</h3>
-                      {official.electionHistory.length > 3 && (
+                      <h3 className="text-lg font-medium text-gray-900">Education</h3>
+                      {official.education && official.education.length > 3 && (
                         <button className="text-sm text-gray-500 hover:text-gray-700">
                           See all <ArrowLeft className="inline h-3 w-3 ml-1 rotate-180" />
                         </button>
                       )}
                     </div>
                     
-                    <ElectionTimeline elections={official.electionHistory} />
+                    <EducationTimeline education={official.education || []} />
                   </div>
                   
                   {/* Political career */}
