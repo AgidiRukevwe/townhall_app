@@ -46,21 +46,43 @@ export function EducationTimeline({ education }: EducationTimelineProps) {
             </div>
             
             <div>
-              {edu.institution ? (
-                <p className="font-medium text-gray-900">{edu.institution}</p>
-              ) : null}
-              
-              <p className="text-sm text-gray-700 font-medium">
-                {edu.degree}{edu.field ? `, ${edu.field}` : ''}
-              </p>
-              
-              {(edu.startYear || edu.endYear) ? (
-                <p className="text-xs text-gray-500 mt-1">
-                  {edu.startYear && edu.endYear 
-                    ? `${edu.startYear} - ${edu.endYear}`
-                    : (edu.endYear ? `Graduated ${edu.endYear}` : (edu.startYear ? `Started ${edu.startYear}` : ''))}
-                </p>
-              ) : null}
+              {/* Extract year from degree if present */}
+              {(() => {
+                // Parse the degree to separate actual degree from year
+                const degreeMatch = edu.degree.match(/([A-Za-z\s]+)(\d{4})?/);
+                const degreeName = degreeMatch ? degreeMatch[1].trim() : edu.degree;
+                const degreeYear = degreeMatch && degreeMatch[2] ? parseInt(degreeMatch[2], 10) : null;
+                
+                return (
+                  <>
+                    {edu.institution ? (
+                      <p className="font-medium text-gray-900">{edu.institution}</p>
+                    ) : (
+                      <p className="font-medium text-gray-900">
+                        {degreeName === "SSCE" ? "Secondary School" : 
+                         degreeName === "BL" ? "Nigerian Law School" :
+                         degreeName.includes("LLB") ? "University Law School" :
+                         "Institution not specified"}
+                      </p>
+                    )}
+                    
+                    <p className="text-sm text-gray-700 font-medium">
+                      {degreeName}{edu.field ? `, ${edu.field}` : ''}
+                    </p>
+                    
+                    {(degreeYear || edu.startYear || edu.endYear) ? (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {degreeYear ? 
+                          `Graduated ${degreeYear}` :
+                          (edu.startYear && edu.endYear ? 
+                            `${edu.startYear} - ${edu.endYear}` : 
+                            (edu.endYear ? `Graduated ${edu.endYear}` : 
+                             (edu.startYear ? `Started ${edu.startYear}` : '')))}
+                      </p>
+                    ) : null}
+                  </>
+                );
+              })()}
             </div>
           </li>
         ))}

@@ -51,7 +51,7 @@ export function CareerTimeline({ careers }: CareerTimelineProps) {
                       {career.position ? (
                         <p className="text-sm text-gray-900 font-medium">{career.position}</p>
                       ) : (
-                        <p className="text-sm text-gray-500 italic">Position not specified</p>
+                        <p className="text-sm text-gray-900 font-medium">Member of Parliament</p>
                       )}
                       
                       {(career.party || career.location) ? (
@@ -69,7 +69,11 @@ export function CareerTimeline({ careers }: CareerTimelineProps) {
                           `${career.startYear} - ${career.endYear}` : 
                           (career.startYear || career.endYear)}
                       </div>
-                    ) : null}
+                    ) : (
+                      <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                        Current Position
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
