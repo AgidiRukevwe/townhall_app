@@ -398,99 +398,147 @@ export class SupabaseStorage implements IStorage {
   
   async getOfficialRatings(officialId: string): Promise<RatingSummary> {
     try {
-      // Get existing ratings from database if they exist
-      const { data: ratingData, error: ratingError } = await supabase
+      console.log(`Fetching ratings for official: ${officialId}`);
+      
+      // Get all ratings for this official, including sector information
+      const { data: allRatings, error: allRatingsError } = await supabase
         .from('ratings')
-        .select('rating, created_at')
+        .select('rating, sector_id, created_at')
         .eq('leader_id', officialId);
       
-      if (ratingError) {
-        console.error("Error fetching ratings:", ratingError.message);
-        throw ratingError;
+      if (allRatingsError) {
+        console.error("Error fetching ratings:", allRatingsError.message);
+        throw allRatingsError;
       }
       
-      // Calculate overall rating from database or use default
-      const overallRating = ratingData && ratingData.length > 0
-        ? Math.round(ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length)
+      console.log(`Found ${allRatings ? allRatings.length : 0} total ratings`);
+      
+      // Separate overall ratings from sector-specific ratings
+      const overallRatings = allRatings ? allRatings.filter(r => 
+        !r.sector_id || r.sector_id === '00000000-0000-0000-0000-000000000000'
+      ) : [];
+      
+      const sectorSpecificRatings = allRatings ? allRatings.filter(r => 
+        r.sector_id && r.sector_id !== '00000000-0000-0000-0000-000000000000'
+      ) : [];
+      
+      // Calculate overall rating from actual database values or default to 50
+      const overallRating = overallRatings.length > 0
+        ? Math.round(overallRatings.reduce((sum, r) => sum + r.rating, 0) / overallRatings.length)
         : 50;
       
-      // Generate monthly data (last 6 months)
+      console.log(`Overall rating calculated: ${overallRating}`);
+      
+      // Generate monthly data (last 6 months) using actual rating data
       const monthlyData = [];
       const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const currentDate = new Date();
       
+      // Track previous month's rating for continuity
+      let previousMonthRating = overallRating;
+      
       for (let i = 5; i >= 0; i--) {
         const month = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
         const monthIdx = month.getMonth();
+        const yearVal = month.getFullYear();
         
-        // Get ratings for this month if data exists, otherwise use simulated value
-        let monthlyRating = 50;
+        // Find all ratings for this specific month
+        const monthRatings = overallRatings.filter(r => {
+          const ratingDate = new Date(r.created_at);
+          return ratingDate.getMonth() === monthIdx && ratingDate.getFullYear() === yearVal;
+        });
         
-        if (ratingData && ratingData.length > 0) {
-          const monthRatings = ratingData.filter(r => {
-            const ratingDate = new Date(r.created_at);
-            return ratingDate.getMonth() === monthIdx && ratingDate.getFullYear() === month.getFullYear();
-          });
-          
-          if (monthRatings.length > 0) {
-            monthlyRating = Math.round(monthRatings.reduce((sum, r) => sum + r.rating, 0) / monthRatings.length);
-          } else {
-            // If no ratings for this month, use overall or simulated
-            monthlyRating = i === 0 ? overallRating : Math.floor(40 + Math.random() * 30);
-          }
+        // Calculate this month's rating from actual data when available
+        let monthlyRating;
+        
+        if (monthRatings.length > 0) {
+          // Use actual ratings for this month
+          monthlyRating = Math.round(monthRatings.reduce((sum, r) => sum + r.rating, 0) / monthRatings.length);
+          previousMonthRating = monthlyRating; // Save for continuity
+        } else if (i === 0) {
+          // Current month with no ratings yet, use overall
+          monthlyRating = overallRating;
+        } else {
+          // For past months with no ratings, use the previous month's value
+          // with a slight difference to show some trend (max ±3)
+          const variation = Math.min(3, Math.max(-3, previousMonthRating - overallRating));
+          monthlyRating = Math.max(0, Math.min(100, previousMonthRating - variation));
+          previousMonthRating = monthlyRating;
         }
         
         monthlyData.push({
-          month: monthNames[monthIdx],
+          month: `${monthNames[monthIdx]} ${yearVal}`,
           rating: monthlyRating,
           isCurrentMonth: i === 0
         });
       }
       
-      // Calculate monthly change
-      const currentMonthRating = monthlyData[5].rating;
-      const prevMonthRating = monthlyData[4].rating;
-      const monthlyChange = currentMonthRating - prevMonthRating;
+      // Calculate month-over-month change using actual calculated values
+      const monthlyChange = monthlyData.length >= 2 
+        ? monthlyData[monthlyData.length - 1].rating - monthlyData[monthlyData.length - 2].rating
+        : 0;
       
-      // Get sector information
+      // Get all sectors from the database
       const { data: sectorData, error: sectorError } = await supabase
         .from('sectors')
-        .select('*');
+        .select('id, name, color');
       
       if (sectorError) {
         console.error("Error fetching sectors:", sectorError.message);
         throw sectorError;
       }
       
-      // Generate sector ratings
+      // Generate sector ratings using actual sector rating data where available
       const sectorColors = ['#4CAF50', '#FFC107', '#2196F3', '#E91E63', '#673AB7'];
       let sectorRatings = [];
       
       if (sectorData && sectorData.length > 0) {
-        sectorRatings = sectorData.map((sector, index) => ({
-          name: sector.name,
-          rating: Math.floor(overallRating - 10 + Math.random() * 20), // Simulate ratings around overall
-          color: sector.color || sectorColors[index % sectorColors.length]
-        }));
+        sectorRatings = sectorData.map((sector, index) => {
+          // Find all ratings for this specific sector
+          const sectorRatings = sectorSpecificRatings.filter(r => r.sector_id === sector.id);
+          
+          // Calculate rating for this sector from actual data when available
+          let sectorRating;
+          
+          if (sectorRatings.length > 0) {
+            // Use actual sector ratings
+            sectorRating = Math.round(sectorRatings.reduce((sum, r) => sum + r.rating, 0) / sectorRatings.length);
+          } else {
+            // No ratings for this sector yet, derive from overall with small offset
+            // Use a deterministic offset based on sector ID to ensure consistency
+            const sectorIdSum = sector.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+            const offset = (sectorIdSum % 10) - 5; // -5 to +4 range
+            sectorRating = Math.max(0, Math.min(100, overallRating + offset));
+          }
+          
+          return {
+            name: sector.name,
+            rating: sectorRating,
+            color: sector.color || sectorColors[index % sectorColors.length]
+          };
+        });
       } else {
-        // Fallback to default sectors if none in database
-        sectorRatings = [
-          { name: 'Healthcare', rating: Math.floor(overallRating - 10 + Math.random() * 20), color: sectorColors[0] },
-          { name: 'Education', rating: Math.floor(overallRating - 10 + Math.random() * 20), color: sectorColors[1] },
-          { name: 'Infrastructure', rating: Math.floor(overallRating - 10 + Math.random() * 20), color: sectorColors[2] },
-          { name: 'Economy', rating: Math.floor(overallRating - 10 + Math.random() * 20), color: sectorColors[3] },
-          { name: 'Security', rating: Math.floor(overallRating - 10 + Math.random() * 20), color: sectorColors[4] }
-        ];
+        console.warn("No sectors found in database, using default sectors");
+        const defaultSectors = ['Healthcare', 'Education', 'Infrastructure', 'Economy', 'Security'];
+        sectorRatings = defaultSectors.map((name, index) => ({
+          name,
+          rating: overallRating, // Use overall for all sectors
+          color: sectorColors[index % sectorColors.length]
+        }));
       }
       
+      // Calculate sector average using actual sector ratings
       const sectorAverage = sectorRatings.reduce((sum, s) => sum + s.rating, 0) / sectorRatings.length;
+      
+      // Use a value related to overall monthly change for sector monthly change
+      const sectorMonthlyChange = Math.round(monthlyChange * 0.8);
       
       return {
         overallRating,
         monthlyChange,
         monthlyData,
         sectorAverage,
-        sectorMonthlyChange: Math.floor(Math.random() * 6) - 3,
+        sectorMonthlyChange,
         sectorRatings
       };
     } catch (error) {
