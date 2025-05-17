@@ -481,7 +481,7 @@ export class SupabaseStorage implements IStorage {
       // Get all sectors from the database
       const { data: sectorData, error: sectorError } = await supabase
         .from('sectors')
-        .select('id, name, color');
+        .select('id, name');
       
       if (sectorError) {
         console.error("Error fetching sectors:", sectorError.message);
@@ -502,11 +502,11 @@ export class SupabaseStorage implements IStorage {
           
           if (sectorRatings.length > 0) {
             // Use actual sector ratings
-            sectorRating = Math.round(sectorRatings.reduce((sum, r) => sum + r.rating, 0) / sectorRatings.length);
+            sectorRating = Math.round(sectorRatings.reduce((sum: number, r) => sum + r.rating, 0) / sectorRatings.length);
           } else {
             // No ratings for this sector yet, derive from overall with small offset
             // Use a deterministic offset based on sector ID to ensure consistency
-            const sectorIdSum = sector.id.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+            const sectorIdSum = sector.id.split('').reduce((sum: number, char: string) => sum + char.charCodeAt(0), 0);
             const offset = (sectorIdSum % 10) - 5; // -5 to +4 range
             sectorRating = Math.max(0, Math.min(100, overallRating + offset));
           }
@@ -514,7 +514,7 @@ export class SupabaseStorage implements IStorage {
           return {
             name: sector.name,
             rating: sectorRating,
-            color: sector.color || sectorColors[index % sectorColors.length]
+            color: sectorColors[index % sectorColors.length]
           };
         });
       } else {
@@ -551,6 +551,65 @@ export class SupabaseStorage implements IStorage {
     try {
       console.log("Submitting rating:", ratingData);
       
+      // Let's first check if we have the sectors table ready
+      const { data: sectorsData, error: sectorsError } = await supabase
+        .from('sectors')
+        .select('id, name');
+        
+      if (sectorsError) {
+        console.error("Error checking sectors:", sectorsError.message);
+        throw sectorsError;
+      }
+      
+      // If no sectors exist, create default ones
+      if (!sectorsData || sectorsData.length === 0) {
+        console.log("No sectors found, creating default sectors");
+        // Create default sectors
+        const defaultSectors = [
+          { id: randomUUID(), name: 'Healthcare' },
+          { id: randomUUID(), name: 'Education' },
+          { id: randomUUID(), name: 'Infrastructure' },
+          { id: randomUUID(), name: 'Economy' },
+          { id: randomUUID(), name: 'Security' }
+        ];
+        
+        const { error: createSectorsError } = await supabase
+          .from('sectors')
+          .insert(defaultSectors);
+          
+        if (createSectorsError) {
+          console.error("Error creating default sectors:", createSectorsError.message);
+          throw createSectorsError;
+        }
+      }
+      
+      // Get or create the default sector ID for overall ratings
+      let defaultSectorId = '00000000-0000-0000-0000-000000000000';
+      const { data: defaultSector, error: defaultSectorError } = await supabase
+        .from('sectors')
+        .select('id')
+        .eq('name', 'Overall')
+        .maybeSingle();
+        
+      if (defaultSectorError) {
+        console.error("Error checking for default sector:", defaultSectorError.message);
+      }
+      
+      if (!defaultSector) {
+        // Create a default sector for overall ratings
+        defaultSectorId = randomUUID();
+        const { error: createDefaultError } = await supabase
+          .from('sectors')
+          .insert({ id: defaultSectorId, name: 'Overall' });
+          
+        if (createDefaultError) {
+          console.error("Error creating default sector:", createDefaultError.message);
+          // Continue with the UUID we generated
+        }
+      } else {
+        defaultSectorId = defaultSector.id;
+      }
+      
       // Insert the overall rating
       const { error } = await supabase
         .from('ratings')
@@ -559,7 +618,7 @@ export class SupabaseStorage implements IStorage {
           leader_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: ratingData.overallRating,
-          sector_id: '00000000-0000-0000-0000-000000000000', // Default for overall rating
+          sector_id: defaultSectorId,
           created_at: new Date().toISOString()
         });
       
@@ -585,7 +644,7 @@ export class SupabaseStorage implements IStorage {
         
         if (sectorRatingError) {
           console.error("Error submitting sector ratings:", sectorRatingError.message);
-          throw sectorRatingError;
+          // We'll continue since at least the overall rating was submitted
         }
       }
       

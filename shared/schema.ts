@@ -49,7 +49,6 @@ export const leaders = pgTable("leaders", {
 export const sectors = pgTable("sectors", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
-  color: text("color").default("blue"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -71,6 +70,7 @@ export const ratings = pgTable("ratings", {
   id: uuid("id").primaryKey().defaultRandom(),
   leaderId: uuid("leader_id").notNull().references(() => leaders.id),
   sectorId: uuid("sector_id").notNull().references(() => sectors.id),
+  userId: uuid("user_id").notNull().references(() => users.id),
   rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
