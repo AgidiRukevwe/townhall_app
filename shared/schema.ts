@@ -120,6 +120,7 @@ export type Official = {
   gender: string;
   term: string;
   imageUrl: string | null;
+  bio: string | null; // Added bio field
   approvalRating: number;
   approvalTrend: number;
   createdAt: Date | null;

@@ -269,6 +269,7 @@ export class SupabaseStorage implements IStorage {
           gender: '', // Not available in leaders table
           term: '', // Not available in leaders table
           imageUrl: leader.avatar_url || null,
+          bio: leader.bio || null, // Added bio field mapping
           approvalRating: 50, // Default value
           approvalTrend: 0,
           createdAt: leader.created_at ? new Date(leader.created_at) : null,
@@ -351,6 +352,7 @@ export class SupabaseStorage implements IStorage {
         gender: '', // Not available in leaders table
         term: '', // Not available in leaders table
         imageUrl: leader.avatar_url || null,
+        bio: leader.bio || null, // Added bio field
         approvalRating: 50, // Default value
         approvalTrend: 0,
         createdAt: leader.created_at ? new Date(leader.created_at) : null,
