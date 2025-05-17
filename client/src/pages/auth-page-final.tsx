@@ -174,7 +174,6 @@ export default function AuthPage() {
                           autoComplete="email"
                           className="pr-4"
                           onFocus={() => setFocusedField('email')}
-                          onBlur={() => setFocusedField(null)}
                           {...field}
                         />
                       </FormControl>
@@ -243,7 +242,7 @@ export default function AuthPage() {
                   variant="black"
                   size="default"
                   className="w-full font-medium"
-                  disabled={loginMutation ? loginMutation.isPending : false}
+                  disabled={loginMutation ? (loginMutation.isPending || !loginForm.formState.isValid) : !loginForm.formState.isValid}
                 >
                   {loginMutation && loginMutation.isPending ? (
                     "Signing in..."
@@ -284,7 +283,9 @@ export default function AuthPage() {
                           className="pr-4"
                           onFocus={() => setFocusedField('regEmail')}
                           onBlur={() => setFocusedField(null)}
-                          {...field}
+                          value={field.value}
+                          onChange={field.onChange}
+                          name={field.name}
                         />
                       </FormControl>
                       {/* Show hint text only when focused or has error */}
@@ -312,7 +313,9 @@ export default function AuthPage() {
                             className="pr-10"
                             onFocus={() => setFocusedField('regPassword')}
                             onBlur={() => setFocusedField(null)}
-                            {...field}
+                            value={field.value}
+                            onChange={field.onChange}
+                            name={field.name}
                           />
                           <button
                             type="button"
@@ -352,7 +355,9 @@ export default function AuthPage() {
                             className="pr-10"
                             onFocus={() => setFocusedField('confirmPassword')}
                             onBlur={() => setFocusedField(null)}
-                            {...field}
+                            value={field.value}
+                            onChange={field.onChange}
+                            name={field.name}
                           />
                           <button
                             type="button"
@@ -392,7 +397,7 @@ export default function AuthPage() {
                   variant="black"
                   size="default"
                   className="w-full font-medium"
-                  disabled={registerMutation ? registerMutation.isPending : false}
+                  disabled={registerMutation ? (registerMutation.isPending || !registerForm.formState.isValid) : !registerForm.formState.isValid}
                 >
                   {registerMutation && registerMutation.isPending ? (
                     "Signing in..."
