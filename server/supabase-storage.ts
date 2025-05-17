@@ -26,22 +26,10 @@ export class SupabaseStorage implements IStorage {
   public sessionStore: session.Store;
   
   constructor() {
-    // Set up PostgreSQL session store
-    const PostgresSessionStore = connectPg(session);
-    
-    // Use the database connection from environment variables
-    const connectionString = process.env.DATABASE_URL as string;
-    
-    console.log("Auth: Using Supabase database for session store");
-    
-    this.sessionStore = new PostgresSessionStore({ 
-      conObject: {
-        connectionString,
-        ssl: { rejectUnauthorized: false }
-      },
-      createTableIfMissing: true,
-      tableName: 'sessions'
-    });
+    // Use a simple in-memory session store
+    // This avoids PostgreSQL connection issues
+    console.log("Auth: Using in-memory session store with Supabase data storage");
+    this.sessionStore = new session.MemoryStore();
   }
   
   async checkDatabaseConnection(): Promise<boolean> {

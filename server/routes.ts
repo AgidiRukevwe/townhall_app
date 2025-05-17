@@ -31,16 +31,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const category = req.query.category as string | undefined;
       const search = req.query.search as string | undefined;
       
+      console.log("Fetching officials with filters:", { location, category, search });
+      
       const officials = await storage.getOfficials({
         location,
         category,
         search
       });
       
+      console.log(`Successfully fetched ${officials.length} officials`);
       res.json(officials);
     } catch (error) {
       console.error("Error fetching officials:", error);
-      res.status(500).json({ message: "Failed to fetch officials" });
+      
+      // Send more detailed error information
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      
+      res.status(500).json({ 
+        message: "Failed to fetch officials", 
+        error: errorMessage,
+        stack: process.env.NODE_ENV === 'development' ? errorStack : undefined
+      });
     }
   });
 
