@@ -126,6 +126,7 @@ export type Official = {
   createdAt: Date | null;
   updatedAt: Date | null;
   sectors: any[];
+  education: any[]; // Added education field
   electionHistory: any[];
   careerHistory: any[];
 };

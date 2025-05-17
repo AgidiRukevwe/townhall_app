@@ -275,6 +275,15 @@ export class SupabaseStorage implements IStorage {
           createdAt: leader.created_at ? new Date(leader.created_at) : null,
           updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
           sectors: [], // Will be populated in the future
+          education: Array.isArray(education) ? education.map((e: any) => ({
+            id: randomUUID(),
+            officialId: leader.id,
+            institution: e.institution || '',
+            degree: e.degree || '',
+            field: e.field || '',
+            startYear: e.startYear || 0,
+            endYear: e.endYear || 0
+          })) : [],
           electionHistory: [],
           careerHistory: Array.isArray(career) ? career.map((c: any) => ({
             id: randomUUID(),
@@ -358,6 +367,15 @@ export class SupabaseStorage implements IStorage {
         createdAt: leader.created_at ? new Date(leader.created_at) : null,
         updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
         sectors: [], // Will be populated in the future
+        education: Array.isArray(education) ? education.map((e: any) => ({
+          id: randomUUID(),
+          officialId: leader.id,
+          institution: e.institution || '',
+          degree: e.degree || '',
+          field: e.field || '',
+          startYear: e.startYear || 0,
+          endYear: e.endYear || 0
+        })) : [],
         electionHistory: [],
         careerHistory: Array.isArray(career) ? career.map((c: any) => ({
           id: randomUUID(),
