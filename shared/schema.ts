@@ -37,6 +37,7 @@ export const leaders = pgTable("leaders", {
   phone: text("phone"),
   email: text("email"),
   parliamentAddress: text("parliament_address"),
+  bio: text("bio"), // Added bio column
   education: json("education").default('[]'),
   awards: json("awards").default('[]'),
   career: json("career").default('[]'),
