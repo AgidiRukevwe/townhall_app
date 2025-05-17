@@ -23,8 +23,8 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Leaders Table (from SQL file)
-export const leaders = pgTable("leaders", {
+// Public Officials Table (formerly Leaders)
+export const publicOfficials = pgTable("public_officials", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
   avatarUrl: text("avatar_url"),
@@ -68,7 +68,7 @@ export const officeSectors = pgTable("office_sectors", {
 // Ratings Table
 export const ratings = pgTable("ratings", {
   id: uuid("id").primaryKey().defaultRandom(),
-  leaderId: uuid("leader_id").notNull().references(() => leaders.id),
+  publicOfficialId: uuid("public_official_id").notNull().references(() => publicOfficials.id),
   sectorId: uuid("sector_id").notNull().references(() => sectors.id),
   rating: integer("rating").notNull(),
   createdAt: timestamp("created_at").defaultNow(),
@@ -82,7 +82,7 @@ export const petitions = pgTable("petitions", {
   location: text("location"),
   category: text("category"),
   userId: uuid("user_id").notNull().references(() => users.id),
-  leaderId: uuid("leader_id").references(() => leaders.id),
+  publicOfficialId: uuid("public_official_id").references(() => publicOfficials.id),
   signatureCount: integer("signature_count").default(0),
   status: text("status").default("pending"),
   createdAt: timestamp("created_at").defaultNow(),
@@ -92,7 +92,7 @@ export const petitions = pgTable("petitions", {
 // Zod Schemas
 export const userSchema = createInsertSchema(users);
 export const userProfileSchema = createInsertSchema(userProfiles);
-export const leaderSchema = createInsertSchema(leaders);
+export const publicOfficialSchema = createInsertSchema(publicOfficials);
 export const sectorSchema = createInsertSchema(sectors);
 export const ratingSchema = createInsertSchema(ratings);
 export const officeSchema = createInsertSchema(offices);

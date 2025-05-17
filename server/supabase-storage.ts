@@ -380,7 +380,7 @@ export class SupabaseStorage implements IStorage {
       const { data: ratingData, error: ratingError } = await supabase
         .from('ratings')
         .select('rating, created_at')
-        .eq('leader_id', officialId);
+        .eq('public_official_id', officialId);
       
       if (ratingError) {
         console.error("Error fetching ratings:", ratingError.message);
@@ -484,7 +484,7 @@ export class SupabaseStorage implements IStorage {
         .from('ratings')
         .insert({
           id: randomUUID(),
-          leader_id: ratingData.officialId,
+          public_official_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: ratingData.overallRating,
           sector_id: '00000000-0000-0000-0000-000000000000', // Default for overall rating
@@ -500,7 +500,7 @@ export class SupabaseStorage implements IStorage {
       if (ratingData.sectorRatings && ratingData.sectorRatings.length > 0) {
         const sectorRatingsToInsert = ratingData.sectorRatings.map(sr => ({
           id: randomUUID(),
-          leader_id: ratingData.officialId,
+          public_official_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: sr.rating,
           sector_id: sr.sectorId,
