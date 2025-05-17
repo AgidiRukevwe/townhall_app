@@ -25,6 +25,8 @@ export default function Profile() {
   console.log("Profile page - official data:", official);
   console.log("Profile page - education data:", official?.education);
   console.log("Profile page - career data:", official?.careerHistory);
+  console.log("Profile page - sectors data:", official?.sectors);
+  console.log("Profile page - rating summary:", ratingSummary);
   
   if (isLoading) {
     return <Loading message="Loading official profile..." />;
