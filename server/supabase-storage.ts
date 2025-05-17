@@ -207,7 +207,7 @@ export class SupabaseStorage implements IStorage {
   async getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]> {
     try {
       let query = supabase
-        .from('leaders')
+        .from('public_officials')
         .select('*');
       
       // Apply filters
@@ -226,58 +226,58 @@ export class SupabaseStorage implements IStorage {
       const { data, error } = await query;
       
       if (error) {
-        console.error("Error fetching leaders:", error.message);
+        console.error("Error fetching public officials:", error.message);
         throw error;
       }
       
-      // Map leaders to the Official format for compatibility
-      const mappedLeaders = data.map(leader => {
+      // Map public_officials to the Official format for compatibility
+      const mappedOfficials = data.map(official => {
         // Parse JSON fields if they exist
         let education: any[] = [];
         let awards: any[] = [];
         let career: any[] = [];
         
         try {
-          if (leader.education) {
-            education = typeof leader.education === 'string' 
-              ? JSON.parse(leader.education) 
-              : leader.education;
+          if (official.education) {
+            education = typeof official.education === 'string' 
+              ? JSON.parse(official.education) 
+              : official.education;
           }
           
-          if (leader.awards) {
-            awards = typeof leader.awards === 'string' 
-              ? JSON.parse(leader.awards) 
-              : leader.awards;
+          if (official.awards) {
+            awards = typeof official.awards === 'string' 
+              ? JSON.parse(official.awards) 
+              : official.awards;
           }
           
-          if (leader.career) {
-            career = typeof leader.career === 'string' 
-              ? JSON.parse(leader.career) 
-              : leader.career;
+          if (official.career) {
+            career = typeof official.career === 'string' 
+              ? JSON.parse(official.career) 
+              : official.career;
           }
         } catch (e) {
           console.error("Error parsing JSON fields:", e);
         }
         
-        // Create a leader object that maps to our Official interface
+        // Create an official object that maps to our Official interface
         return {
-          id: leader.id,
-          name: leader.name,
-          position: leader.office || '',
-          location: leader.jurisdiction || '',
-          party: leader.party ? leader.party.replace('Party: ', '') : '',
-          gender: '', // Not available in leaders table
-          term: '', // Not available in leaders table
-          imageUrl: leader.avatar_url || null,
+          id: official.id,
+          name: official.name,
+          position: official.office || '',
+          location: official.jurisdiction || '',
+          party: official.party ? official.party.replace('Party: ', '') : '',
+          gender: '', // Not available in public_officials table
+          term: '', // Not available in public_officials table
+          imageUrl: official.avatar_url || null,
           approvalRating: 50, // Default value
           approvalTrend: 0,
-          createdAt: leader.created_at ? new Date(leader.created_at) : null,
-          updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
+          createdAt: official.created_at ? new Date(official.created_at) : null,
+          updatedAt: official.updated_at ? new Date(official.updated_at) : null,
           sectors: [], // Will be populated in the future
           electionHistory: [],
           careerHistory: Array.isArray(career) ? career.map((c: any) => ({
             id: randomUUID(),
-            officialId: leader.id,
+            officialId: official.id,
             position: c.position || '',
             party: c.party || '',
             location: c.location || '',
@@ -288,7 +288,7 @@ export class SupabaseStorage implements IStorage {
         };
       });
       
-      return mappedLeaders;
+      return mappedOfficials;
     } catch (error) {
       console.error("Error fetching officials:", error);
       throw error;
@@ -298,21 +298,21 @@ export class SupabaseStorage implements IStorage {
   async getOfficialById(id: string): Promise<Official | undefined> {
     try {
       const { data, error } = await supabase
-        .from('leaders')
+        .from('public_officials')
         .select('*')
         .eq('id', id)
         .single();
       
       if (error) {
         if (error.code === 'PGRST116') {
-          // No rows returned - leader not found
+          // No rows returned - official not found
           return undefined;
         }
-        console.error("Error fetching leader by ID:", error.message);
+        console.error("Error fetching public official by ID:", error.message);
         throw error;
       }
       
-      const leader = data;
+      const official = data;
       
       // Parse JSON fields if they exist
       let education: any[] = [];
@@ -320,46 +320,46 @@ export class SupabaseStorage implements IStorage {
       let career: any[] = [];
       
       try {
-        if (leader.education) {
-          education = typeof leader.education === 'string' 
-            ? JSON.parse(leader.education) 
-            : leader.education;
+        if (official.education) {
+          education = typeof official.education === 'string' 
+            ? JSON.parse(official.education) 
+            : official.education;
         }
         
-        if (leader.awards) {
-          awards = typeof leader.awards === 'string' 
-            ? JSON.parse(leader.awards) 
-            : leader.awards;
+        if (official.awards) {
+          awards = typeof official.awards === 'string' 
+            ? JSON.parse(official.awards) 
+            : official.awards;
         }
         
-        if (leader.career) {
-          career = typeof leader.career === 'string' 
-            ? JSON.parse(leader.career) 
-            : leader.career;
+        if (official.career) {
+          career = typeof official.career === 'string' 
+            ? JSON.parse(official.career) 
+            : official.career;
         }
       } catch (e) {
         console.error("Error parsing JSON fields:", e);
       }
       
-      // Create a leader object that maps to our Official interface
+      // Create an official object that maps to our Official interface
       return {
-        id: leader.id,
-        name: leader.name,
-        position: leader.office || '',
-        location: leader.jurisdiction || '',
-        party: leader.party ? leader.party.replace('Party: ', '') : '',
-        gender: '', // Not available in leaders table
-        term: '', // Not available in leaders table
-        imageUrl: leader.avatar_url || null,
+        id: official.id,
+        name: official.name,
+        position: official.office || '',
+        location: official.jurisdiction || '',
+        party: official.party ? official.party.replace('Party: ', '') : '',
+        gender: '', // Not available in public_officials table
+        term: '', // Not available in public_officials table
+        imageUrl: official.avatar_url || null,
         approvalRating: 50, // Default value
         approvalTrend: 0,
-        createdAt: leader.created_at ? new Date(leader.created_at) : null,
-        updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
+        createdAt: official.created_at ? new Date(official.created_at) : null,
+        updatedAt: official.updated_at ? new Date(official.updated_at) : null,
         sectors: [], // Will be populated in the future
         electionHistory: [],
         careerHistory: Array.isArray(career) ? career.map((c: any) => ({
           id: randomUUID(),
-          officialId: leader.id,
+          officialId: official.id,
           position: c.position || '',
           party: c.party || '',
           location: c.location || '',
@@ -369,7 +369,7 @@ export class SupabaseStorage implements IStorage {
         })) : []
       };
     } catch (error) {
-      console.error("Error fetching leader:", error);
+      console.error("Error fetching public official:", error);
       throw error;
     }
   }
