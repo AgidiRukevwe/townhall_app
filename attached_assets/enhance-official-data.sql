@@ -1,74 +1,52 @@
 -- This script will update the database with the fully structured education information
--- It looks like the system is already generating ID and officialId fields for us
+-- Note: Your database uses 'school' instead of 'institution'
 
--- First, let's see the current data to understand how it's stored
--- SELECT id, education FROM leaders WHERE id = '7e03327e-f1d6-4515-bb7c-6ed1d0db842d';
-
--- Update Sen. SERIAKE DICKSON's education data with institution details but keep existing IDs
-WITH existing_data AS (
-  SELECT id, education FROM leaders WHERE id = '7e03327e-f1d6-4515-bb7c-6ed1d0db842d'
-)
+-- First, directly update Sen. SERIAKE DICKSON's education data
 UPDATE leaders
-SET education = (
-  SELECT jsonb_agg(
-    CASE
-      WHEN (education_item->>'degree') = 'SSCE1983' THEN
-        jsonb_set(
-          education_item,
-          '{institution}',
-          '"Mopa Secondary School, Mopa"'::jsonb
-        )
-      WHEN (education_item->>'degree') = 'LLB Honours1992' THEN
-        jsonb_set(
-          jsonb_set(
-            education_item,
-            '{institution}',
-            '"Rivers State University of Science and Technology"'::jsonb
-          ),
-          '{field}',
-          '"Law"'::jsonb
-        )
-      WHEN (education_item->>'degree') = 'BL1993' THEN
-        jsonb_set(
-          jsonb_set(
-            education_item,
-            '{institution}',
-            '"Nigerian Law School"'::jsonb
-          ),
-          '{field}',
-          '"Legal Practice"'::jsonb
-        )
-      ELSE education_item
-    END
-  )
-  FROM existing_data, jsonb_array_elements(existing_data.education) AS education_item
-)
-WHERE id = '7e03327e-f1d6-4515-bb7c-6ed1d0db842d';
-
--- Update Sen. SERIAKE DICKSON's career data 
-WITH existing_data AS (
-  SELECT id, career FROM leaders WHERE id = '7e03327e-f1d6-4515-bb7c-6ed1d0db842d'
-)
-UPDATE leaders
-SET career = (
-  SELECT jsonb_agg(
-    CASE
-      WHEN position = 0 THEN
-        jsonb_build_object(
-          'id', career_item->>'id',
-          'officialId', career_item->>'officialId',
-          'position', 'Senator',
-          'party', 'PDP',
-          'location', 'Bayelsa West Senatorial District',
-          'startYear', 2020,
-          'endYear', 0,
-          'createdAt', career_item->>'createdAt'
-        )
-      ELSE career_item
-    END
-  )
-  FROM existing_data, jsonb_array_elements(COALESCE(existing_data.career, '[]'::jsonb)) WITH ORDINALITY AS t(career_item, position)
-)
+SET education = '[
+  {
+    "degree": "SSCE1983",
+    "school": "Government Secondary school, Toru-Ebeni"
+  },
+  {
+    "degree": "LLB Honours1992",
+    "school": "University of Science and technology, PH, Rivers State"
+  },
+  {
+    "degree": "BL1993",
+    "school": "Nigerian Law school, Lagos"
+  }
+]'::jsonb,
+career = '[
+  {
+    "position": "Legal Practitioner",
+    "party": "Independent",
+    "location": "Bayelsa State",
+    "startYear": 1993,
+    "endYear": 1999
+  },
+  {
+    "position": "Attorney General and Commissioner for Justice",
+    "party": "PDP",
+    "location": "Bayelsa State",
+    "startYear": 2006,
+    "endYear": 2007
+  },
+  {
+    "position": "Governor",
+    "party": "PDP",
+    "location": "Bayelsa State",
+    "startYear": 2012,
+    "endYear": 2020
+  },
+  {
+    "position": "Senator",
+    "party": "PDP",
+    "location": "Bayelsa West Senatorial District",
+    "startYear": 2020,
+    "endYear": 0
+  }
+]'::jsonb
 WHERE id = '7e03327e-f1d6-4515-bb7c-6ed1d0db842d';
 
 -- You can add similar updates for other officials below

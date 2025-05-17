@@ -278,7 +278,7 @@ export class SupabaseStorage implements IStorage {
           education: Array.isArray(education) ? education.map((e: any) => ({
             id: randomUUID(),
             officialId: leader.id,
-            institution: e.institution || '',
+            institution: e.school || e.institution || '',  // Use school field if available
             degree: e.degree || '',
             field: e.field || '',
             startYear: e.startYear || 0,
@@ -370,7 +370,7 @@ export class SupabaseStorage implements IStorage {
         education: Array.isArray(education) ? education.map((e: any) => ({
           id: randomUUID(),
           officialId: leader.id,
-          institution: e.institution || '',
+          institution: e.school || e.institution || '',  // Use school field if available
           degree: e.degree || '',
           field: e.field || '',
           startYear: e.startYear || 0,
