@@ -562,21 +562,50 @@ export class SupabaseStorage implements IStorage {
     try {
       console.log("Submitting rating:", ratingData);
       
-      // First, delete any existing ratings from this user for this official
-      const { error: deleteError } = await supabase
+      // Let's handle this with multiple steps to avoid constraint errors
+      // Step 1: First, get all the current ratings for this user/leader combination
+      const { data: existingRatings, error: getError } = await supabase
         .from('ratings')
-        .delete()
+        .select('id, sector_id')
         .eq('leader_id', ratingData.officialId)
         .eq('user_id', ratingData.userId);
       
-      if (deleteError) {
-        console.error("Error deleting existing ratings:", deleteError.message);
-        // But continue anyway - if there are no ratings, this will just be a no-op
-      } else {
-        console.log("Successfully removed previous ratings");
+      if (getError) {
+        console.error("Error checking existing ratings:", getError.message);
+        // Continue anyway - we'll try to proceed
       }
       
-      // Let's first check if we have the sectors table ready
+      // Step 2: Delete any existing ratings individually to ensure they're gone
+      if (existingRatings && existingRatings.length > 0) {
+        console.log(`Found ${existingRatings.length} existing ratings to remove`);
+        
+        for (const rating of existingRatings) {
+          const { error: deleteError } = await supabase
+            .from('ratings')
+            .delete()
+            .eq('id', rating.id);
+            
+          if (deleteError) {
+            console.error(`Error deleting rating ${rating.id}:`, deleteError.message);
+            // Continue with the other deletions
+          }
+        }
+      }
+      
+      // Let's confirm all ratings are deleted
+      const { data: checkRatings, error: checkError } = await supabase
+        .from('ratings')
+        .select('count')
+        .eq('leader_id', ratingData.officialId)
+        .eq('user_id', ratingData.userId);
+        
+      if (checkError) {
+        console.error("Error checking if ratings were deleted:", checkError.message);
+      } else {
+        console.log("Confirmed deletion - ratings count:", checkRatings);
+      }
+      
+      // Step 3: Ensure we have the sectors table ready
       const { data: sectorsData, error: sectorsError } = await supabase
         .from('sectors')
         .select('id, name');
@@ -586,29 +615,7 @@ export class SupabaseStorage implements IStorage {
         throw sectorsError;
       }
       
-      // If no sectors exist, create default ones
-      if (!sectorsData || sectorsData.length === 0) {
-        console.log("No sectors found, creating default sectors");
-        // Create default sectors
-        const defaultSectors = [
-          { id: randomUUID(), name: 'Healthcare' },
-          { id: randomUUID(), name: 'Education' },
-          { id: randomUUID(), name: 'Infrastructure' },
-          { id: randomUUID(), name: 'Economy' },
-          { id: randomUUID(), name: 'Security' }
-        ];
-        
-        const { error: createSectorsError } = await supabase
-          .from('sectors')
-          .insert(defaultSectors);
-          
-        if (createSectorsError) {
-          console.error("Error creating default sectors:", createSectorsError.message);
-          throw createSectorsError;
-        }
-      }
-      
-      // Get or create the default sector ID for overall ratings
+      // Step 4: Get or create the default sector ID for overall ratings
       let defaultSectorId = '00000000-0000-0000-0000-000000000000';
       const { data: defaultSector, error: defaultSectorError } = await supabase
         .from('sectors')
@@ -618,63 +625,58 @@ export class SupabaseStorage implements IStorage {
         
       if (defaultSectorError) {
         console.error("Error checking for default sector:", defaultSectorError.message);
-      }
-      
-      if (!defaultSector) {
-        // Create a default sector for overall ratings
-        defaultSectorId = randomUUID();
-        const { error: createDefaultError } = await supabase
-          .from('sectors')
-          .insert({ id: defaultSectorId, name: 'Overall' });
-          
-        if (createDefaultError) {
-          console.error("Error creating default sector:", createDefaultError.message);
-          // Continue with the UUID we generated
-        }
-      } else {
+      } else if (defaultSector) {
         defaultSectorId = defaultSector.id;
       }
       
-      // Prepare all ratings to insert in a single batch
-      const ratingsToInsert = [
-        // Overall rating
-        {
+      // Step 5: Insert the overall rating first
+      console.log("Inserting overall rating");
+      const { error: overallError } = await supabase
+        .from('ratings')
+        .insert({
           id: randomUUID(),
           leader_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: ratingData.overallRating,
           sector_id: defaultSectorId,
           created_at: new Date().toISOString()
-        }
-      ];
+        });
       
-      // Add sector ratings if provided
+      if (overallError) {
+        console.error("Error submitting overall rating:", overallError.message);
+        throw overallError;
+      }
+      
+      // Step 6: Insert sector ratings one by one
+      let insertedCount = 0;
       if (ratingData.sectorRatings && ratingData.sectorRatings.length > 0) {
-        const sectorRatings = ratingData.sectorRatings
-          .filter(sr => sr.sectorId !== defaultSectorId) // Avoid duplicates with the overall rating
-          .map(sr => ({
-            id: randomUUID(),
-            leader_id: ratingData.officialId,
-            user_id: ratingData.userId,
-            rating: sr.rating,
-            sector_id: sr.sectorId,
-            created_at: new Date().toISOString()
-          }));
+        console.log(`Inserting ${ratingData.sectorRatings.length} sector ratings`);
         
-        ratingsToInsert.push(...sectorRatings);
+        for (const sr of ratingData.sectorRatings) {
+          // Skip the overall rating sector that we already inserted
+          if (sr.sectorId === defaultSectorId) continue;
+          
+          const { error: sectorError } = await supabase
+            .from('ratings')
+            .insert({
+              id: randomUUID(),
+              leader_id: ratingData.officialId,
+              user_id: ratingData.userId,
+              rating: sr.rating,
+              sector_id: sr.sectorId,
+              created_at: new Date().toISOString()
+            });
+            
+          if (sectorError) {
+            console.error(`Error submitting rating for sector ${sr.sectorId}:`, sectorError.message);
+            // Continue with other sectors
+          } else {
+            insertedCount++;
+          }
+        }
       }
       
-      // Insert all ratings in a single operation
-      const { error: ratingsError } = await supabase
-        .from('ratings')
-        .insert(ratingsToInsert);
-      
-      if (ratingsError) {
-        console.error("Error submitting ratings:", ratingsError.message);
-        throw ratingsError;
-      }
-      
-      console.log("Rating submitted successfully");
+      console.log(`Rating submitted successfully. Inserted overall rating + ${insertedCount} sector ratings`);
       return { success: true };
     } catch (error) {
       console.error("Error submitting rating:", error);
