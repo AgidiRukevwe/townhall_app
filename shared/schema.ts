@@ -125,7 +125,7 @@ export type Official = {
   approvalTrend: number;
   createdAt: Date | null;
   updatedAt: Date | null;
-  sectors: any[];
+  sectors: Sector[];
   education: any[]; // Added education field
   electionHistory: any[];
   careerHistory: Array<{

@@ -22,6 +22,11 @@ export function SectorPerformance({
 
   // Color mapping for sector indicators
   const getColorClass = (color: string) => {
+    // If it's already a hex code, return the style attribute instead
+    if (color.startsWith('#')) {
+      return color; // We'll use inline style instead of a class for hex colors
+    }
+    
     switch (color) {
       case "red":
         return "bg-red-500";
@@ -70,9 +75,10 @@ export function SectorPerformance({
               <div className="flex justify-between mb-1">
                 <div className="flex items-center">
                   <span
-                    className={`h-2 w-2 rounded-full ${getColorClass(
-                      sector.color
-                    )} mr-2`}
+                    className={`h-2 w-2 rounded-full mr-2 ${
+                      sector.color.startsWith('#') ? '' : getColorClass(sector.color)
+                    }`}
+                    style={sector.color.startsWith('#') ? { backgroundColor: sector.color } : {}}
                   ></span>
                   <span className="text-sm font-medium">{sector.name}</span>
                 </div>
