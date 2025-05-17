@@ -562,7 +562,7 @@ export class SupabaseStorage implements IStorage {
     try {
       console.log("Submitting rating:", ratingData);
       
-      // First, delete existing ratings from this user for this official to avoid unique constraint violations
+      // First, delete any existing ratings from this user for this official
       const { error: deleteError } = await supabase
         .from('ratings')
         .delete()
@@ -571,7 +571,9 @@ export class SupabaseStorage implements IStorage {
       
       if (deleteError) {
         console.error("Error deleting existing ratings:", deleteError.message);
-        // We'll continue anyway, the insert might still succeed
+        // But continue anyway - if there are no ratings, this will just be a no-op
+      } else {
+        console.log("Successfully removed previous ratings");
       }
       
       // Let's first check if we have the sectors table ready
