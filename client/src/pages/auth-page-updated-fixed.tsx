@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -38,8 +38,13 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPageUpdated() {
   const [isLogin, setIsLogin] = useState(true);
-  const [showPassword, setShowPassword] = useState(false);
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Form field states to conditionally show hints
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  
   const auth = useAuth();
   const user = auth.user;
   
@@ -65,6 +70,7 @@ export default function AuthPageUpdated() {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   // Register form
@@ -75,9 +81,10 @@ export default function AuthPageUpdated() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   });
 
-  const onLoginSubmit = (data: LoginFormValues) => {
+  const onLoginSubmit = async (data: LoginFormValues) => {
     if (loginMutation) {
       loginMutation.mutate({
         username: data.email, // Using email as username
@@ -100,7 +107,7 @@ export default function AuthPageUpdated() {
     }
   };
 
-  const onRegisterSubmit = (data: RegisterFormValues) => {
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
     if (registerMutation) {
       registerMutation.mutate(
         {
@@ -127,8 +134,19 @@ export default function AuthPageUpdated() {
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  // Reset forms when switching between login and register
+  useEffect(() => {
+    loginForm.reset();
+    registerForm.reset();
+    setFocusedField(null);
+  }, [isLogin]);
+
+  const toggleLoginPasswordVisibility = () => {
+    setShowLoginPassword(!showLoginPassword);
+  };
+
+  const toggleRegisterPasswordVisibility = () => {
+    setShowRegisterPassword(!showRegisterPassword);
   };
 
   const toggleConfirmPasswordVisibility = () => {
@@ -141,10 +159,10 @@ export default function AuthPageUpdated() {
         <div className="flex flex-col items-center mb-8">
           <THLogo className="mb-6" />
           <h2 className="text-2xl font-bold text-center text-[#262626]">
-            {isLogin ? "Welcome to Townhall" : "Welcome back to Townhall"}
+            {isLogin ? "Welcome to Townhall" : "Create an account"}
           </h2>
           <p className="mt-2 text-[14px] md:text-[16px] text-center text-[#737373] font-medium">
-            {isLogin ? "Sign up to get started" : "Sign in to continue"}
+            {isLogin ? "Sign in to continue" : "Sign up to get started"}
           </p>
         </div>
 
@@ -159,44 +177,52 @@ export default function AuthPageUpdated() {
                   control={loginForm.control}
                   name="email"
                   render={({ field, fieldState }) => (
-                    <div className="space-y-1">
-                      <FormItemWithHint 
-                        label="Email" 
-                        hintText="Enter your email address" 
-                        errorMessage={fieldState.error?.message}
-                        error={!!fieldState.error}
-                      >
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Email</FormLabel>
+                      <FormControl>
                         <Input
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setFocusedField('loginEmail')}
+                          onBlur={() => setFocusedField(null)}
                           {...field}
                         />
-                      </FormItemWithHint>
-                    </div>
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'loginEmail' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
                   )}
                 />
 
                 <FormField
                   control={loginForm.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            type={showPassword ? "text" : "password"}
+                            type={showLoginPassword ? "text" : "password"}
                             autoComplete="current-password"
                             className="pr-10"
+                            onFocus={() => setFocusedField('loginPassword')}
+                            onBlur={() => setFocusedField(null)}
                             {...field}
                           />
                           <button
                             type="button"
                             className="absolute inset-y-0 right-0 flex items-center pr-4"
-                            onClick={togglePasswordVisibility}
+                            onClick={toggleLoginPasswordVisibility}
                           >
-                            {showPassword ? (
+                            {showLoginPassword ? (
                               <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
                             ) : (
                               <Eye className="h-5 w-5 text-[#BFBFBF]" />
@@ -204,8 +230,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'loginPassword' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -215,7 +246,7 @@ export default function AuthPageUpdated() {
                     type="button" 
                     className="text-[#737373] hover:text-[#262626]"
                   >
-                    Forgot passwords ?
+                    Forgot password?
                   </button>
                 </div>
 
@@ -224,25 +255,19 @@ export default function AuthPageUpdated() {
                   variant="black"
                   size="default"
                   className="w-full font-medium"
-                  disabled={loginMutation ? loginMutation.isPending : false}
+                  disabled={!loginForm.formState.isValid || (loginMutation?.isPending || false)}
                 >
-                  {loginMutation && loginMutation.isPending ? (
-                    <>
-                      <span className="text-[#8c8c8c]">Signing in...</span>
-                    </>
-                  ) : (
-                    "Sign up"
-                  )}
+                  {loginMutation?.isPending ? "Signing in..." : "Sign in"}
                 </Button>
 
                 <div className="text-[14px] md:text-[16px] text-center font-medium">
-                  Already have an account ?{" "}
+                  Don't have an account?{" "}
                   <button
                     type="button"
                     onClick={() => setIsLogin(false)}
                     className="text-[#1476FF] font-semibold hover:text-blue-700"
                   >
-                    Sign in
+                    Sign up
                   </button>
                 </div>
               </form>
@@ -256,19 +281,27 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="email"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Email</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setFocusedField('regEmail')}
+                          onBlur={() => setFocusedField(null)}
                           {...field}
                         />
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'regEmail' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -276,23 +309,25 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            type={showPassword ? "text" : "password"}
+                            type={showRegisterPassword ? "text" : "password"}
                             autoComplete="new-password"
                             className="pr-10"
+                            onFocus={() => setFocusedField('regPassword')}
+                            onBlur={() => setFocusedField(null)}
                             {...field}
                           />
                           <button
                             type="button"
                             className="absolute inset-y-0 right-0 flex items-center pr-4"
-                            onClick={togglePasswordVisibility}
+                            onClick={toggleRegisterPasswordVisibility}
                           >
-                            {showPassword ? (
+                            {showRegisterPassword ? (
                               <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
                             ) : (
                               <Eye className="h-5 w-5 text-[#BFBFBF]" />
@@ -300,8 +335,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'regPassword' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -309,15 +349,17 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="confirmPassword"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
-                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Confirm password</FormLabel>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Confirm password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
                             autoComplete="new-password"
                             className="pr-10"
+                            onFocus={() => setFocusedField('confirmPassword')}
+                            onBlur={() => setFocusedField(null)}
                             {...field}
                           />
                           <button
@@ -333,37 +375,29 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'confirmPassword' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Re-enter your password to confirm"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
-
-                <div className="text-[14px] md:text-[16px] font-medium">
-                  <button 
-                    type="button" 
-                    className="text-[#737373] hover:text-[#262626]"
-                  >
-                    Forgot passwords ?
-                  </button>
-                </div>
 
                 <Button
                   type="submit"
                   variant="black"
                   size="default"
                   className="w-full font-medium"
-                  disabled={registerMutation ? registerMutation.isPending : false}
+                  disabled={!registerForm.formState.isValid || (registerMutation?.isPending || false)}
                 >
-                  {registerMutation && registerMutation.isPending ? (
-                    <span className="text-[#8c8c8c]">Signing in...</span>
-                  ) : (
-                    "Sign up"
-                  )}
+                  {registerMutation?.isPending ? "Signing up..." : "Sign up"}
                 </Button>
 
                 <div className="text-[14px] md:text-[16px] text-center font-medium">
-                  Already have an account ?{" "}
+                  Already have an account?{" "}
                   <button
                     type="button"
                     onClick={() => setIsLogin(true)}
