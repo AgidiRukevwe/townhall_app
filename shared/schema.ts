@@ -128,7 +128,17 @@ export type Official = {
   sectors: any[];
   education: any[]; // Added education field
   electionHistory: any[];
-  careerHistory: any[];
+  careerHistory: Array<{
+    id: string;
+    officialId: string;
+    position: string;
+    party: string;
+    location: string;
+    startYear: number;
+    endYear: number;
+    date?: string;
+    createdAt?: Date;
+  }>;
 };
 
 export type InsertOfficial = InsertLeader;

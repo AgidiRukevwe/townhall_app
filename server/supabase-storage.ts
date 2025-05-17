@@ -288,11 +288,12 @@ export class SupabaseStorage implements IStorage {
           careerHistory: Array.isArray(career) ? career.map((c: any) => ({
             id: randomUUID(),
             officialId: leader.id,
-            position: c.position || '',
+            position: c.office || c.position || '',
             party: c.party || '',
             location: c.location || '',
             startYear: c.startYear || 0,
             endYear: c.endYear || 0,
+            date: c.date || '',
             createdAt: new Date()
           })) : []
         };
@@ -380,11 +381,12 @@ export class SupabaseStorage implements IStorage {
         careerHistory: Array.isArray(career) ? career.map((c: any) => ({
           id: randomUUID(),
           officialId: leader.id,
-          position: c.position || '',
+          position: c.office || c.position || '',
           party: c.party || '',
           location: c.location || '',
           startYear: c.startYear || 0,
           endYear: c.endYear || 0,
+          date: c.date || '',
           createdAt: new Date()
         })) : []
       };
