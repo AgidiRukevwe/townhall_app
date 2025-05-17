@@ -501,7 +501,9 @@ export class SupabaseStorage implements IStorage {
   
   async submitRating(ratingData: RatingPayload & { userId: string }): Promise<{ success: boolean }> {
     try {
-      // Insert the rating
+      console.log("Submitting rating:", ratingData);
+      
+      // Insert the overall rating
       const { error } = await supabase
         .from('ratings')
         .insert({
@@ -514,7 +516,7 @@ export class SupabaseStorage implements IStorage {
         });
       
       if (error) {
-        console.error("Error submitting rating:", error.message);
+        console.error("Error submitting overall rating:", error.message);
         throw error;
       }
       
@@ -535,10 +537,11 @@ export class SupabaseStorage implements IStorage {
         
         if (sectorRatingError) {
           console.error("Error submitting sector ratings:", sectorRatingError.message);
-          // We still return success since the overall rating was saved
+          throw sectorRatingError;
         }
       }
       
+      console.log("Rating submitted successfully");
       return { success: true };
     } catch (error) {
       console.error("Error submitting rating:", error);
