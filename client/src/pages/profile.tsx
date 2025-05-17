@@ -5,13 +5,14 @@ import { ApprovalChart } from "@/components/profile/approval-chart";
 import { SectorPerformance } from "@/components/profile/sector-performance";
 import { ElectionTimeline } from "@/components/profile/election-timeline";
 import { CareerTimeline } from "@/components/profile/career-timeline";
+import { EducationTimeline } from "@/components/profile/education-timeline";
 import { useOfficialDetails } from "@/hooks/use-officials";
 import { useRatings } from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
 import { RatingModal } from "@/components/rating/rating-modal";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Flag, MapPin } from "lucide-react";
+import { ArrowLeft, Flag, MapPin, User } from "lucide-react";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -58,11 +59,17 @@ export default function Profile() {
         {/* Official info */}
         <div className="flex flex-col md:flex-row items-start mb-8">
           <div className="flex-shrink-0 mb-4 md:mb-0 mr-6">
-            <img 
-              src={official.imageUrl} 
-              alt={official.name}
-              className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
-            />
+            {official.imageUrl ? (
+              <img 
+                src={official.imageUrl as string} 
+                alt={official.name}
+                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
+              />
+            ) : (
+              <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+                <User className="h-16 w-16 text-gray-400" />
+              </div>
+            )}
           </div>
           
           <div className="flex-1">
@@ -109,6 +116,12 @@ export default function Profile() {
               className="border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent px-1 py-4 border-b-2 font-medium text-gray-500 data-[state=active]:shadow-none rounded-none"
             >
               Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="biography"
+              className="border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent px-1 py-4 border-b-2 font-medium text-gray-500 data-[state=active]:shadow-none rounded-none"
+            >
+              Biography
             </TabsTrigger>
             <TabsTrigger
               value="petitions"
@@ -171,6 +184,34 @@ export default function Profile() {
                 </div>
               </>
             )}
+          </TabsContent>
+          
+          <TabsContent value="biography">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Bio Section */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Biography</h3>
+                {official.bio ? (
+                  <p className="text-gray-700 whitespace-pre-line">{official.bio}</p>
+                ) : (
+                  <p className="text-gray-400 text-center py-4">No biography information available</p>
+                )}
+              </div>
+              
+              {/* Education Section */}
+              <div>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-medium text-gray-900">Education</h3>
+                  {official.education && official.education.length > 3 && (
+                    <button className="text-sm text-gray-500 hover:text-gray-700">
+                      See all <ArrowLeft className="inline h-3 w-3 ml-1 rotate-180" />
+                    </button>
+                  )}
+                </div>
+                
+                <EducationTimeline education={official.education || []} />
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="petitions">
