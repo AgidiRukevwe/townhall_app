@@ -8,7 +8,7 @@ import OfficialsDebug from "./pages/officials-debug";
 import Navbar from "./components/layout/navbar";
 import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
-import AuthPageUpdated from "./pages/auth-page-updated";
+import AuthPageUpdated from "./pages/auth-page-updated-fixed";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
