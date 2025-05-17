@@ -207,7 +207,7 @@ export class SupabaseStorage implements IStorage {
   async getOfficials(filters?: { location?: string; category?: string; search?: string }): Promise<Official[]> {
     try {
       let query = supabase
-        .from('public_officials')
+        .from('leaders')
         .select('*');
       
       // Apply filters
@@ -226,58 +226,58 @@ export class SupabaseStorage implements IStorage {
       const { data, error } = await query;
       
       if (error) {
-        console.error("Error fetching public officials:", error.message);
+        console.error("Error fetching leaders:", error.message);
         throw error;
       }
       
-      // Map public_officials to the Official format for compatibility
-      const mappedOfficials = data.map(official => {
+      // Map leaders to the Official format for compatibility
+      const mappedLeaders = data.map(leader => {
         // Parse JSON fields if they exist
         let education: any[] = [];
         let awards: any[] = [];
         let career: any[] = [];
         
         try {
-          if (official.education) {
-            education = typeof official.education === 'string' 
-              ? JSON.parse(official.education) 
-              : official.education;
+          if (leader.education) {
+            education = typeof leader.education === 'string' 
+              ? JSON.parse(leader.education) 
+              : leader.education;
           }
           
-          if (official.awards) {
-            awards = typeof official.awards === 'string' 
-              ? JSON.parse(official.awards) 
-              : official.awards;
+          if (leader.awards) {
+            awards = typeof leader.awards === 'string' 
+              ? JSON.parse(leader.awards) 
+              : leader.awards;
           }
           
-          if (official.career) {
-            career = typeof official.career === 'string' 
-              ? JSON.parse(official.career) 
-              : official.career;
+          if (leader.career) {
+            career = typeof leader.career === 'string' 
+              ? JSON.parse(leader.career) 
+              : leader.career;
           }
         } catch (e) {
           console.error("Error parsing JSON fields:", e);
         }
         
-        // Create an official object that maps to our Official interface
+        // Create a leader object that maps to our Official interface
         return {
-          id: official.id,
-          name: official.name,
-          position: official.office || '',
-          location: official.jurisdiction || '',
-          party: official.party ? official.party.replace('Party: ', '') : '',
-          gender: '', // Not available in public_officials table
-          term: '', // Not available in public_officials table
-          imageUrl: official.avatar_url || null,
+          id: leader.id,
+          name: leader.name,
+          position: leader.office || '',
+          location: leader.jurisdiction || '',
+          party: leader.party ? leader.party.replace('Party: ', '') : '',
+          gender: '', // Not available in leaders table
+          term: '', // Not available in leaders table
+          imageUrl: leader.avatar_url || null,
           approvalRating: 50, // Default value
           approvalTrend: 0,
-          createdAt: official.created_at ? new Date(official.created_at) : null,
-          updatedAt: official.updated_at ? new Date(official.updated_at) : null,
+          createdAt: leader.created_at ? new Date(leader.created_at) : null,
+          updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
           sectors: [], // Will be populated in the future
           electionHistory: [],
           careerHistory: Array.isArray(career) ? career.map((c: any) => ({
             id: randomUUID(),
-            officialId: official.id,
+            officialId: leader.id,
             position: c.position || '',
             party: c.party || '',
             location: c.location || '',
@@ -288,7 +288,7 @@ export class SupabaseStorage implements IStorage {
         };
       });
       
-      return mappedOfficials;
+      return mappedLeaders;
     } catch (error) {
       console.error("Error fetching officials:", error);
       throw error;
@@ -298,21 +298,21 @@ export class SupabaseStorage implements IStorage {
   async getOfficialById(id: string): Promise<Official | undefined> {
     try {
       const { data, error } = await supabase
-        .from('public_officials')
+        .from('leaders')
         .select('*')
         .eq('id', id)
         .single();
       
       if (error) {
         if (error.code === 'PGRST116') {
-          // No rows returned - official not found
+          // No rows returned - leader not found
           return undefined;
         }
-        console.error("Error fetching public official by ID:", error.message);
+        console.error("Error fetching leader by ID:", error.message);
         throw error;
       }
       
-      const official = data;
+      const leader = data;
       
       // Parse JSON fields if they exist
       let education: any[] = [];
@@ -320,46 +320,46 @@ export class SupabaseStorage implements IStorage {
       let career: any[] = [];
       
       try {
-        if (official.education) {
-          education = typeof official.education === 'string' 
-            ? JSON.parse(official.education) 
-            : official.education;
+        if (leader.education) {
+          education = typeof leader.education === 'string' 
+            ? JSON.parse(leader.education) 
+            : leader.education;
         }
         
-        if (official.awards) {
-          awards = typeof official.awards === 'string' 
-            ? JSON.parse(official.awards) 
-            : official.awards;
+        if (leader.awards) {
+          awards = typeof leader.awards === 'string' 
+            ? JSON.parse(leader.awards) 
+            : leader.awards;
         }
         
-        if (official.career) {
-          career = typeof official.career === 'string' 
-            ? JSON.parse(official.career) 
-            : official.career;
+        if (leader.career) {
+          career = typeof leader.career === 'string' 
+            ? JSON.parse(leader.career) 
+            : leader.career;
         }
       } catch (e) {
         console.error("Error parsing JSON fields:", e);
       }
       
-      // Create an official object that maps to our Official interface
+      // Create a leader object that maps to our Official interface
       return {
-        id: official.id,
-        name: official.name,
-        position: official.office || '',
-        location: official.jurisdiction || '',
-        party: official.party ? official.party.replace('Party: ', '') : '',
-        gender: '', // Not available in public_officials table
-        term: '', // Not available in public_officials table
-        imageUrl: official.avatar_url || null,
+        id: leader.id,
+        name: leader.name,
+        position: leader.office || '',
+        location: leader.jurisdiction || '',
+        party: leader.party ? leader.party.replace('Party: ', '') : '',
+        gender: '', // Not available in leaders table
+        term: '', // Not available in leaders table
+        imageUrl: leader.avatar_url || null,
         approvalRating: 50, // Default value
         approvalTrend: 0,
-        createdAt: official.created_at ? new Date(official.created_at) : null,
-        updatedAt: official.updated_at ? new Date(official.updated_at) : null,
+        createdAt: leader.created_at ? new Date(leader.created_at) : null,
+        updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
         sectors: [], // Will be populated in the future
         electionHistory: [],
         careerHistory: Array.isArray(career) ? career.map((c: any) => ({
           id: randomUUID(),
-          officialId: official.id,
+          officialId: leader.id,
           position: c.position || '',
           party: c.party || '',
           location: c.location || '',
@@ -369,7 +369,7 @@ export class SupabaseStorage implements IStorage {
         })) : []
       };
     } catch (error) {
-      console.error("Error fetching public official:", error);
+      console.error("Error fetching leader:", error);
       throw error;
     }
   }
@@ -380,7 +380,7 @@ export class SupabaseStorage implements IStorage {
       const { data: ratingData, error: ratingError } = await supabase
         .from('ratings')
         .select('rating, created_at')
-        .eq('public_official_id', officialId);
+        .eq('leader_id', officialId);
       
       if (ratingError) {
         console.error("Error fetching ratings:", ratingError.message);
@@ -484,7 +484,7 @@ export class SupabaseStorage implements IStorage {
         .from('ratings')
         .insert({
           id: randomUUID(),
-          public_official_id: ratingData.officialId,
+          leader_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: ratingData.overallRating,
           sector_id: '00000000-0000-0000-0000-000000000000', // Default for overall rating
@@ -500,7 +500,7 @@ export class SupabaseStorage implements IStorage {
       if (ratingData.sectorRatings && ratingData.sectorRatings.length > 0) {
         const sectorRatingsToInsert = ratingData.sectorRatings.map(sr => ({
           id: randomUUID(),
-          public_official_id: ratingData.officialId,
+          leader_id: ratingData.officialId,
           user_id: ratingData.userId,
           rating: sr.rating,
           sector_id: sr.sectorId,

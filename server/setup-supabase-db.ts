@@ -21,33 +21,6 @@ async function initDatabase() {
     console.log('Setting up Supabase database tables...');
     
     // 1. Check if tables already exist
-    console.log('Checking if tables already exist...');
-    
-    // Check if the leaders table exists and needs to be renamed
-    const { data: leadersData, error: leadersError } = await supabase
-      .from('leaders')
-      .select('id')
-      .limit(1);
-    
-    if (!leadersError) {
-      console.log('Found leaders table. You should rename it to public_officials using the rename-table-to-public-officials.sql script.');
-    } else {
-      console.log('Leaders table not found or not accessible.');
-    }
-    
-    // Check if the public_officials table exists
-    const { data: officialsData, error: officialsError } = await supabase
-      .from('public_officials')
-      .select('id')
-      .limit(1);
-    
-    if (!officialsError) {
-      console.log('✅ public_officials table already exists, no need to create it.');
-    } else {
-      console.log('public_officials table does not exist or is not accessible.');
-    }
-    
-    // Check if the users table exists
     const { data: tablesData, error: tablesError } = await supabase
       .from('users')
       .select('id')
