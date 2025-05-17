@@ -23,30 +23,23 @@ function Router() {
   return (
     <Switch>
       <Route path="/auth" component={AuthPageUpdated} />
-      <ProtectedRoute 
-        path="/" 
-        component={() => (
-          <ProtectedLayout>
-            <Home />
-          </ProtectedLayout>
-        )} 
-      />
-      <ProtectedRoute 
-        path="/profile/:id" 
-        component={({ params }) => (
+      <Route path="/">
+        <ProtectedLayout>
+          <Home />
+        </ProtectedLayout>
+      </Route>
+      <Route path="/profile/:id">
+        {(params) => (
           <ProtectedLayout>
             <Profile id={params.id} />
           </ProtectedLayout>
-        )} 
-      />
-      <ProtectedRoute 
-        path="/debug-officials" 
-        component={() => (
-          <ProtectedLayout>
-            <OfficialsDebug />
-          </ProtectedLayout>
-        )} 
-      />
+        )}
+      </Route>
+      <Route path="/debug-officials">
+        <ProtectedLayout>
+          <OfficialsDebug />
+        </ProtectedLayout>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );

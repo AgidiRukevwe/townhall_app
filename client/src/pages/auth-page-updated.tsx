@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -15,7 +15,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 import { THLogo } from "@/components/ui/th-logo";
 
@@ -137,14 +136,14 @@ export default function AuthPageUpdated() {
   };
 
   return (
-    <div className="flex min-h-screen bg-white flex-col items-center justify-center px-4 py-12">
+    <div className="flex min-h-screen bg-[#F9FAFB] flex-col items-center justify-center px-4 py-12 font-['Satoshi']">
       <div className="w-full max-w-md mx-auto">
         <div className="flex flex-col items-center mb-8">
           <THLogo className="mb-6" />
-          <h2 className="text-2xl font-bold text-center text-gray-900">
+          <h2 className="text-2xl font-bold text-center text-[#262626]">
             {isLogin ? "Welcome to Townhall" : "Welcome back to Townhall"}
           </h2>
-          <p className="mt-2 text-sm text-center text-gray-600">
+          <p className="mt-2 text-sm text-center text-[#737373]">
             {isLogin ? "Sign up to get started" : "Sign in to continue"}
           </p>
         </div>
@@ -161,17 +160,18 @@ export default function AuthPageUpdated() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900">Email</FormLabel>
+                      <FormLabel className="text-[#262626] font-medium">Email</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="email@untitledui.com"
+                          placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
-                          className="rounded-full h-12"
+                          className="rounded-[24px] h-14 px-4 bg-white border-[#E5E5E5]"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-xs text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -181,29 +181,30 @@ export default function AuthPageUpdated() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-medium">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
-                            className="rounded-full h-12 pr-10"
+                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
                             {...field}
                           />
                           <button
                             type="button"
-                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
                             onClick={togglePasswordVisibility}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
                             ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
                             )}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-xs text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -211,7 +212,7 @@ export default function AuthPageUpdated() {
                 <div className="text-sm">
                   <button 
                     type="button" 
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-[#737373] hover:text-[#262626]"
                   >
                     Forgot passwords ?
                   </button>
@@ -219,13 +220,12 @@ export default function AuthPageUpdated() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-full bg-black hover:bg-gray-900 text-white"
+                  className="w-full h-14 rounded-[24px] bg-[#262626] hover:bg-[#404040] text-white font-medium"
                   disabled={loginMutation ? loginMutation.isPending : false}
                 >
                   {loginMutation && loginMutation.isPending ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
+                      <span className="text-[#8c8c8c]">Signing in...</span>
                     </>
                   ) : (
                     "Sign up"
@@ -237,7 +237,7 @@ export default function AuthPageUpdated() {
                   <button
                     type="button"
                     onClick={() => setIsLogin(false)}
-                    className="text-blue-600 font-semibold hover:text-blue-500"
+                    className="text-[#1476FF] font-semibold hover:text-blue-700"
                   >
                     Sign in
                   </button>
@@ -255,17 +255,18 @@ export default function AuthPageUpdated() {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900">Email</FormLabel>
+                      <FormLabel className="text-[#262626] font-medium">Email</FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="email@untitledui.com"
+                          placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
-                          className="rounded-full h-12"
+                          className="rounded-[24px] h-14 px-4 bg-white border-[#E5E5E5]"
                           {...field}
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-xs text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -275,29 +276,30 @@ export default function AuthPageUpdated() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900">Password</FormLabel>
+                      <FormLabel className="text-[#262626] font-medium">Password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            className="rounded-full h-12 pr-10"
+                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
                             {...field}
                           />
                           <button
                             type="button"
-                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
                             onClick={togglePasswordVisibility}
                           >
                             {showPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
                             ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
                             )}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-xs text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -307,29 +309,30 @@ export default function AuthPageUpdated() {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-gray-900">Confirm password</FormLabel>
+                      <FormLabel className="text-[#262626] font-medium">Confirm password</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
                             type={showConfirmPassword ? "text" : "password"}
                             autoComplete="new-password"
-                            className="rounded-full h-12 pr-10"
+                            className="rounded-[24px] h-14 px-4 pr-10 bg-[#F5F5F5] border-[#F5F5F5]"
                             {...field}
                           />
                           <button
                             type="button"
-                            className="absolute inset-y-0 right-0 flex items-center pr-3"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
                             onClick={toggleConfirmPasswordVisibility}
                           >
                             {showConfirmPassword ? (
-                              <EyeOff className="h-5 w-5 text-gray-400" />
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
                             ) : (
-                              <Eye className="h-5 w-5 text-gray-400" />
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
                             )}
                           </button>
                         </div>
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <p className="text-xs text-[#737373] mt-1">This is a hint text to help user.</p>
+                      <FormMessage className="text-xs text-[#EF4444]" />
                     </FormItem>
                   )}
                 />
@@ -337,7 +340,7 @@ export default function AuthPageUpdated() {
                 <div className="text-sm">
                   <button 
                     type="button" 
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-[#737373] hover:text-[#262626]"
                   >
                     Forgot passwords ?
                   </button>
@@ -345,14 +348,11 @@ export default function AuthPageUpdated() {
 
                 <Button
                   type="submit"
-                  className="w-full h-12 rounded-full bg-black hover:bg-gray-900 text-white"
+                  className="w-full h-14 rounded-[24px] bg-[#262626] hover:bg-[#404040] text-white font-medium"
                   disabled={registerMutation ? registerMutation.isPending : false}
                 >
                   {registerMutation && registerMutation.isPending ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      <span>Signing in...</span>
-                    </>
+                    <span className="text-[#8c8c8c]">Signing in...</span>
                   ) : (
                     "Sign up"
                   )}
@@ -363,7 +363,7 @@ export default function AuthPageUpdated() {
                   <button
                     type="button"
                     onClick={() => setIsLogin(true)}
-                    className="text-blue-600 font-semibold hover:text-blue-500"
+                    className="text-[#1476FF] font-semibold hover:text-blue-700"
                   >
                     Sign in
                   </button>
