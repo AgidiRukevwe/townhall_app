@@ -5,7 +5,7 @@ import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -36,10 +36,16 @@ const registerSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>;
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function AuthPageUpdated() {
+export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Form field states to conditionally show hints
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+  
   const auth = useAuth();
   const user = auth.user;
   
@@ -65,6 +71,7 @@ export default function AuthPageUpdated() {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   // Register form
@@ -75,6 +82,7 @@ export default function AuthPageUpdated() {
       password: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   });
 
   const onLoginSubmit = (data: LoginFormValues) => {
@@ -159,28 +167,34 @@ export default function AuthPageUpdated() {
                   control={loginForm.control}
                   name="email"
                   render={({ field, fieldState }) => (
-                    <div className="space-y-1">
-                      <FormItemWithHint 
-                        label="Email" 
-                        hintText="Enter your email address" 
-                        errorMessage={fieldState.error?.message}
-                        error={!!fieldState.error}
-                      >
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Email</FormLabel>
+                      <FormControl>
                         <Input
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setIsEmailFocused(true)}
+                          onBlur={() => setIsEmailFocused(false)}
                           {...field}
                         />
-                      </FormItemWithHint>
-                    </div>
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(isEmailFocused || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
                   )}
                 />
 
                 <FormField
                   control={loginForm.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
                       <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
                       <FormControl>
@@ -189,6 +203,8 @@ export default function AuthPageUpdated() {
                             type={showPassword ? "text" : "password"}
                             autoComplete="current-password"
                             className="pr-10"
+                            onFocus={() => setIsPasswordFocused(true)}
+                            onBlur={() => setIsPasswordFocused(false)}
                             {...field}
                           />
                           <button
@@ -204,8 +220,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(isPasswordFocused || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -227,9 +248,7 @@ export default function AuthPageUpdated() {
                   disabled={loginMutation ? loginMutation.isPending : false}
                 >
                   {loginMutation && loginMutation.isPending ? (
-                    <>
-                      <span className="text-[#8c8c8c]">Signing in...</span>
-                    </>
+                    "Signing in..."
                   ) : (
                     "Sign up"
                   )}
@@ -256,7 +275,7 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="email"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
                       <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Email</FormLabel>
                       <FormControl>
@@ -264,11 +283,19 @@ export default function AuthPageUpdated() {
                           placeholder="olivia@untitledui.com"
                           type="email"
                           autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setIsEmailFocused(true)}
+                          onBlur={() => setIsEmailFocused(false)}
                           {...field}
                         />
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(isEmailFocused || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -276,7 +303,7 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="password"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
                       <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Password</FormLabel>
                       <FormControl>
@@ -285,6 +312,8 @@ export default function AuthPageUpdated() {
                             type={showPassword ? "text" : "password"}
                             autoComplete="new-password"
                             className="pr-10"
+                            onFocus={() => setIsPasswordFocused(true)}
+                            onBlur={() => setIsPasswordFocused(false)}
                             {...field}
                           />
                           <button
@@ -300,8 +329,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(isPasswordFocused || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -309,7 +343,7 @@ export default function AuthPageUpdated() {
                 <FormField
                   control={registerForm.control}
                   name="confirmPassword"
-                  render={({ field }) => (
+                  render={({ field, fieldState }) => (
                     <FormItem>
                       <FormLabel className="text-[#262626] font-semibold text-[14px] md:text-[16px]">Confirm password</FormLabel>
                       <FormControl>
@@ -318,6 +352,8 @@ export default function AuthPageUpdated() {
                             type={showConfirmPassword ? "text" : "password"}
                             autoComplete="new-password"
                             className="pr-10"
+                            onFocus={() => setIsConfirmPasswordFocused(true)}
+                            onBlur={() => setIsConfirmPasswordFocused(false)}
                             {...field}
                           />
                           <button
@@ -333,8 +369,13 @@ export default function AuthPageUpdated() {
                           </button>
                         </div>
                       </FormControl>
-                      <p className="text-[12px] md:text-[14px] text-[#737373] mt-1">This is a hint text to help user.</p>
-                      <FormMessage className="text-[12px] md:text-[14px] text-[#EF4444]" />
+                      {/* Show hint text only when focused or has error */}
+                      {(isConfirmPasswordFocused || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Re-enter your password to confirm"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
                     </FormItem>
                   )}
                 />
@@ -356,7 +397,7 @@ export default function AuthPageUpdated() {
                   disabled={registerMutation ? registerMutation.isPending : false}
                 >
                   {registerMutation && registerMutation.isPending ? (
-                    <span className="text-[#8c8c8c]">Signing in...</span>
+                    "Signing in..."
                   ) : (
                     "Sign up"
                   )}
