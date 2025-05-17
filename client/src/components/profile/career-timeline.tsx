@@ -9,6 +9,7 @@ interface CareerTimelineProps {
     location: string;
     startYear: number;
     endYear: number;
+    date?: string;
     createdAt?: Date;
   }>;
 }
