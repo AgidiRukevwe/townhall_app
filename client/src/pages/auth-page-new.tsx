@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -15,16 +15,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
+import { useLocation } from "wouter";
+import { THLogo } from "@/components/ui/th-logo";
 
 // Form validation schemas
 const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 const registerSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
   confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
@@ -38,47 +38,57 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
+  // Form field states to conditionally show hints
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  
   const auth = useAuth();
+  const user = auth.user;
+  
+  // Check for mutation-based auth
+  const hasMutations = typeof auth === 'object' && auth !== null && 'loginMutation' in auth;
+  
+  // Safely access mutations
+  const loginMutation = hasMutations ? auth.loginMutation : null;
+  const registerMutation = hasMutations ? auth.registerMutation : null;
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
-  // Get user safely
-  const user = auth?.user || null;
-  
   // If user is already logged in, redirect to home
   if (user) {
     navigate("/");
     return null;
   }
 
-  // Check for mutations in auth object safely
-  const hasMutations = typeof auth === 'object' && auth !== null && 'loginMutation' in auth;
-  const loginMutation = hasMutations ? auth.loginMutation : null;
-  const registerMutation = hasMutations ? auth.registerMutation : null;
-
   // Login form
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
-  // Register form - completely separate from login form
+  // Register form
   const registerForm = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
       email: "",
       password: "",
       confirmPassword: "",
     },
+    mode: "onChange",
   });
 
   const onLoginSubmit = async (data: LoginFormValues) => {
     if (loginMutation) {
-      loginMutation.mutate(data, {
+      loginMutation.mutate({
+        username: data.email, // Using email as username
+        password: data.password,
+      }, {
         onError: (error) => {
           toast({
             title: "Login failed",
@@ -102,7 +112,7 @@ export default function AuthPage() {
         {
           email: data.email,
           password: data.password,
-          username: data.username,
+          username: data.email, // Using email as username
         },
         {
           onError: (error) => {
@@ -123,236 +133,270 @@ export default function AuthPage() {
     }
   };
 
-  const isLoginLoading = loginMutation && loginMutation.isPending;
-  const isRegisterLoading = registerMutation && registerMutation.isPending;
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-  // Render the login form
-  const renderLoginForm = () => (
-    <Form {...loginForm}>
-      <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-6">
-        <FormField
-          control={loginForm.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Your username"
-                  type="text"
-                  autoComplete="username"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={loginForm.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="current-password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!!isLoginLoading}
-        >
-          {isLoginLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Signing in...
-            </>
-          ) : (
-            "Sign in"
-          )}
-        </Button>
-      </form>
-    </Form>
-  );
-
-  // Render the registration form
-  const renderRegisterForm = () => (
-    <Form {...registerForm}>
-      <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-6">
-        <FormField
-          control={registerForm.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input 
-                  placeholder="Choose a username" 
-                  {...field} 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={registerForm.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email address</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="you@example.com"
-                  type="email"
-                  autoComplete="email"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={registerForm.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={registerForm.control}
-          name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Confirm password</FormLabel>
-              <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="new-password"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!!isRegisterLoading}
-        >
-          {isRegisterLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating account...
-            </>
-          ) : (
-            "Create account"
-          )}
-        </Button>
-      </form>
-    </Form>
-  );
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
-      {/* Auth form */}
-      <div className="flex flex-col justify-center flex-1 px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="w-full max-w-sm mx-auto lg:w-96">
-          <div>
-            <Link href="/">
-              <h2 className="text-2xl font-bold text-gray-900">TOWNHALL</h2>
-            </Link>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              {isLogin ? "Sign in to your account" : "Create your account"}
-            </h2>
-            <p className="mt-2 text-sm text-gray-600">
-              {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                type="button"
-                className="font-medium text-primary hover:text-primary/90 focus:outline-none"
-              >
-                {isLogin ? "Create one" : "Sign in"}
-              </button>
-            </p>
-          </div>
-
-          <div className="mt-8">
-            {isLogin ? renderLoginForm() : renderRegisterForm()}
-          </div>
+    <div className="flex min-h-screen bg-[#FFFFFF] flex-col items-center justify-center px-4 py-12 font-['Satoshi']">
+      <div className="w-full max-w-md md:max-w-xs mx-auto">
+        <div className="flex flex-col items-center mb-8">
+          <THLogo className="mb-6" />
+          <h2 className="text-2xl font-bold text-center text-[#262626]">
+            {isLogin ? "Welcome to Townhall" : "Create an account"}
+          </h2>
+          <p className="mt-2 text-[14px] md:text-[16px] text-center text-[#737373] font-medium">
+            {isLogin ? "Sign in to continue" : "Sign up to get started"}
+          </p>
         </div>
-      </div>
 
-      {/* Hero section */}
-      <div className="relative flex-1 hidden w-0 lg:block">
-        <div className="absolute inset-0 flex flex-col justify-center px-10 bg-gray-900">
-          <div className="max-w-lg mx-auto">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Welcome to Townhall
-            </h2>
-            <p className="text-gray-300 text-lg mb-8">
-              The civic tech platform that enables Nigerians to anonymously track, 
-              rate, and monitor elected officials' performance across various sectors.
-            </p>
-            <div className="space-y-4">
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+        <div className="w-full">
+          {isLogin ? (
+            <Form {...loginForm}>
+              <form
+                onSubmit={loginForm.handleSubmit(onLoginSubmit)}
+                className="space-y-5"
+              >
+                <FormField
+                  control={loginForm.control}
+                  name="email"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="olivia@untitledui.com"
+                          type="email"
+                          autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setFocusedField('email')}
+                          onBlur={() => setFocusedField(null)}
+                          {...field}
+                        />
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'email' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={loginForm.control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="current-password"
+                            className="pr-10"
+                            onFocus={() => setFocusedField('password')}
+                            onBlur={() => setFocusedField(null)}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'password' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="text-[14px] md:text-[16px] font-medium">
+                  <button 
+                    type="button" 
+                    className="text-[#737373] hover:text-[#262626]"
+                  >
+                    Forgot password?
+                  </button>
                 </div>
-                <p className="ml-3 text-gray-300">
-                  Rate officials with transparency and anonymity
-                </p>
-              </div>
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+
+                <Button
+                  type="submit"
+                  variant="black"
+                  size="default"
+                  className="w-full font-medium"
+                  disabled={!loginForm.formState.isValid || (loginMutation?.isPending || false)}
+                >
+                  {loginMutation?.isPending ? "Signing in..." : "Sign in"}
+                </Button>
+
+                <div className="text-[14px] md:text-[16px] text-center font-medium">
+                  Don't have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(false)}
+                    className="text-[#1476FF] font-semibold hover:text-blue-700"
+                  >
+                    Sign up
+                  </button>
                 </div>
-                <p className="ml-3 text-gray-300">
-                  Track public sentiment and performance metrics over time
-                </p>
-              </div>
-              <div className="flex items-center">
-                <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
+              </form>
+            </Form>
+          ) : (
+            <Form {...registerForm}>
+              <form
+                onSubmit={registerForm.handleSubmit(onRegisterSubmit)}
+                className="space-y-5"
+              >
+                <FormField
+                  control={registerForm.control}
+                  name="email"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="olivia@untitledui.com"
+                          type="email"
+                          autoComplete="email"
+                          className="pr-4"
+                          onFocus={() => setFocusedField('regEmail')}
+                          onBlur={() => setFocusedField(null)}
+                          {...field}
+                        />
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'regEmail' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={registerForm.control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            className="pr-10"
+                            onFocus={() => setFocusedField('regPassword')}
+                            onBlur={() => setFocusedField(null)}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
+                            onClick={togglePasswordVisibility}
+                          >
+                            {showPassword ? (
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'regPassword' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={registerForm.control}
+                  name="confirmPassword"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Confirm password</FormLabel>
+                      <FormControl>
+                        <div className="relative">
+                          <Input
+                            type={showConfirmPassword ? "text" : "password"}
+                            autoComplete="new-password"
+                            className="pr-10"
+                            onFocus={() => setFocusedField('confirmPassword')}
+                            onBlur={() => setFocusedField(null)}
+                            {...field}
+                          />
+                          <button
+                            type="button"
+                            className="absolute inset-y-0 right-0 flex items-center pr-4"
+                            onClick={toggleConfirmPasswordVisibility}
+                          >
+                            {showConfirmPassword ? (
+                              <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
+                            ) : (
+                              <Eye className="h-5 w-5 text-[#BFBFBF]" />
+                            )}
+                          </button>
+                        </div>
+                      </FormControl>
+                      {/* Show hint text only when focused or has error */}
+                      {(focusedField === 'confirmPassword' || fieldState.error) && (
+                        <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                          {fieldState.error ? fieldState.error.message : "Re-enter your password to confirm"}
+                        </p>
+                      )}
+                      <FormMessage className="sr-only" />
+                    </FormItem>
+                  )}
+                />
+
+                <Button
+                  type="submit"
+                  variant="black"
+                  size="default"
+                  className="w-full font-medium"
+                  disabled={!registerForm.formState.isValid || (registerMutation?.isPending || false)}
+                >
+                  {registerMutation?.isPending ? "Signing up..." : "Sign up"}
+                </Button>
+
+                <div className="text-[14px] md:text-[16px] text-center font-medium">
+                  Already have an account?{" "}
+                  <button
+                    type="button"
+                    onClick={() => setIsLogin(true)}
+                    className="text-[#1476FF] font-semibold hover:text-blue-700"
+                  >
+                    Sign in
+                  </button>
                 </div>
-                <p className="ml-3 text-gray-300">
-                  Find and evaluate representatives who serve your community
-                </p>
-              </div>
-            </div>
-          </div>
+              </form>
+            </Form>
+          )}
         </div>
       </div>
     </div>
