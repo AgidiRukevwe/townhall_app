@@ -65,9 +65,11 @@ export function CareerTimeline({ careers }: CareerTimelineProps) {
                     
                     {(career.startYear || career.endYear) ? (
                       <div className="whitespace-nowrap text-right text-sm text-gray-500">
-                        {career.startYear && career.endYear ? 
+                        {career.startYear && career.endYear && career.endYear > 0 ? 
                           `${career.startYear} - ${career.endYear}` : 
-                          (career.startYear || career.endYear)}
+                          (career.startYear && (!career.endYear || career.endYear === 0) ?
+                            `${career.startYear} - Present` :
+                            (career.startYear || career.endYear))}
                       </div>
                     ) : (
                       <div className="whitespace-nowrap text-right text-sm text-gray-500">
