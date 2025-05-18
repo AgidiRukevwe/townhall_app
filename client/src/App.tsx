@@ -33,7 +33,7 @@ function Router() {
       <Route path="/profile/:id">
         {(params) => (
           <ProtectedLayout>
-            <Profile id={params.id} />
+            <Profile />
           </ProtectedLayout>
         )}
       </Route>
