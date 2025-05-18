@@ -28,7 +28,7 @@ export const SearchInput = ({
           <input
             type="search"
             placeholder={placeholder}
-            className={`input-standard w-full pl-12 pr-4 ${className}`}
+            className={`input-standard w-full pl-14 pr-4 ${className}`}
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
