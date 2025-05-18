@@ -187,5 +187,15 @@
   .gap-4xl {
     gap: 4rem; /* 64px */
   }
+
+  /* Input, Select, and Button styling */
+  .input-standard {
+    @apply h-11 px-4 rounded-full bg-surface-secondary border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:border-black focus:border-2 focus:bg-white;
+  }
+
+  /* Spacing between profile and search (24px) */
+  .profile-search-spacing {
+    @apply ml-6; /* 24px */
+  }
 }
 

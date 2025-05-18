@@ -73,42 +73,44 @@ export default function Home() {
             <THLogo />
           </div>
           
-          <div className="relative flex-1 max-w-md mx-6">
-            <form onSubmit={handleSearch}>
-              <div className="relative">
-                <input
-                  type="search"
-                  placeholder="Search for officials, locations"
-                  className="w-full h-11 pl-10 pr-4 rounded-full border border-gray-200 bg-surface-secondary text-sm font-satoshi focus:outline-none focus:ring-2 focus:ring-gray-200"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <SearchNormal1 size={18} variant="Bold" className="text-gray-400" />
+          <div className="flex items-center">
+            <div className="relative">
+              <form onSubmit={handleSearch}>
+                <div className="relative">
+                  <input
+                    type="search"
+                    placeholder="Search for officials, locations"
+                    className="input-standard w-full pl-10 pr-4"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                  />
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <SearchNormal1 size={18} variant="Bold" className="text-gray-400" />
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
-          
-          <div className="relative group">
-            <div className="flex items-center space-x-1 bg-surface-secondary py-1.5 px-2 rounded-full cursor-pointer">
-              <div className="h-7 w-7 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
-                {user ? userName.charAt(0).toUpperCase() : "G"}
-              </div>
-              <ArrowDown2 size={16} variant="Bold" className="text-gray-500" />
+              </form>
             </div>
             
-            {/* User dropdown menu */}
-            <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-10">
-              <div className="px-4 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium font-satoshi">{userName}</p>
+            <div className="relative group profile-search-spacing">
+              <div className="flex items-center space-x-1 bg-surface-secondary py-1.5 px-2 rounded-full cursor-pointer">
+                <div className="h-7 w-7 rounded-full bg-gray-200 flex items-center justify-center text-sm font-medium text-gray-600">
+                  {user ? userName.charAt(0).toUpperCase() : "G"}
+                </div>
+                <ArrowDown2 size={16} variant="Bold" className="text-gray-500" />
               </div>
-              <button 
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-satoshi"
-              >
-                <Logout size={18} variant="Bold" className="mr-2" /> Log out
-              </button>
+              
+              {/* User dropdown menu */}
+              <div className="absolute top-full right-0 mt-1 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block z-10">
+                <div className="px-4 py-2 border-b border-gray-100">
+                  <p className="text-sm font-medium font-satoshi">{userName}</p>
+                </div>
+                <button 
+                  onClick={handleLogout}
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-satoshi"
+                >
+                  <Logout size={18} variant="Bold" className="mr-2" /> Log out
+                </button>
+              </div>
             </div>
           </div>
         </div>
