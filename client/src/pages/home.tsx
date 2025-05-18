@@ -6,10 +6,11 @@ import { useAuth } from "@/hooks/use-auth";
 import { THLogo } from "@/components/ui/th-logo";
 import { Search, LogOut } from "lucide-react";
 import { Link, useLocation } from "wouter";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Home() {
   const { officials, isLoading, error } = useOfficials();
-  const { user, logoutMutation } = useAuth();
+  const { user } = useAuth();
   const [, navigate] = useLocation();
   const [searchInput, setSearchInput] = useState("");
   
@@ -31,9 +32,18 @@ export default function Home() {
   };
 
   const handleLogout = () => {
-    if (logoutMutation) {
-      logoutMutation.mutate();
-    }
+    // Make a POST request to logout endpoint directly
+    fetch('/api/logout', {
+      method: 'POST',
+      credentials: 'include'
+    }).then(() => {
+      // Clear user data from query cache
+      queryClient.setQueryData(['/api/user'], null);
+      // Redirect to login page
+      navigate('/auth');
+    }).catch(err => {
+      console.error("Logout failed:", err);
+    });
   };
 
   // Filter officials based on search query
@@ -58,7 +68,7 @@ export default function Home() {
     <main className="flex-1 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header with Logo, Search, and User Avatar */}
-        <div className="flex justify-between items-center mb-10">
+        <div className="flex justify-between items-center mb-6">
           <div>
             <THLogo />
           </div>
@@ -98,14 +108,23 @@ export default function Home() {
                 <p className="text-sm font-medium">{userName}</p>
               </div>
               <button 
-                onClick={() => user && user.logoutMutation && user.logoutMutation.mutate()}
-                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
               >
-                Log out
+                <LogOut className="h-4 w-4 mr-2" /> Log out
               </button>
             </div>
           </div>
         </div>
+        
+        {/* Greeting */}
+        {userName && (
+          <div className="mb-6">
+            <h2 className="text-base font-medium flex items-center">
+              Hello, {userName} <span className="text-amber-400 ml-1">👋</span>
+            </h2>
+          </div>
+        )}
 
         {/* Main Content */}
         {isLoading ? (
