@@ -22,7 +22,7 @@ export const SearchInput = ({
   };
 
   return (
-    <div className="relative w-full max-w-lg">
+    <div className="relative w-96">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <input

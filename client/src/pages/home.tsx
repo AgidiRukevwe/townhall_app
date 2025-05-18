@@ -66,8 +66,16 @@ export default function Home() {
 
   return (
     <main className="flex-1 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Header with Logo, Search, and User Avatar */}
+      <div className="border-b border-gray-200 mb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div className="font-bold text-lg">TOWNHALL</div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* New Header with Logo, Search, and User Avatar */}
         <div className="flex justify-between items-center mb-6">
           <div>
             <THLogo />
