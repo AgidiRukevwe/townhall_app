@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Official } from "@shared/schema";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface OfficialCardProps {
   official: Official;
@@ -8,6 +9,8 @@ interface OfficialCardProps {
 }
 
 export function OfficialCard({ official, compact = false }: OfficialCardProps) {
+  const [imageError, setImageError] = useState(false);
+  
   // Function to capitalize first letter of each word
   const toTitleCase = (str: string) => {
     return str.toLowerCase().split(' ').map(word => 
@@ -18,16 +21,35 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   const formattedName = toTitleCase(official.name);
   const formattedPosition = toTitleCase(official.position);
   const formattedLocation = official.location ? toTitleCase(official.location) : '';
+  
+  // Get initials for avatar
+  const getInitials = (name: string) => {
+    const nameParts = name.split(' ').filter(Boolean);
+    if (nameParts.length === 0) return '?';
+    if (nameParts.length === 1) return nameParts[0].charAt(0).toUpperCase();
+    return (nameParts[0].charAt(0) + nameParts[nameParts.length - 1].charAt(0)).toUpperCase();
+  };
+  
+  const initials = getInitials(official.name);
 
   return (
     <div className="overflow-hidden bg-white">
       {/* Image with 24px border radius and no black background */}
-      <div className="relative h-48 overflow-hidden p-2">
-        <img 
-          src={official.imageUrl || ""} 
-          alt={formattedName}
-          className="w-full h-full object-cover object-center rounded-[24px]" 
-        />
+      <div className="relative h-48 p-0">
+        {!imageError && official.imageUrl ? (
+          <img 
+            src={official.imageUrl} 
+            alt={formattedName}
+            className="w-full h-full object-cover object-center rounded-[24px]" 
+            onError={() => setImageError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-[#e6f4ff] rounded-[24px]">
+            <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center">
+              <span className="text-[#1476FF] text-4xl font-bold">{initials}</span>
+            </div>
+          </div>
+        )}
       </div>
       
       {/* Official details */}
