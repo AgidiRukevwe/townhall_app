@@ -52,10 +52,20 @@ export function setupAuth(app: Express) {
 
   passport.use(
     new LocalStrategy(async (username, password, done) => {
-      const user = await storage.getUserByUsername(username);
+      console.log("Attempting login with:", username);
+      // Try to get user by username first
+      let user = await storage.getUserByUsername(username);
+      
+      // If not found, try by email
+      if (!user) {
+        user = await storage.getUserByEmail(username);
+      }
+      
       if (!user || !(await comparePasswords(password, user.password))) {
+        console.log("Login failed for:", username);
         return done(null, false);
       } else {
+        console.log("Login successful for:", username);
         return done(null, user);
       }
     }),
