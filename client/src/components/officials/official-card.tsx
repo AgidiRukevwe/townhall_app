@@ -80,11 +80,11 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       <div className="py-3">
         <h3 className="font-bold text-base">{formattedName}</h3>
         <p className="text-gray-500 font-medium text-sm">
-          {formattedPosition}
-          {formattedLocation ? `, ${formattedLocation}` : ""}
+          {/* {formattedPosition} */}
+          {formattedLocation ? `${formattedLocation}` : ""}
         </p>
 
-        {official.approvalRating !== undefined && (
+        {/* {official.approvalRating !== undefined && (
           <div className="mt-2 flex items-center">
             <span
               className={`text-sm font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}
@@ -97,7 +97,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
               )}
             </span>
           </div>
-        )}
+        )} */}
 
         {!compact && (
           <div className="mt-4">

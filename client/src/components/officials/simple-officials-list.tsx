@@ -1,6 +1,6 @@
 import { Official } from "@shared/schema";
 import { Link } from "wouter";
-import { ArrowRight2, ArrowLeft2, ArrowRight } from "iconsax-react";
+import { ArrowCircleRight, ArrowCircleLeft, ArrowRight2 } from "iconsax-react";
 import { useRef } from "react";
 import { OfficialCard } from "./official-card";
 
@@ -74,20 +74,20 @@ export function SimpleOfficialsList({
       <div className="mb-10" key={category}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold flex items-center">
-            {category} <ArrowRight size="18" className="ml-1 text-[#1476FF]" />
+            {category} <ArrowRight2 variant="Bold" size="24" className="ml-1 text-[#1476FF]" />
           </h2>
           <div className="flex space-x-1">
             <button 
-              className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+              className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-200 group"
               onClick={() => scrollContainer(category, 'left')}
             >
-              <ArrowLeft2 size="16" className="text-gray-500" />
+              <ArrowCircleLeft size="24" variant="Bold" className="text-[#BFBFBF] group-hover:text-[#737373]" />
             </button>
             <button 
-              className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+              className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-200 group"
               onClick={() => scrollContainer(category, 'right')}
             >
-              <ArrowRight2 size="16" className="text-gray-500" />
+              <ArrowCircleRight size="24" variant="Bold" className="text-[#BFBFBF] group-hover:text-[#737373]" />
             </button>
           </div>
         </div>
@@ -121,11 +121,11 @@ export function SimpleOfficialsList({
         )}
 
       {/* Load more button */}
-      <div className="flex justify-center mt-6">
+      {/* <div className="flex justify-center mt-6">
         <button className="px-4 py-2 border border-gray-200 rounded-md text-sm text-gray-600 hover:bg-gray-50 transition-colors">
           Load more officials
         </button>
-      </div>
+      </div> */}
     </div>
   );
 }
