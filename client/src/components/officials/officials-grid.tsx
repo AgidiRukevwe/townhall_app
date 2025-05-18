@@ -1,4 +1,4 @@
-import { OfficialCard } from "./official-card-new";
+import { OfficialCard } from "./official-card-shadcn";
 import { Official } from "@shared/schema";
 import { Filter, SortAsc, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
