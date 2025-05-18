@@ -23,7 +23,7 @@ export function SearchBar() {
         </div>
         <Input
           type="text"
-          className="block w-full pl-10 py-2 bg-gray-100 border-gray-300 rounded-full"
+          className="block w-full pl-24 py-2 bg-gray-100 border-gray-300 rounded-full"
           placeholder="Search officials, locations..."
           value={searchValue}
           onChange={(e) => setSearchValue(e.target.value)}
