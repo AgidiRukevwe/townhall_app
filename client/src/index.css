@@ -5,6 +5,12 @@
 @tailwind utilities;
 
 @layer base {
+  html, body {
+    font-family: 'Satoshi', sans-serif;
+  }
+}
+
+@layer base {
   :root {
     --background: 220 14% 96%;
     --foreground: 0 0% 15%;
