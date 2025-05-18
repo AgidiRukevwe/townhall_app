@@ -17,13 +17,18 @@ export function SectorPerformance({
   monthlyChange,
   sectors,
 }: SectorPerformanceProps) {
-  const isPositive = monthlyChange > 0;
-  const changeText = Math.abs(monthlyChange).toFixed(1);
+  // Safeguard against undefined or null values
+  const rating = averageRating || 0;
+  const change = monthlyChange || 0;
+  const sectorData = sectors || [];
+  
+  const isPositive = change > 0;
+  const changeText = Math.abs(change).toFixed(1);
 
   // Color mapping for sector indicators
-  const getColorClass = (color: string) => {
+  const getColorClass = (color: string = '') => {
     // If it's already a hex code, return the style attribute instead
-    if (color.startsWith('#')) {
+    if (color && color.startsWith('#')) {
       return color; // We'll use inline style instead of a class for hex colors
     }
     
@@ -52,7 +57,7 @@ export function SectorPerformance({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline mb-6">
-          <div className="text-5xl font-bold mr-4">{averageRating.toFixed(1)}%</div>
+          <div className="text-5xl font-bold mr-4">{rating.toFixed(1)}%</div>
           <div
             className={`text-sm font-medium flex items-center ${
               isPositive ? "text-green-500" : "text-red-500"
@@ -70,22 +75,28 @@ export function SectorPerformance({
         </div>
 
         <div className="space-y-6">
-          {sectors.map((sector) => (
-            <div key={sector.name}>
-              <div className="flex justify-between mb-1">
-                <div className="flex items-center">
-                  <span
-                    className={`h-2 w-2 rounded-full mr-2 ${
-                      sector.color.startsWith('#') ? '' : getColorClass(sector.color)
-                    }`}
-                    style={sector.color.startsWith('#') ? { backgroundColor: sector.color } : {}}
-                  ></span>
-                  <span className="text-sm font-medium">{sector.name}</span>
+          {sectorData.length > 0 ? (
+            sectorData.map((sector) => (
+              <div key={sector.name || 'unnamed-sector'}>
+                <div className="flex justify-between mb-1">
+                  <div className="flex items-center">
+                    <span
+                      className={`h-2 w-2 rounded-full mr-2 ${
+                        sector.color && sector.color.startsWith('#') ? '' : getColorClass(sector.color)
+                      }`}
+                      style={sector.color && sector.color.startsWith('#') ? { backgroundColor: sector.color } : {}}
+                    ></span>
+                    <span className="text-sm font-medium">{sector.name || 'Unknown'}</span>
+                  </div>
                 </div>
+                <Progress value={sector.rating || 0} className="h-2" />
               </div>
-              <Progress value={sector.rating} className="h-2" />
+            ))
+          ) : (
+            <div className="text-sm text-gray-500 text-center py-4">
+              No sector data available
             </div>
-          ))}
+          )}
         </div>
       </CardContent>
     </Card>

@@ -17,8 +17,19 @@ export function ApprovalChart({
   monthlyChange,
   monthlyData,
 }: ApprovalChartProps) {
-  const isPositive = monthlyChange > 0;
-  const changeText = Math.abs(monthlyChange).toFixed(1);
+  // Safeguard against undefined or null values
+  const rating = approvalRating || 0;
+  const change = monthlyChange || 0;
+  const data = monthlyData || [];
+  
+  const isPositive = change > 0;
+  const changeText = Math.abs(change).toFixed(1);
+
+  // Custom formatter for tooltip to handle type issues
+  const customFormatter = (value: any) => {
+    const numValue = Number(value);
+    return [`${!isNaN(numValue) ? numValue.toFixed(1) : "0.0"}%`, "Approval"];
+  };
 
   return (
     <Card>
@@ -29,7 +40,7 @@ export function ApprovalChart({
       </CardHeader>
       <CardContent>
         <div className="flex items-baseline mb-6">
-          <div className="text-5xl font-bold mr-4">{approvalRating.toFixed(1)}%</div>
+          <div className="text-5xl font-bold mr-4">{rating.toFixed(1)}%</div>
           <div
             className={`text-sm font-medium flex items-center ${
               isPositive ? "text-green-500" : "text-red-500"
@@ -48,7 +59,7 @@ export function ApprovalChart({
 
         <div className="h-32 w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={monthlyData}>
+            <BarChart data={data}>
               <XAxis
                 dataKey="month"
                 tick={{ fontSize: 10 }}
@@ -56,14 +67,12 @@ export function ApprovalChart({
                 tickLine={false}
               />
               <Tooltip
-                formatter={(value) => [`${parseFloat(value).toFixed(1)}%`, "Approval"]}
-                labelFormatter={(label) => `${label}`}
+                formatter={customFormatter}
+                labelFormatter={(label: any) => `${label}`}
               />
               <Bar
                 dataKey="rating"
-                fill={(entry) =>
-                  entry.isCurrentMonth ? "hsl(var(--primary))" : "#e5e7eb"
-                }
+                fill="#1476FF"
                 radius={[4, 4, 0, 0]}
               />
             </BarChart>
