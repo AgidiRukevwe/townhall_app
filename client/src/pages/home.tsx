@@ -88,14 +88,7 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Greeting */}
-        {userName && (
-          <div className="mb-6">
-            <h2 className="text-base font-medium flex items-center">
-              Hello, {userName} <span className="text-amber-400 ml-1">👋</span>
-            </h2>
-          </div>
-        )}
+
 
         {/* Main Content */}
         {isLoading ? (
