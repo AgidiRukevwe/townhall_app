@@ -119,8 +119,11 @@ export function ImprovedApprovalChart({
                 <stop offset="95%" stopColor="#007BFF" stopOpacity={0}/>
               </linearGradient>
             </defs>
+            {/* Custom grid pattern with dots instead of lines */}
             <CartesianGrid 
-              strokeDasharray="3 3" 
+              strokeDasharray="0 10" 
+              strokeWidth={2}
+              strokeLinecap="round"
               vertical={true} 
               horizontal={true} 
               stroke="#f0f0f0" 

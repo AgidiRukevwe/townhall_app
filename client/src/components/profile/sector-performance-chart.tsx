@@ -100,7 +100,15 @@ export function SectorPerformanceChart({
             margin={{ top: 10, right: 0, left: 0, bottom: 10 }}
             layout="vertical"
           >
-            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#f0f0f0" />
+            {/* Custom grid pattern with dots instead of lines */}
+            <CartesianGrid 
+              strokeDasharray="0 10" 
+              strokeWidth={2}
+              strokeLinecap="round"
+              vertical={true} 
+              horizontal={true} 
+              stroke="#f0f0f0" 
+            />
             <XAxis 
               type="number"
               axisLine={false}
