@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Official } from "@shared/schema";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface OfficialCardProps {
   official: Official;
@@ -9,7 +9,7 @@ interface OfficialCardProps {
 }
 
 export function OfficialCard({ official, compact = false }: OfficialCardProps) {
-  const [imageError, setImageError] = useState(false);
+  const [showAvatar, setShowAvatar] = useState(!official.imageUrl);
 
   // Function to capitalize first letter of each word
   const toTitleCase = (str: string) => {
@@ -38,18 +38,30 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
 
   const initials = getInitials(official.name);
 
+  // Check if image exists and is valid
+  useEffect(() => {
+    if (official.imageUrl) {
+      const img = new Image();
+      img.onload = () => setShowAvatar(false);
+      img.onerror = () => setShowAvatar(true);
+      img.src = official.imageUrl;
+    }
+  }, [official.imageUrl]);
+
   return (
     <div className="overflow-hidden bg-white">
       {/* Image with 24px border radius and no black background */}
-      <div className="relative h-48 p-0 bg-[#e6f4ff] rounded-[24px] overflow-hidden">
-        {!imageError && official.imageUrl ? (
-          <img
-            src={official.imageUrl}
-            alt={formattedName}
-            className="w-full h-full object-cover"
-            style={{ objectPosition: "center top" }}
-            onError={() => setImageError(true)}
-          />
+      <div className="relative h-48">
+        {!showAvatar ? (
+          <div 
+            className="w-full h-full rounded-[24px]"
+            style={{
+              backgroundImage: `url("${official.imageUrl}")`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundColor: '#e6f4ff'
+            }}
+          ></div>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[#e6f4ff] rounded-[24px]">
             <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center">
