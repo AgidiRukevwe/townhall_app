@@ -97,7 +97,7 @@ export function SimpleOfficialsList({
         >
           {displayOfficials.map((official) => (
             <Link href={`/profile/${official.id}`} key={official.id}>
-              <div className="h-full">
+              <div className="h-full min-w-[220px] w-[220px] flex-shrink-0">
                 <OfficialCard official={official} compact={true} />
               </div>
             </Link>
