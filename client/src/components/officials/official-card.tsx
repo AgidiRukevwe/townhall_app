@@ -51,19 +51,18 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   return (
     <div className="overflow-hidden bg-white">
       {/* Image with 24px border radius and no black background */}
-      <div className="relative h-48">
+      <div className="relative h-56">
         {!showAvatar ? (
-          <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff]">
-            <div
-              className="w-[120%] h-[120%] -ml-[10%] -mt-[10%]"
+          <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] flex items-center justify-center">
+            <img
+              src={official.imageUrl}
+              alt={formattedName}
+              className="w-full h-full object-cover object-position-top"
               style={{
-                backgroundImage: `url("${official.imageUrl}")`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center 15%',
-                backgroundRepeat: 'no-repeat',
-                transform: 'scale(1.2)'
+                objectFit: "cover",
+                objectPosition: "center 25%"
               }}
-            ></div>
+            />
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-[#e6f4ff] rounded-[24px]">
