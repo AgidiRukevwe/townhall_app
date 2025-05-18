@@ -5,16 +5,16 @@ import NotFound from "@/pages/not-found";
 import Home from "./pages/home";
 import Profile from "./pages/profile";
 import OfficialsDebug from "./pages/officials-debug";
-import Navbar from "./components/layout/navbar";
+import { Navbar } from "./components/layout/navbar";
 import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
 import LoginPage from "./pages/login-page";
 import RegisterPage from "./pages/register-page";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
+  // We don't need to pass props here since the Navbar in Home will handle search/user functionality
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
       {children}
     </div>
   );
