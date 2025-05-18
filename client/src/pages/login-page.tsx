@@ -1,11 +1,11 @@
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "../hooks/use-auth.tsx";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
+import { Eye, EyeOff } from "lucide-react";
 import {
   Form,
   FormControl,
@@ -15,68 +15,51 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
+import { THLogo } from "@/components/ui/th-logo";
 
-// Login form validation schema
+// Form validation schema
 const loginSchema = z.object({
-  username: z.string().min(3, "Username must be at least 3 characters"),
+  email: z.string().email("Please enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
+  
   const auth = useAuth();
+  const user = auth.user;
+  
+  // Safely access mutation
+  const loginMutation = auth?.loginMutation;
   const { toast } = useToast();
   const [, navigate] = useLocation();
 
-  // Get user safely
-  const user = auth?.user || null;
-  
-  // We'll use an effect for navigation to avoid React hook rules violation
-  React.useEffect(() => {
-    // If user is already logged in, redirect to home
-    if (user) {
-      console.log("User is already logged in, redirecting to home page...");
-      window.location.href = '/';
-    }
-  }, [user]);
-
-  // Check for mutations in auth object safely
-  const loginMutation = auth && 'loginMutation' in auth ? auth.loginMutation : null;
+  // If user is already logged in, redirect to home
+  if (user) {
+    navigate("/");
+    return null;
+  }
 
   // Login form
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
-  const onSubmit = (data: LoginFormValues) => {
+  const onSubmit = async (data: LoginFormValues) => {
     if (loginMutation) {
-      loginMutation.mutate(data, {
-        onSuccess: (user) => {
-          toast({
-            title: "Login successful",
-            description: "Welcome back! Redirecting to home page...",
-            variant: "default",
-          });
-          
-          console.log("Login successful, user:", user);
-          
-          // Directly set the data instead of trying to navigate
-          // The auth provider will handle updating state across components
-          queryClient.setQueryData(["/api/user"], user);
-          
-          // Use direct browser navigation instead of React navigation
-          setTimeout(() => {
-            console.log("Forcing redirect to home page...");
-            window.location.href = '/';
-          }, 1000);
-        },
+      loginMutation.mutate({
+        username: data.email, // Using email as username
+        password: data.password,
+      }, {
         onError: (error) => {
           toast({
             title: "Login failed",
@@ -94,84 +77,129 @@ export default function LoginPage() {
     }
   };
 
-  const isLoading = loginMutation && loginMutation.isPending;
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   return (
-    <div className="flex min-h-screen bg-gray-50 items-center justify-center">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold">Sign in to your account</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Enter your credentials to access your account
+    <div className="flex min-h-screen bg-[#FFFFFF] flex-col items-center justify-center px-4 py-12 font-['Satoshi']">
+      <div className="w-full max-w-md md:max-w-xs mx-auto">
+        <div className="flex flex-col items-center mb-8">
+          <THLogo className="mb-6" />
+          <h2 className="text-2xl font-bold text-center text-[#262626]">
+            Welcome to Townhall
+          </h2>
+          <p className="mt-2 text-[14px] md:text-[16px] text-center text-[#737373] font-medium">
+            Sign in to continue
           </p>
         </div>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Your username"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Your password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading ? true : false}
+        <div className="w-full">
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-5"
             >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                "Sign in"
-              )}
-            </Button>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="olivia@untitledui.com"
+                        type="email"
+                        autoComplete="email"
+                        className="pr-4"
+                        onFocus={() => setFocusedField('email')}
+                        onBlur={() => setFocusedField(null)}
+                        {...field}
+                      />
+                    </FormControl>
+                    {/* Show hint text only when focused or has error */}
+                    {(focusedField === 'email' || fieldState.error) && (
+                      <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                        {fieldState.error ? fieldState.error.message : "Enter your email address"}
+                      </p>
+                    )}
+                    <FormMessage className="sr-only" />
+                  </FormItem>
+                )}
+              />
 
-            <div className="text-center mt-4">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Button
-                  variant="link"
-                  className="p-0"
-                  onClick={() => navigate("/register")}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#262626] font-semibold text-[12px] md:text-[14px]">Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          autoComplete="current-password"
+                          className="pr-10"
+                          onFocus={() => setFocusedField('password')}
+                          onBlur={() => setFocusedField(null)}
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          className="absolute inset-y-0 right-0 flex items-center pr-4"
+                          onClick={togglePasswordVisibility}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-5 w-5 text-[#BFBFBF]" />
+                          ) : (
+                            <Eye className="h-5 w-5 text-[#BFBFBF]" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    {/* Show hint text only when focused or has error */}
+                    {(focusedField === 'password' || fieldState.error) && (
+                      <p className={`text-[12px] md:text-[14px] mt-1 ${fieldState.error ? 'text-[#EF4444]' : 'text-[#737373]'}`}>
+                        {fieldState.error ? fieldState.error.message : "Password must be at least 6 characters"}
+                      </p>
+                    )}
+                    <FormMessage className="sr-only" />
+                  </FormItem>
+                )}
+              />
+
+              <div className="text-[14px] md:text-[16px] font-medium">
+                <button 
+                  type="button" 
+                  className="text-[#737373] hover:text-[#262626]"
                 >
-                  Register here
-                </Button>
-              </p>
-            </div>
-          </form>
-        </Form>
+                  Forgot password?
+                </button>
+              </div>
+
+              <Button
+                type="submit"
+                variant="black"
+                size="default"
+                className="w-full font-medium"
+                disabled={!form.formState.isValid || (loginMutation?.isPending || false)}
+              >
+                {loginMutation?.isPending ? "Signing in..." : "Sign in"}
+              </Button>
+
+              <div className="text-[14px] md:text-[16px] text-center font-medium">
+                Don't have an account?{" "}
+                <button
+                  type="button"
+                  onClick={() => navigate("/register")}
+                  className="text-[#1476FF] font-semibold hover:text-blue-700"
+                >
+                  Sign up
+                </button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
     </div>
   );

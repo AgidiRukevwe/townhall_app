@@ -8,7 +8,8 @@ import OfficialsDebug from "./pages/officials-debug";
 import Navbar from "./components/layout/navbar";
 import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
-import AuthPageUpdated from "./pages/auth-page-updated-fixed";
+import LoginPage from "./pages/login-page";
+import RegisterPage from "./pages/register-page";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -22,7 +23,8 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 function Router() {
   return (
     <Switch>
-      <Route path="/auth" component={AuthPageUpdated} />
+      <Route path="/auth" component={LoginPage} />
+      <Route path="/register" component={RegisterPage} />
       <Route path="/">
         <ProtectedLayout>
           <Home />
