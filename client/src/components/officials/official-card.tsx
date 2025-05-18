@@ -57,10 +57,10 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
             <img
               src={official.imageUrl}
               alt={formattedName}
-              className="w-full h-full object-cover object-position-top"
+              className="w-[130%] h-[130%] -ml-[15%] -mt-[15%]"
               style={{
                 objectFit: "cover",
-                objectPosition: "center 25%"
+                objectPosition: "center 20%"
               }}
             />
           </div>
