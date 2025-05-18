@@ -26,12 +26,12 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   return (
     <Card className="border border-gray-200 overflow-hidden">
       <CardContent className="p-0">
-        {/* Image with rounded corners */}
+        {/* Image with 24px border radius */}
         <div className="relative h-48 overflow-hidden">
           <img 
             src={official.imageUrl || ""} 
             alt={formattedName}
-            className="w-full h-full object-cover rounded-t-lg" 
+            className="w-full h-full object-cover rounded-[24px]" 
           />
         </div>
         
