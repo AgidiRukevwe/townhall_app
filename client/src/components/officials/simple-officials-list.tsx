@@ -74,7 +74,7 @@ export function SimpleOfficialsList({
       <div className="mb-10" key={category}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold flex items-center">
-            {category} <ArrowRight2 variant="Bold" size="24" className="ml-1 text-[#1476FF]" />
+            {category} <ArrowRight2 variant="Bold" size="24" className="ml-1 text-[#BFBFBF]" />
           </h2>
           <div className="flex space-x-1">
             <button 
@@ -96,11 +96,13 @@ export function SimpleOfficialsList({
           ref={(el) => scrollContainerRefs.current[category] = el}
         >
           {displayOfficials.map((official) => (
-            <Link href={`/profile/${official.id}`} key={official.id}>
-              <div className="h-full min-w-[220px] w-[220px] flex-shrink-0">
-                <OfficialCard official={official} compact={true} />
-              </div>
-            </Link>
+            <div 
+              key={official.id} 
+              className="h-full min-w-[220px] w-[220px] flex-shrink-0 cursor-pointer"
+              onClick={() => window.location.href = `/profile/${official.id}`}
+            >
+              <OfficialCard official={official} compact={true} />
+            </div>
           ))}
         </div>
       </div>
