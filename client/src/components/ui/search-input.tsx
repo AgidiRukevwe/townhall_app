@@ -22,7 +22,7 @@ export const SearchInput = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full max-w-md">
       <form onSubmit={handleSubmit}>
         <div className="relative">
           <input
@@ -32,7 +32,7 @@ export const SearchInput = ({
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
             <SearchNormal1 size={18} variant="Bold" className="text-gray-400" />
           </div>
         </div>
