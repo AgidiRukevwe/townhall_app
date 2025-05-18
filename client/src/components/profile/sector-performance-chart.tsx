@@ -55,34 +55,36 @@ export function SectorPerformanceChart({
   };
   
   return (
-    <div className="bg-white rounded-lg border border-gray-100 p-6 mb-8">
+    <div className="bg-white rounded-xl border border-gray-100 p-6 mb-8">
       <div className="flex items-center mb-5">
         <div className="flex items-center space-x-2">
           <div className="bg-blue-500 rounded-md w-6 h-6 flex items-center justify-center text-white text-xs">
             B1
           </div>
-          <span className="text-base font-semibold">Performance ratings by sectors</span>
+          <span className="text-base font-medium text-gray-900">Performance ratings by sectors</span>
         </div>
         
         <div className="ml-auto flex items-center space-x-1">
-          <button 
-            onClick={prevMonth}
-            className="p-1 rounded hover:bg-gray-100"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </button>
-          <span className="text-sm font-medium">{currentMonth}</span>
-          <button 
-            onClick={nextMonth}
-            className="p-1 rounded hover:bg-gray-100"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </button>
+          <div className="bg-gray-100 rounded-full flex items-center">
+            <button 
+              onClick={prevMonth}
+              className="p-1 px-2 rounded-l-full hover:bg-gray-100 text-gray-500"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            <span className="text-sm font-medium px-2">{currentMonth}</span>
+            <button 
+              onClick={nextMonth}
+              className="p-1 px-2 rounded-r-full hover:bg-gray-100 text-gray-500"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </div>
       
       <div className="mb-4">
-        <h2 className="text-6xl font-bold">
+        <h2 className="text-6xl font-bold text-gray-900">
           {sectorAverage || 27}%
         </h2>
         <div className="text-green-500 text-sm flex items-center mt-2">
@@ -91,19 +93,19 @@ export function SectorPerformanceChart({
         </div>
       </div>
       
-      <div className="h-64 w-full">
+      <div className="h-[350px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 0, left: 0, bottom: 0 }}
+            margin={{ top: 10, right: 0, left: 0, bottom: 10 }}
             layout="vertical"
           >
-            <CartesianGrid strokeDasharray="2 2" vertical={true} horizontal={false} stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#f0f0f0" />
             <XAxis 
               type="number"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 10, fill: '#888' }}
               domain={[0, 100]}
               ticks={[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]}
             />
@@ -112,7 +114,7 @@ export function SectorPerformanceChart({
               type="category"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 10 }}
+              tick={{ fontSize: 12, fill: '#888' }}
               width={100}
             />
             <Tooltip
@@ -131,8 +133,8 @@ export function SectorPerformanceChart({
             />
             <Bar 
               dataKey="rating" 
-              radius={[0, 10, 10, 0]}
-              barSize={16}
+              radius={[0, 16, 16, 0]}
+              barSize={30}
             >
               {chartData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill="#007BFF" />

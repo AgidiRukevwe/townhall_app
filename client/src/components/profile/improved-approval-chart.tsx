@@ -55,21 +55,21 @@ export function ImprovedApprovalChart({
   const highlightValue = formattedChartData.find(d => d.month === highlightMonth)?.rating || 75;
   
   return (
-    <div className="bg-[#111] text-white rounded-xl p-6 w-full">
+    <div className="bg-white border border-gray-100 rounded-xl p-6 w-full mb-8">
       <div className="flex items-center mb-5">
         <div className="flex items-center space-x-2">
           <div className="bg-blue-500 rounded-md w-6 h-6 flex items-center justify-center text-white text-xs">
-            A
+            A1
           </div>
-          <span className="text-base font-medium">Approval rating</span>
+          <span className="text-base font-medium text-gray-900">Approval rating</span>
         </div>
         
         <div className="ml-auto flex items-center">
-          <div className="bg-gray-800 rounded-full p-1 flex items-center">
+          <div className="bg-gray-100 rounded-full p-1 flex items-center">
             <button 
               className={cn(
                 "px-3 py-1 text-xs rounded-full transition-colors", 
-                timeRange === "1 Dy" ? "bg-white text-black" : "text-white"
+                timeRange === "1 Dy" ? "bg-white text-black shadow-sm" : "text-gray-600"
               )}
               onClick={() => setTimeRange("1 Dy")}
             >
@@ -78,7 +78,7 @@ export function ImprovedApprovalChart({
             <button 
               className={cn(
                 "px-3 py-1 text-xs rounded-full transition-colors", 
-                timeRange === "1 Wk" ? "bg-white text-black" : "text-white"
+                timeRange === "1 Wk" ? "bg-white text-black shadow-sm" : "text-gray-600"
               )}
               onClick={() => setTimeRange("1 Wk")}
             >
@@ -87,7 +87,7 @@ export function ImprovedApprovalChart({
             <button 
               className={cn(
                 "px-3 py-1 text-xs rounded-full transition-colors", 
-                timeRange === "1 Mn" ? "bg-white text-black" : "text-white"
+                timeRange === "1 Mn" ? "bg-white text-black shadow-sm" : "text-gray-600"
               )}
               onClick={() => setTimeRange("1 Mn")}
             >
@@ -97,8 +97,8 @@ export function ImprovedApprovalChart({
         </div>
       </div>
       
-      <div className="mb-6">
-        <h2 className="text-6xl font-bold">
+      <div className="mb-4">
+        <h2 className="text-6xl font-bold text-gray-900">
           {overallRating || 27}%
         </h2>
         <div className="text-green-500 text-sm flex items-center mt-2">
@@ -121,9 +121,9 @@ export function ImprovedApprovalChart({
             </defs>
             <CartesianGrid 
               strokeDasharray="3 3" 
-              vertical={false} 
+              vertical={true} 
               horizontal={true} 
-              stroke="#222" 
+              stroke="#f0f0f0" 
             />
             <XAxis 
               dataKey="month" 
@@ -164,12 +164,6 @@ export function ImprovedApprovalChart({
               x={highlightMonth}
               stroke="#333" 
               strokeDasharray="3 3"
-              label={{
-                position: "insideBottomRight",
-                value: `${highlightValue}%`,
-                fill: "#fff",
-                fontSize: 11
-              }}
               ifOverflow="extendDomain"
             />
             <Area 
