@@ -1,11 +1,11 @@
 import React from 'react';
-import * as Iconsax from 'iconsax-react';
+import * as IconsaxIcons from 'iconsax-react';
 
-// Type for icon variants
-type IconVariant = 'Linear' | 'Bold' | 'Outline' | 'TwoTone' | 'Broken';
+export type IconName = keyof typeof IconsaxIcons;
+export type IconVariant = 'Linear' | 'Bold' | 'Outline' | 'TwoTone' | 'Broken';
 
-interface IconProps {
-  name: keyof typeof Iconsax;
+export interface IconProps {
+  name: IconName;
   size?: number;
   variant?: IconVariant;
   color?: string;
@@ -13,34 +13,33 @@ interface IconProps {
   onClick?: () => void;
 }
 
-export const Icon = ({ 
-  name, 
-  size = 24, 
-  variant = 'Linear', 
-  color, 
+export const Icon: React.FC<IconProps> = ({
+  name,
+  size = 24,
+  variant = 'Linear',
+  color,
   className = '',
-  onClick
-}: IconProps) => {
-  // Get the icon component from Iconsax
-  const IconComponent = Iconsax[name];
-  
+  onClick,
+}) => {
+  const IconComponent = IconsaxIcons[name];
+
   if (!IconComponent) {
-    console.warn(`Icon ${name} not found in Iconsax library`);
+    console.warn(`Icon "${name}" not found in Iconsax library`);
     return null;
   }
-  
+
   return (
-    <IconComponent 
-      size={size} 
-      variant={variant} 
-      color={color} 
+    <IconComponent
+      size={size}
+      variant={variant}
+      color={color}
       className={className}
       onClick={onClick}
     />
   );
 };
 
-// Export all icon names for easy autocomplete
-export const IconNames = Object.keys(Iconsax).filter(
-  key => typeof Iconsax[key as keyof typeof Iconsax] === 'function'
-) as Array<keyof typeof Iconsax>;
+// Export all available icon names for reference
+export const availableIcons = Object.keys(IconsaxIcons).filter(
+  (key) => typeof IconsaxIcons[key as IconName] === 'function'
+) as IconName[];
