@@ -4,7 +4,6 @@ import {
   Card, 
   CardContent
 } from "@/components/ui/card";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
 interface OfficialCardProps {
@@ -24,27 +23,17 @@ export function OfficialCard({ official }: OfficialCardProps) {
   const formattedLocation = official.location ? toTitleCase(official.location) : '';
   
   return (
-    <Card className="overflow-hidden border bg-blue-500 border-gray-200">
-      <CardContent className="p-4 flex flex-col space-y-4">
-        {/* Large custom rounded avatar for the official */}
-        <div className="relative h-48 w-full rounded-[24px] overflow-hidden">
-          {official.imageUrl ? (
-            <img 
-              src={official.imageUrl} 
-              alt={formattedName}
-              className="w-full h-full rounded-[24px] object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-              <span className="text-6xl font-bold text-gray-400">
-                {official.name.charAt(0).toUpperCase()}
-              </span>
-            </div>
-          )}
-        </div>
+    <Card className="border border-gray-200">
+      <CardContent className="p-4">
+        {/* Simple image with direct border radius */}
+        <img 
+          src={official.imageUrl || ""} 
+          alt={formattedName}
+          className="w-full h-48 object-cover rounded-[24px] mb-4"
+        />
         
         {/* Official details */}
-        <div className="space-y-2">
+        <div>
           <h3 className="text-base font-bold">{formattedName}</h3>
           <p className="text-gray-700 text-sm">{formattedPosition}</p>
           {formattedLocation && <p className="text-gray-700 text-sm">{formattedLocation}</p>}
@@ -57,7 +46,7 @@ export function OfficialCard({ official }: OfficialCardProps) {
             </div>
           )}
           
-          <div className="pt-2">
+          <div className="mt-4">
             <Link href={`/profile/${official.id}`}>
               <Button 
                 variant="outline" 
