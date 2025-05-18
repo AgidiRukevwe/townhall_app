@@ -36,18 +36,18 @@ export function OfficialCard({ official }: OfficialCardProps) {
       <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <div className="p-4">
           {/* Image container with 24px border radius */}
-          <div 
-            className="h-48 overflow-hidden mb-4 rounded-[24px]" 
-          >
+          <div className="h-48 overflow-hidden mb-4" style={{ borderRadius: "24px" }}>
             {official.imageUrl ? (
               <img 
                 src={official.imageUrl} 
                 alt={formattedName}
-                className="w-full h-full object-cover rounded-[24px]"
+                className="w-full h-full object-cover"
+                style={{ borderRadius: "24px" }}
               />
             ) : (
               <div 
-                className="bg-gray-100 h-full w-full flex items-center justify-center text-6xl font-bold text-gray-400 rounded-[24px]"
+                className="bg-gray-100 h-full w-full flex items-center justify-center text-6xl font-bold text-gray-400"
+                style={{ borderRadius: "24px" }}
               >
                 {official.name.charAt(0).toUpperCase()}
               </div>
@@ -93,9 +93,6 @@ export function OfficialCard({ official }: OfficialCardProps) {
       <div className="border border-red-300 rounded-lg p-4">
         <p className="text-red-500">Error rendering card</p>
       </div>
-    );
-  }
-}
     );
   }
 }
