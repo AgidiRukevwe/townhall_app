@@ -33,7 +33,7 @@ export function OfficialCard({ official }: OfficialCardProps) {
     const formattedParty = official.party ? toTitleCase(official.party) : '';
     
     return (
-      <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="border border-gray-200 rounded-full shadow-sm overflow-hidden">
         <div className="p-4">
           {/* Image container with 24px border radius */}
           <div 
@@ -43,7 +43,7 @@ export function OfficialCard({ official }: OfficialCardProps) {
               <img 
                 src={official.imageUrl} 
                 alt={formattedName}
-                className="w-full h-full object-cover rounded-[24px]"
+                className="w-full h-full rounded-lg object-cover rounded-[24px]"
               />
             ) : (
               <div 

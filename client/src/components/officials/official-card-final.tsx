@@ -8,67 +8,62 @@ interface OfficialCardProps {
 export function OfficialCard({ official }: OfficialCardProps) {
   if (!official) {
     return (
-      <div className="border border-red-300 rounded-full p-4">
+      <div className="border border-red-300 rounded-lg p-4">
         <p className="text-red-500">Error: Missing official data</p>
       </div>
     );
   }
-
+  
   // Function to capitalize first letter of each word
   const toTitleCase = (str: string) => {
-    return str
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
+    return str.toLowerCase().split(' ').map(word => 
+      word.charAt(0).toUpperCase() + word.slice(1)
+    ).join(' ');
   };
-
+  
   // Format the name in title case
   const formattedName = toTitleCase(official.name);
   // Format position in title case
   const formattedPosition = toTitleCase(official.position);
   // Format location in title case if it exists
-  const formattedLocation = official.location
-    ? toTitleCase(official.location)
-    : "";
+  const formattedLocation = official.location ? toTitleCase(official.location) : '';
   // Format party in title case if it exists
-  const formattedParty = official.party ? toTitleCase(official.party) : "";
-
+  const formattedParty = official.party ? toTitleCase(official.party) : '';
+  
   return (
-    <div className="border border-gray-200 rounded-[24px] shadow-sm overflow-hidden">
+    <div className="border border-gray-200 rounded-lg shadow-sm">
       <div className="p-4">
-        {/* Image with 24px border radius */}
-        <div className="h-48 mb-4">
+        {/* Image container (not rounded) */}
+        <div className="h-48 mb-4 overflow-hidden" style={{borderRadius: 0}}>
+          {/* Image itself with 24px border radius */}
           {official.imageUrl ? (
-            <img
-              src={official.imageUrl}
-              alt={formattedName}
-              className="w-full h-full object-cover rounded-[24px]"
-            />
+            <div className="rounded-[24px] overflow-hidden h-full">
+              <img 
+                src={official.imageUrl} 
+                alt={formattedName}
+                className="w-full h-full object-cover"
+              />
+            </div>
           ) : (
-            <div className="bg-gray-100 h-full w-full flex items-center justify-center text-6xl font-bold text-gray-400 rounded-[24px]">
+            <div 
+              className="bg-gray-100 h-full w-full flex items-center justify-center text-6xl font-bold text-gray-400 rounded-[24px]"
+            >
               {official.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
-
+        
         {/* Official details */}
         <div>
           <h3 className="text-base font-bold">{formattedName}</h3>
           <p className="text-gray-700 text-sm">{formattedPosition}</p>
-          {formattedLocation && (
-            <p className="text-gray-700 text-sm">{formattedLocation}</p>
-          )}
-          {formattedParty && (
-            <p className="text-gray-700 text-sm">Party: {formattedParty}</p>
-          )}
-
+          {formattedLocation && <p className="text-gray-700 text-sm">{formattedLocation}</p>}
+          {formattedParty && <p className="text-gray-700 text-sm">Party: {formattedParty}</p>}
+          
           {/* Approval rating */}
           {official.approvalRating !== undefined && (
             <div className="mt-2">
-              <span
-                className={`text-sm font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}
-              >
+              <span className={`text-sm font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}>
                 {official.approvalRating}%
                 {official.approvalTrend !== 0 && (
                   <span className="ml-1">
@@ -78,7 +73,7 @@ export function OfficialCard({ official }: OfficialCardProps) {
               </span>
             </div>
           )}
-
+          
           {/* View profile button */}
           <div className="mt-4">
             <Link href={`/profile/${official.id}`}>
