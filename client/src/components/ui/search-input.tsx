@@ -24,17 +24,22 @@ export const SearchInput = ({
   return (
     <div className="w-96">
       <form onSubmit={handleSubmit}>
-        <div className="flex items-center relative">
-          <div className="absolute left-4 z-10 pointer-events-none">
-            <SearchNormal1 size={18} variant="Bold" className="text-gray-400" />
+        <div className="flex items-center">
+          <div className="relative w-full">
+            <SearchNormal1 
+              size={18} 
+              variant="Bold" 
+              className="absolute left-5 top-1/2 transform -translate-y-1/2 text-gray-400" 
+            />
+            <input
+              type="search"
+              placeholder={placeholder}
+              className={`input-standard w-full pl-12 ${className}`}
+              style={{ paddingLeft: "48px" }}
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+            />
           </div>
-          <input
-            type="search"
-            placeholder={placeholder}
-            className={`input-standard w-full py-2 pl-12 pr-4 ${className}`}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
         </div>
       </form>
     </div>
