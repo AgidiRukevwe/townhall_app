@@ -37,7 +37,7 @@ export function OfficialCard({ official }: OfficialCardProps) {
     const formattedParty = official.party ? toTitleCase(official.party) : "";
 
     return (
-      <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="border bg-red-400 border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <div className="p-4">
           {/* Image container with 24px border radius */}
           <div className="h-48 overflow-hidden mb-4 rounded-[24px]">
