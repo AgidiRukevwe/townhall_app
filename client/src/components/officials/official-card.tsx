@@ -54,12 +54,12 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       <div className="relative h-48">
         {!showAvatar ? (
           <div 
-            className="w-full h-full rounded-[24px]"
+            className="w-full h-full rounded-[24px] bg-[#e6f4ff]"
             style={{
               backgroundImage: `url("${official.imageUrl}")`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundColor: '#e6f4ff'
+              backgroundPosition: 'center top',
+              backgroundRepeat: 'no-repeat'
             }}
           ></div>
         ) : (
