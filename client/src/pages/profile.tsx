@@ -122,14 +122,19 @@ export default function Profile() {
           <div className="flex flex-col md:flex-row items-start mb-8">
             <div className="flex-shrink-0 mb-4 md:mb-0 mr-6">
               {official.imageUrl ? (
-                <img 
-                  src={official.imageUrl as string} 
-                  alt={official.name}
-                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
-                />
+                <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-md relative bg-[#e6f4ff]">
+                  <img 
+                    src={official.imageUrl ?? ""} 
+                    alt={official.name}
+                    className="absolute w-[120%] h-[120%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover"
+                    style={{ objectPosition: "center 20%" }}
+                  />
+                </div>
               ) : (
-                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
-                  <User className="h-16 w-16 text-gray-400" />
+                <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center border-4 border-white shadow-md">
+                  <span className="text-[#1476FF] text-3xl font-bold">
+                    {official.name.split(' ').map(part => part[0]).slice(0, 2).join('')}
+                  </span>
                 </div>
               )}
             </div>

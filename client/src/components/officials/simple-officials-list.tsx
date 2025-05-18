@@ -53,7 +53,7 @@ export function SimpleOfficialsList({
     return (
       <div className="mb-10" key={category}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-base font-medium flex items-center">
+          <h2 className="text-2xl font-bold flex items-center">
             {category} <span className="ml-1">›</span>
           </h2>
           <div className="flex space-x-1">

@@ -55,12 +55,12 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
         {!showAvatar ? (
           <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
             <img
-              src={official.imageUrl || ""}
+              src={official.imageUrl ?? ""}
               alt={formattedName}
               className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
               style={{
                 objectFit: "cover",
-                objectPosition: "center 20%"
+                objectPosition: "center 20%",
               }}
             />
           </div>
@@ -76,9 +76,9 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       </div>
 
       {/* Official details */}
-      <div className="p-3">
-        <h3 className="font-medium text-sm">{formattedName}</h3>
-        <p className="text-gray-500 text-xs">
+      <div className="py-3">
+        <h3 className="font-bold text-base">{formattedName}</h3>
+        <p className="text-gray-500 font-medium text-sm">
           {formattedPosition}
           {formattedLocation ? `, ${formattedLocation}` : ""}
         </p>
@@ -86,7 +86,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
         {official.approvalRating !== undefined && (
           <div className="mt-2 flex items-center">
             <span
-              className={`text-xs font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}
+              className={`text-sm font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}
             >
               {official.approvalRating?.toFixed(1)}%
               {official.approvalTrend !== 0 && (
