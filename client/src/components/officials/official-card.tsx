@@ -8,54 +8,65 @@ import { Button } from "@/components/ui/button";
 
 interface OfficialCardProps {
   official: Official;
+  compact?: boolean;
 }
 
-export function OfficialCard({ official }: OfficialCardProps) {
+export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   // Function to capitalize first letter of each word
   const toTitleCase = (str: string) => {
     return str.toLowerCase().split(' ').map(word => 
       word.charAt(0).toUpperCase() + word.slice(1)
     ).join(' ');
   };
-  
+
   const formattedName = toTitleCase(official.name);
   const formattedPosition = toTitleCase(official.position);
   const formattedLocation = official.location ? toTitleCase(official.location) : '';
-  
+
   return (
-    <Card className="border border-gray-200">
-      <CardContent className="p-4">
-        {/* Simple image with direct border radius */}
-        <img 
-          src={official.imageUrl || ""} 
-          alt={formattedName}
-          className="w-full h-48 object-cover rounded-[24px] mb-4"
-        />
+    <Card className="border border-gray-200 overflow-hidden">
+      <CardContent className="p-0">
+        {/* Image with rounded corners */}
+        <div className="relative h-48 overflow-hidden">
+          <img 
+            src={official.imageUrl || ""} 
+            alt={formattedName}
+            className="w-full h-full object-cover rounded-t-lg" 
+          />
+        </div>
         
         {/* Official details */}
-        <div>
-          <h3 className="text-base font-bold">{formattedName}</h3>
-          <p className="text-gray-700 text-sm">{formattedPosition}</p>
-          {formattedLocation && <p className="text-gray-700 text-sm">{formattedLocation}</p>}
+        <div className="p-3">
+          <h3 className="font-medium text-sm">{formattedName}</h3>
+          <p className="text-gray-500 text-xs">
+            {formattedPosition}{formattedLocation ? `, ${formattedLocation}` : ''}
+          </p>
           
           {official.approvalRating !== undefined && (
-            <div className="mt-1">
-              <span className="text-sm font-medium text-green-500">
-                {official.approvalRating}%
+            <div className="mt-2 flex items-center">
+              <span className={`text-xs font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}>
+                {official.approvalRating?.toFixed(1)}%
+                {official.approvalTrend !== 0 && (
+                  <span className="ml-1">
+                    {official.approvalTrend > 0 ? "▲" : "▼"}
+                  </span>
+                )}
               </span>
             </div>
           )}
           
-          <div className="mt-4">
-            <Link href={`/profile/${official.id}`}>
-              <Button 
-                variant="outline" 
-                className="w-full text-sm"
-              >
-                View Profile
-              </Button>
-            </Link>
-          </div>
+          {!compact && (
+            <div className="mt-4">
+              <Link href={`/profile/${official.id}`}>
+                <Button 
+                  variant="outline" 
+                  className="w-full text-xs h-8"
+                >
+                  View Profile
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
