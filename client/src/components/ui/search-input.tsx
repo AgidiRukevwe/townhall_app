@@ -28,11 +28,11 @@ export const SearchInput = ({
           <input
             type="search"
             placeholder={placeholder}
-            className={`input-standard w-full pl-14 pr-4 ${className}`}
+            className={`input-standard w-full pl-16 pr-4 ${className}`}
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+          <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
             <SearchNormal1 size={18} variant="Bold" className="text-gray-400" />
           </div>
         </div>
