@@ -53,11 +53,11 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       {/* Image with 24px border radius and no black background */}
       <div className="relative h-56">
         {!showAvatar ? (
-          <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] flex items-center justify-center">
+          <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
             <img
-              src={official.imageUrl}
+              src={official.imageUrl || ""}
               alt={formattedName}
-              className="w-[130%] h-[130%] -ml-[15%] -mt-[15%]"
+              className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
               style={{
                 objectFit: "cover",
                 objectPosition: "center 20%"
