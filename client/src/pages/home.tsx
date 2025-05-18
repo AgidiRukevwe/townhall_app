@@ -88,8 +88,6 @@ export default function Home() {
           </div>
         </div>
         
-
-
         {/* Main Content */}
         {isLoading ? (
           <Loading />
