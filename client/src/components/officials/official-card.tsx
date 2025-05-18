@@ -35,15 +35,15 @@ export function OfficialCard({ official }: OfficialCardProps) {
     
     return (
       <div className="border border-gray-200 rounded-lg overflow-hidden shadow-sm">
-        <div className="h-48 overflow-hidden">
+        <div className="h-48 overflow-hidden rounded-[24px]">
           {official.imageUrl ? (
             <img 
               src={official.imageUrl} 
               alt={formattedName}
-              className="w-full h-full object-cover rounded-[24px]"
+              className="w-full h-full object-cover"
             />
           ) : (
-            <div className="bg-gray-100 h-48 flex items-center justify-center text-6xl font-bold text-gray-400 rounded-[24px]">
+            <div className="bg-gray-100 h-48 flex items-center justify-center text-6xl font-bold text-gray-400">
               {official.name.charAt(0).toUpperCase()}
             </div>
           )}
