@@ -13,6 +13,9 @@ import { RatingModal } from "@/components/rating/rating-modal";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Flag, MapPin, User } from "lucide-react";
+import { Navbar } from "@/components/layout/navbar";
+import { useAuth } from "@/hooks/use-auth";
+import { queryClient } from "@/lib/queryClient";
 
 export default function Profile() {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +23,41 @@ export default function Profile() {
   const { data: ratingSummary, isLoading: isLoadingRatings } = useRatings(id);
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState("");
+  
+  // Get username or use default
+  const userName: string =
+    user && user !== null && typeof user === "object" && "username" in user
+      ? (user.username as string)
+      : "";
+      
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    // Redirect to home page with search query
+    if (query.trim()) {
+      const params = new URLSearchParams();
+      params.set("search", query);
+      window.location.href = `/?${params.toString()}`;
+    }
+  };
+  
+  const handleLogout = () => {
+    // Make a POST request to logout endpoint directly
+    fetch("/api/logout", {
+      method: "POST",
+      credentials: "include",
+    })
+      .then(() => {
+        // Clear user data from query cache
+        queryClient.setQueryData(["/api/user"], null);
+        // Redirect to login page
+        window.location.href = "/auth";
+      })
+      .catch((err) => {
+        console.error("Logout failed:", err);
+      });
+  };
   
   // Debug official data
   console.log("Profile page - official data:", official);
@@ -34,16 +72,26 @@ export default function Profile() {
   
   if (error || !official) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Home
-        </Link>
+      <main className="flex-1 bg-white">
+        <Navbar 
+          onSearch={handleSearch}
+          username={userName}
+          onLogout={handleLogout}
+        />
         
-        <div className="flex justify-center py-12">
-          <p className="text-red-500">Error loading official: {error?.toString() || "Official not found"}</p>
+        <div className="bg-gray-50 py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-6">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Home
+            </Link>
+            
+            <div className="flex justify-center py-12">
+              <p className="text-red-500">Error loading official: {error?.toString() || "Official not found"}</p>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
   
@@ -55,186 +103,132 @@ export default function Profile() {
   };
   
   return (
-    <main className="flex-1 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Back button */}
-        <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-6">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Home
-        </Link>
-        
-        {/* Official info */}
-        <div className="flex flex-col md:flex-row items-start mb-8">
-          <div className="flex-shrink-0 mb-4 md:mb-0 mr-6">
-            {official.imageUrl ? (
-              <img 
-                src={official.imageUrl as string} 
-                alt={official.name}
-                className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
-                <User className="h-16 w-16 text-gray-400" />
-              </div>
-            )}
-          </div>
+    <main className="flex-1 bg-white">
+      <Navbar 
+        onSearch={handleSearch}
+        username={userName}
+        onLogout={handleLogout}
+      />
+      
+      <div className="bg-gray-50 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back button */}
+          <Link href="/" className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-6">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Home
+          </Link>
           
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold mb-1">{official.name}</h2>
-            <p className="text-gray-600 mb-4">{official.position}</p>
+          {/* Official info */}
+          <div className="flex flex-col md:flex-row items-start mb-8">
+            <div className="flex-shrink-0 mb-4 md:mb-0 mr-6">
+              {official.imageUrl ? (
+                <img 
+                  src={official.imageUrl as string} 
+                  alt={official.name}
+                  className="w-32 h-32 rounded-full object-cover border-4 border-white shadow-md"
+                />
+              ) : (
+                <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center border-4 border-white shadow-md">
+                  <User className="h-16 w-16 text-gray-400" />
+                </div>
+              )}
+            </div>
             
-            <div className="flex flex-wrap items-center text-sm text-gray-500 mb-4">
-              <div className="flex items-center mr-4 mb-2">
-                <MapPin className="h-4 w-4 mr-1" />
-                <span>{official.location}</span>
+            <div className="flex-1">
+              <h2 className="text-2xl font-bold mb-1">{official.name}</h2>
+              <p className="text-gray-600 mb-4">{official.position}</p>
+              
+              <div className="flex flex-wrap items-center text-sm text-gray-500 mb-4">
+                <div className="flex items-center mr-4 mb-2">
+                  <MapPin className="h-4 w-4 mr-1" />
+                  <span>{official.location}</span>
+                </div>
+                <div className="flex items-center mr-4 mb-2">
+                  <Flag className="h-4 w-4 mr-1" />
+                  <span>{official.party}</span>
+                </div>
               </div>
               
-              <div className="flex items-center mr-4 mb-2">
-                <Flag className="h-4 w-4 mr-1" />
-                <span>{official.party}</span>
+              <div className="flex items-center space-x-4">
+                <Button 
+                  onClick={() => setRatingModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Rate Official
+                </Button>
+                
+                <Button 
+                  variant="outline"
+                  onClick={handleCreatePetition}
+                >
+                  Create Petition
+                </Button>
               </div>
             </div>
           </div>
           
-          <div className="mt-4 md:mt-0 flex flex-col sm:flex-row gap-3">
-            <Button 
-              variant="outline" 
-              className="order-2 sm:order-1"
-              onClick={handleCreatePetition}
-            >
-              Create Petitions
-            </Button>
-            
-            <Button 
-              variant="default" 
-              className="order-1 sm:order-2 bg-black hover:bg-gray-900 text-white"
-              onClick={() => setRatingModalOpen(true)}
-            >
-              Rate this public official
-            </Button>
-          </div>
-        </div>
-        
-        {/* Tabs */}
-        <Tabs defaultValue="overview">
-          <TabsList className="border-b border-gray-200 w-full flex justify-start space-x-8 rounded-none bg-transparent h-auto mb-8">
-            <TabsTrigger
-              value="overview"
-              className="border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent px-1 py-4 border-b-2 font-medium text-gray-500 data-[state=active]:shadow-none rounded-none"
-            >
-              Overview
-            </TabsTrigger>
-            <TabsTrigger
-              value="biography"
-              className="border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent px-1 py-4 border-b-2 font-medium text-gray-500 data-[state=active]:shadow-none rounded-none"
-            >
-              Biography
-            </TabsTrigger>
-            <TabsTrigger
-              value="petitions"
-              className="border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-transparent px-1 py-4 border-b-2 font-medium text-gray-500 data-[state=active]:shadow-none rounded-none"
-            >
-              Petitions
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview">
-            {/* Main content */}
-            {isLoadingRatings ? (
-              <Loading message="Loading ratings data..." />
-            ) : (
-              <>
-                {/* Approval and sectors */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <ApprovalChart 
-                    approvalRating={official.approvalRating}
-                    monthlyChange={ratingSummary?.monthlyChange || 0}
-                    monthlyData={ratingSummary?.monthlyData || []}
-                  />
-                  
-                  <SectorPerformance 
-                    averageRating={ratingSummary?.sectorAverage || 0}
-                    monthlyChange={ratingSummary?.sectorMonthlyChange || 0}
-                    sectors={ratingSummary?.sectorRatings || []}
-                  />
-                </div>
-                
-                {/* History Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-                  {/* Education section */}
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-medium text-gray-900">Education</h3>
-                      {official.education && official.education.length > 3 && (
-                        <button className="text-sm text-gray-500 hover:text-gray-700">
-                          See all <ArrowLeft className="inline h-3 w-3 ml-1 rotate-180" />
-                        </button>
-                      )}
-                    </div>
-                    
-                    <EducationTimeline education={official.education || []} />
-                  </div>
-                  
-                  {/* Political career */}
-                  <div>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-lg font-medium text-gray-900">Political career</h3>
-                      {official.careerHistory.length > 3 && (
-                        <button className="text-sm text-gray-500 hover:text-gray-700">
-                          See all <ArrowLeft className="inline h-3 w-3 ml-1 rotate-180" />
-                        </button>
-                      )}
-                    </div>
-                    
-                    <CareerTimeline careers={official.careerHistory} />
-                  </div>
-                </div>
-              </>
-            )}
-          </TabsContent>
-          
-          <TabsContent value="biography">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Bio Section */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">Biography</h3>
-                {official.bio ? (
-                  <p className="text-gray-700 whitespace-pre-line">{official.bio}</p>
+          {/* Performance data */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4">Overall Approval Rating</h3>
+              <div className="text-4xl font-bold text-blue-600 mb-2">{official.approvalRating}%</div>
+              <div className="text-sm text-gray-500">
+                {official.approvalTrend > 0 ? (
+                  <span className="text-green-500">↑ {official.approvalTrend}% this month</span>
+                ) : official.approvalTrend < 0 ? (
+                  <span className="text-red-500">↓ {Math.abs(official.approvalTrend)}% this month</span>
                 ) : (
-                  <p className="text-gray-400 text-center py-4">No biography information available</p>
+                  <span>No change this month</span>
                 )}
               </div>
-              
-              {/* Education Section */}
-              <div>
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-medium text-gray-900">Education</h3>
-                  {official.education && official.education.length > 3 && (
-                    <button className="text-sm text-gray-500 hover:text-gray-700">
-                      See all <ArrowLeft className="inline h-3 w-3 ml-1 rotate-180" />
-                    </button>
-                  )}
-                </div>
-                
-                <EducationTimeline education={official.education || []} />
+            </div>
+            
+            <div className="bg-white rounded-xl shadow-sm p-6 md:col-span-2">
+              <h3 className="text-lg font-semibold mb-2">Approval Trend</h3>
+              <div className="h-64">
+                {ratingSummary && <ApprovalChart data={ratingSummary.monthlyData} />}
               </div>
             </div>
-          </TabsContent>
+          </div>
           
-          <TabsContent value="petitions">
-            <div className="py-12 text-center">
-              <p className="text-gray-500 mb-2">
-                No petitions yet
-              </p>
-              <p className="text-sm text-gray-400">
-                Be the first to create a petition for this official
-              </p>
-              <Button className="mt-4 bg-black hover:bg-gray-900 text-white" onClick={handleCreatePetition}>
-                Create Petition
-              </Button>
+          {/* Bio */}
+          {official.bio && (
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4">Biography</h3>
+              <p className="text-gray-700">{official.bio}</p>
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+          
+          {/* Tabs for detailed info */}
+          <Tabs defaultValue="performance" className="mb-8">
+            <TabsList className="mb-4">
+              <TabsTrigger value="performance">Performance by Sector</TabsTrigger>
+              <TabsTrigger value="education">Education</TabsTrigger>
+              <TabsTrigger value="career">Career</TabsTrigger>
+              <TabsTrigger value="elections">Election History</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="performance" className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4">Performance by Sector</h3>
+              <SectorPerformance data={ratingSummary?.sectorRatings || []} />
+            </TabsContent>
+            
+            <TabsContent value="education" className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4">Education Background</h3>
+              <EducationTimeline education={official.education || []} />
+            </TabsContent>
+            
+            <TabsContent value="career" className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4">Career History</h3>
+              <CareerTimeline career={official.careerHistory || []} />
+            </TabsContent>
+            
+            <TabsContent value="elections" className="bg-white rounded-xl shadow-sm p-6">
+              <h3 className="text-lg font-semibold mb-4">Election History</h3>
+              <ElectionTimeline elections={official.electionHistory || []} />
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
       
       {/* Rating Modal */}
