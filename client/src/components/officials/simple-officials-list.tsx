@@ -1,6 +1,7 @@
 import { Official } from "@shared/schema";
 import { Link } from "wouter";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowRight2, ArrowLeft2, ArrowRight } from "iconsax-react";
+import { useRef } from "react";
 import { OfficialCard } from "./official-card";
 
 interface SimpleOfficialsListProps {
@@ -12,6 +13,25 @@ export function SimpleOfficialsList({
   officials,
   isLoading,
 }: SimpleOfficialsListProps) {
+  // Create refs for scrollable containers
+  const scrollContainerRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+
+  // Function to scroll the container horizontally
+  const scrollContainer = (category: string, direction: 'left' | 'right') => {
+    const container = scrollContainerRefs.current[category];
+    if (container) {
+      const scrollAmount = 300; // Adjust scroll amount as needed
+      const newScrollLeft = direction === 'left' 
+        ? container.scrollLeft - scrollAmount 
+        : container.scrollLeft + scrollAmount;
+      
+      container.scrollTo({
+        left: newScrollLeft,
+        behavior: 'smooth'
+      });
+    }
+  };
+  
   if (isLoading) {
     return <div>Loading officials...</div>;
   }
@@ -47,25 +67,34 @@ export function SimpleOfficialsList({
   });
 
   const renderCategorySection = (category: string, officials: Official[]) => {
-    // Only show first 5 officials per category in the UI
-    const displayOfficials = officials.slice(0, 5);
+    // Show more officials for horizontal scrolling
+    const displayOfficials = officials.slice(0, 10);
 
     return (
       <div className="mb-10" key={category}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold flex items-center">
-            {category} <span className="ml-1">›</span>
+            {category} <ArrowRight size="18" className="ml-1 text-[#1476FF]" />
           </h2>
           <div className="flex space-x-1">
-            <button className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-              <ChevronLeft className="w-4 h-4" />
+            <button 
+              className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+              onClick={() => scrollContainer(category, 'left')}
+            >
+              <ArrowLeft2 size="16" className="text-gray-500" />
             </button>
-            <button className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center">
-              <ChevronRight className="w-4 h-4" />
+            <button 
+              className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+              onClick={() => scrollContainer(category, 'right')}
+            >
+              <ArrowRight2 size="16" className="text-gray-500" />
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div 
+          className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar"
+          ref={(el) => scrollContainerRefs.current[category] = el}
+        >
           {displayOfficials.map((official) => (
             <Link href={`/profile/${official.id}`} key={official.id}>
               <div className="h-full">

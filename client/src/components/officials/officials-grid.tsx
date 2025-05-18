@@ -1,6 +1,7 @@
 import { OfficialCard } from "./official-card";
 import { Official } from "@shared/schema";
-import { Filter, SortAsc, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { ArrowRight, FilterSquare, Sort } from "iconsax-react";
 import { Button } from "@/components/ui/button";
 import { 
   Select, 
@@ -85,7 +86,7 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
         <Select value={locationFilter} onValueChange={setLocationFilter}>
           <SelectTrigger className="w-[180px] bg-white">
             <div className="flex items-center">
-              <Filter className="h-4 w-4 mr-2" />
+              <FilterSquare size="18" className="mr-2 text-gray-500" variant="Outline" />
               <SelectValue placeholder="Filter by location" />
             </div>
           </SelectTrigger>
@@ -101,7 +102,7 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <SortAsc className="h-5 w-5 text-gray-500" />
+              <Sort size="20" className="text-gray-500" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">

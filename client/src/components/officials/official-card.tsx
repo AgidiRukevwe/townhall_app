@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Official } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { ArrowRight } from "iconsax-react";
 
 interface OfficialCardProps {
   official: Official;
@@ -101,8 +102,9 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
         {!compact && (
           <div className="mt-4">
             <Link href={`/profile/${official.id}`}>
-              <Button variant="outline" className="w-full text-xs h-8">
+              <Button variant="outline" className="w-full text-xs h-8 flex items-center justify-center gap-1">
                 View Profile
+                <ArrowRight size="16" className="text-[#1476FF]" />
               </Button>
             </Link>
           </div>
