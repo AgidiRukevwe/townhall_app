@@ -7,11 +7,9 @@ let useSupabase = false;
 
 if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   useSupabase = true;
-  console.log('💾 Using Supabase client storage');
+  console.log("💾 Using Supabase client storage");
 } else {
-  console.log('💾 Using in-memory storage for development');
+  console.log("💾 Using in-memory storage for development");
 }
 
-export const storage = useSupabase 
-  ? new SupabaseStorage() 
-  : new MemStorage();
+export const storage = useSupabase ? new SupabaseStorage() : new MemStorage();
