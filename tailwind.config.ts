@@ -5,7 +5,7 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
-      sans: ['Satoshi', 'sans-serif'],
+      sans: ["Satoshi", "sans-serif"],
     },
     extend: {
       borderRadius: {
@@ -32,9 +32,20 @@ export default {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
         },
+        text: {
+          primary: "#262626", // Primary text (Dark gray)
+          secondary: "#737373", // Secondary text (Medium gray)
+          tertiary: "#BFBFBF", // Tertiary text (Light gray)
+          inverse: "#FFFFFF", // Inverse text (For dark backgrounds)
+          brand: "#32D583", // Brand color
+        },
         surface: {
           DEFAULT: "#FFFFFF",
           secondary: "#F5F5F5",
+          tertiary: "#434343", // Even darker surface
+          dark: "#141414", // Dark mode surface
+          brand: "#007AFF",
+          brand_secondary: "#3395FF",
         },
         muted: {
           DEFAULT: "hsl(var(--muted))",
