@@ -77,9 +77,9 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       </div>
 
       {/* Official details */}
-      <div className="py-3">
-        <h3 className="font-bold text-base">{formattedName}</h3>
-        <p className="text-gray-500 font-medium text-sm">
+      <div className="py-3 ga">
+        <h3 className="font-medium md:mb-1 text-sm">{formattedName}</h3>
+        <p className="text-gray-500 font-medium text-xs">
           {/* {formattedPosition} */}
           {formattedLocation ? `${formattedLocation}` : ""}
         </p>
@@ -102,7 +102,10 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
         {!compact && (
           <div className="mt-4">
             <Link href={`/profile/${official.id}`}>
-              <Button variant="outline" className="w-full text-xs h-8 flex items-center justify-center gap-1">
+              <Button
+                variant="outline"
+                className="w-full text-xs h-8 flex items-center justify-center gap-1"
+              >
                 View Profile
                 <ArrowRight size="16" className="text-[#1476FF]" />
               </Button>

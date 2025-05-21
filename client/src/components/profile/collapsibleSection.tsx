@@ -54,6 +54,7 @@ export default function CollapsibleSection({
           name={open ? "ArrowUp2" : "ArrowDown2"}
           variant="Bold"
           size={16}
+          color="#BFBFBF"
         />
       </CollapsibleTrigger>
 

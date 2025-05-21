@@ -12,6 +12,7 @@ import {
   type ChartOptions,
 } from "chart.js";
 import { Line, Bar } from "react-chartjs-2";
+import { useBreakpoint } from "@/hooks/use-breakpoints";
 
 ChartJS.register(
   CategoryScale,
@@ -34,7 +35,8 @@ interface DottedGridChartProps {
     text: string;
   };
   height?: number;
-  granularity?: "Today" | "This week" | "This month" | "This year";
+  // granularity?: "Today" | "This week" | "This month" | "This year";
+  granularity?: "1 Dy" | "1 Wk" | "1 Yr";
 }
 
 export default function DottedGridChart({
@@ -45,6 +47,7 @@ export default function DottedGridChart({
   height = 400,
 }: DottedGridChartProps) {
   const chartRef = useRef<any>(null);
+  const isMobile = useBreakpoint();
 
   const chartData = React.useMemo(() => {
     const commonProps = {
@@ -65,7 +68,7 @@ export default function DottedGridChart({
           }
         : {
             ...commonProps,
-            backgroundColor: "rgba(59, 130, 246, 0.6)",
+            backgroundColor: "rgba(59, 130, 246, 1)",
             borderRadius: 6,
             barPercentage: 0.6,
           };
@@ -84,13 +87,20 @@ export default function DottedGridChart({
         x: {
           grid: { display: false },
           border: { display: false },
-          ticks: { padding: 10, font: { size: 10 } },
+          ticks: {
+            padding: 10,
+            font: { size: 10 },
+            maxRotation: 0,
+            minRotation: 0,
+            maxTicksLimit: isMobile ? 12 : 15,
+          },
         },
         y: {
           beginAtZero: true,
           grid: { display: false },
           border: { display: false },
           ticks: {
+            display: !isMobile,
             padding: 10,
             font: { size: 10 },
             callback: (value) => `${value}%`,
