@@ -6,21 +6,35 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { User, Flag, Briefcase, GraduationCap } from "lucide-react";
+import CollapsibleSection from "./collapsibleSection";
+import { CareerHistoryItem } from "./career-item";
+import { off } from "node:process";
+import { EducationHistoryItem } from "./education-item";
+import { CareerTimelineProps } from "./career-timeline";
+import { toTitleCase } from "@/helpers/to-title-case";
 
 interface OfficialProfileCardProps {
   official: Official;
   educationData: any[];
   careerData: any[];
+  classname?: string;
 }
 
-export function OfficialProfileCard({ official, educationData, careerData }: OfficialProfileCardProps) {
+export function OfficialProfileCard({
+  official,
+  educationData,
+  careerData,
+  classname,
+}: OfficialProfileCardProps) {
   return (
-    <div className="flex flex-col items-center text-center mb-12">
+    <div
+      className={`flex flex-col items-center text-center mb-12 ${classname}`}
+    >
       {/* Profile image */}
       {official.imageUrl ? (
-        <div className="w-32 h-32 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
-          <img 
-            src={official.imageUrl ?? ""} 
+        <div className="w-40 h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
+          <img
+            src={official.imageUrl ?? ""}
             alt={official.name}
             className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover"
           />
@@ -28,19 +42,58 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
       ) : (
         <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
           <span className="text-[#1476FF] text-2xl font-bold">
-            {official.name.split(' ').map(part => part[0]).slice(0, 2).join('')}
+            {official.name}
           </span>
         </div>
       )}
-      
+
       {/* Official name and position */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-1">{official.name}</h2>
-      <p className="text-gray-500 mb-6">{official.position}, {official.location}</p>
-      
+      <h2 className="text-xl font-bold text-gray-900">
+        {toTitleCase(official.name)}
+      </h2>
+      <p className="text-gray-500 mb-6 text-sm">{official.location}</p>
+
       {/* Profile information in accordions */}
+
       <div className="w-full max-w-md">
-        <Accordion type="single" collapsible className="w-full">
-          {/* Bio accordion */}
+        <CollapsibleSection icon="Box" title="Bio">
+          <p className="text-text-secondary text-sm text-left">
+            You can run the following SQL query in the Supabase SQL editor to
+            alter the column definition You can run the following SQL query in
+            the Supabase SQL editor to alter the column definiti...
+          </p>
+        </CollapsibleSection>
+        <CollapsibleSection defaultOpen icon="Profile" title="Political party">
+          <span className="flex flex-row gap-x-2 items-center">
+            <div className="h-4 w-4 md:h-8 md:w-8 rounded-full items-center justify-center overflow-hidden bg-red-200">
+              <img
+                src={official.imageUrl || ""}
+                alt={`photo of ${official.name}`}
+                width={24}
+                height={24}
+                className="object-cover h-full w-full"
+              />
+            </div>
+            <p className="font-medium text-sm md:text-sm text-text-secondary">
+              Apc
+            </p>
+          </span>
+        </CollapsibleSection>
+        <CollapsibleSection icon="Briefcase" title="Education">
+          <EducationHistoryItem items={official.education} />
+        </CollapsibleSection>
+      </div>
+    </div>
+  );
+}
+/**
+ * 
+ * 
+ * 
+ * 
+ *   <Accordion type="single" collapsible className="w-full">
+          
+          Bio accordion
           <AccordionItem value="bio" className="border-b border-gray-200">
             <AccordionTrigger className="py-4 flex items-center text-sm font-medium gap-2">
               <div className="flex items-center gap-2">
@@ -54,8 +107,10 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
               </p>
             </AccordionContent>
           </AccordionItem>
-          
-          {/* Political party accordion */}
+
+          // Political party accordion 
+          //==========================
+
           <AccordionItem value="party" className="border-b border-gray-200">
             <AccordionTrigger className="py-4 flex items-center text-sm font-medium gap-2">
               <div className="flex items-center gap-2">
@@ -66,8 +121,16 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
             <AccordionContent className="text-left pb-4">
               <div className="flex items-center">
                 <div className="w-8 h-8 rounded-full mr-3 overflow-hidden">
-                  {/* Party logo using specific party colors */}
-                  <div className={`w-full h-full flex items-center justify-center text-white text-xs font-bold ${official.party === "APC" ? "bg-green-600" : "bg-red-600"}`}>
+
+
+
+                  // Party logo using specific party colors 
+                  //=======================================
+                  <div
+                    className={`w-full h-full flex items-center justify-center text-white text-xs font-bold ${
+                      official.party === "APC" ? "bg-green-600" : "bg-red-600"
+                    }`}
+                  >
                     {official.party.substring(0, 3)}
                   </div>
                 </div>
@@ -75,8 +138,10 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
               </div>
             </AccordionContent>
           </AccordionItem>
-          
-          {/* Career history accordion */}
+
+          // Career history accordion
+
+
           <AccordionItem value="career" className="border-b border-gray-200">
             <AccordionTrigger className="py-4 flex items-center text-sm font-medium gap-2">
               <div className="flex items-center gap-2">
@@ -90,17 +155,28 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
                   {careerData.map((career, index) => (
                     <div key={index} className="flex justify-between text-sm">
                       <div className="font-medium">{career.position}</div>
-                      <div className="text-gray-500">{career.date || `${career.startYear || ''}-${career.endYear || 'Present'}`}</div>
+                      <div className="text-gray-500">
+                        {career.date ||
+                          `${career.startYear || ""}-${
+                            career.endYear || "Present"
+                          }`}
+                      </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No career history available.</p>
+                <p className="text-sm text-gray-500">
+                  No career history available.
+                </p>
               )}
             </AccordionContent>
           </AccordionItem>
+
+          // Education accordion 
+          //==========================================
+
+
           
-          {/* Education accordion */}
           <AccordionItem value="education" className="border-b border-gray-200">
             <AccordionTrigger className="py-4 flex items-center text-sm font-medium gap-2">
               <div className="flex items-center gap-2">
@@ -119,12 +195,13 @@ export function OfficialProfileCard({ official, educationData, careerData }: Off
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-gray-500">No education history available.</p>
+                <p className="text-sm text-gray-500">
+                  No education history available.
+                </p>
               )}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      </div>
-    </div>
-  );
-}
+
+
+ */

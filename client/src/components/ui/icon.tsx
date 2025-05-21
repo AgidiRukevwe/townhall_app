@@ -1,8 +1,8 @@
-import React from 'react';
-import * as IconsaxIcons from 'iconsax-react';
+import React from "react";
+import * as IconsaxIcons from "iconsax-react";
 
 export type IconName = keyof typeof IconsaxIcons;
-export type IconVariant = 'Linear' | 'Bold' | 'Outline' | 'TwoTone' | 'Broken';
+export type IconVariant = "Linear" | "Bold" | "Outline" | "TwoTone" | "Broken";
 
 export interface IconProps {
   name: IconName;
@@ -16,9 +16,9 @@ export interface IconProps {
 export const Icon: React.FC<IconProps> = ({
   name,
   size = 24,
-  variant = 'Linear',
+  variant = "Bold",
   color,
-  className = '',
+  className = "",
   onClick,
 }) => {
   const IconComponent = IconsaxIcons[name];
@@ -41,5 +41,5 @@ export const Icon: React.FC<IconProps> = ({
 
 // Export all available icon names for reference
 export const availableIcons = Object.keys(IconsaxIcons).filter(
-  (key) => typeof IconsaxIcons[key as IconName] === 'function'
+  (key) => typeof IconsaxIcons[key as IconName] === "function"
 ) as IconName[];
