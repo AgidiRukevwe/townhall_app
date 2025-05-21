@@ -12,6 +12,8 @@ import { off } from "node:process";
 import { EducationHistoryItem } from "./education-item";
 import { CareerTimelineProps } from "./career-timeline";
 import { toTitleCase } from "@/helpers/to-title-case";
+import ProfileHeader from "./profile-card-header";
+import { useBreakpoint } from "@/hooks/use-breakpoints";
 
 interface OfficialProfileCardProps {
   official: Official;
@@ -26,36 +28,17 @@ export function OfficialProfileCard({
   careerData,
   classname,
 }: OfficialProfileCardProps) {
+  const isMobile = useBreakpoint();
   return (
     <div
       className={`flex flex-col items-center text-center mb-12 ${classname}`}
     >
       {/* Profile image */}
-      {official.imageUrl ? (
-        <div className="w-40 h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
-          <img
-            src={official.imageUrl ?? ""}
-            alt={official.name}
-            className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover"
-          />
-        </div>
-      ) : (
-        <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
-          <span className="text-[#1476FF] text-2xl font-bold">
-            {official.name}
-          </span>
-        </div>
-      )}
-
-      {/* Official name and position */}
-      <h2 className="text-xl font-bold text-gray-900">
-        {toTitleCase(official.name)}
-      </h2>
-      <p className="text-gray-500 mb-6 text-sm">{official.location}</p>
+      {!isMobile && <ProfileHeader official={official} />}
 
       {/* Profile information in accordions */}
 
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-md md:mt-4">
         <CollapsibleSection icon="Box" title="Bio">
           <p className="text-text-secondary text-sm text-left">
             You can run the following SQL query in the Supabase SQL editor to

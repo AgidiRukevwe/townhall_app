@@ -1,28 +1,30 @@
-import React, { useState, FormEvent } from 'react';
-import { SearchNormal1 } from 'iconsax-react';
+import React, { useState, FormEvent } from "react";
+import { SearchNormal1 } from "iconsax-react";
 
 interface SearchInputProps {
   onSearch: (query: string) => void;
   placeholder?: string;
   initialValue?: string;
   className?: string;
+  showSearch?: boolean;
 }
 
-export const SearchInput = ({ 
-  onSearch, 
-  placeholder = "Search...", 
-  initialValue = "", 
-  className = ""
+export const SearchInput = ({
+  onSearch,
+  placeholder = "Search...",
+  initialValue = "",
+  className = "",
+  showSearch,
 }: SearchInputProps) => {
   const [value, setValue] = useState(initialValue);
-  
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     onSearch(value);
   };
 
   return (
-    <div className="w-96">
+    <div className={`w-96 ${!showSearch && "hidden"}  ${className}`}>
       <form onSubmit={handleSubmit}>
         <div className="relative w-full">
           <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">

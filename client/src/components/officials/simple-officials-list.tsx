@@ -14,24 +14,27 @@ export function SimpleOfficialsList({
   isLoading,
 }: SimpleOfficialsListProps) {
   // Create refs for scrollable containers
-  const scrollContainerRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
+  const scrollContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>(
+    {}
+  );
 
   // Function to scroll the container horizontally
-  const scrollContainer = (category: string, direction: 'left' | 'right') => {
+  const scrollContainer = (category: string, direction: "left" | "right") => {
     const container = scrollContainerRefs.current[category];
     if (container) {
       const scrollAmount = 300; // Adjust scroll amount as needed
-      const newScrollLeft = direction === 'left' 
-        ? container.scrollLeft - scrollAmount 
-        : container.scrollLeft + scrollAmount;
-      
+      const newScrollLeft =
+        direction === "left"
+          ? container.scrollLeft - scrollAmount
+          : container.scrollLeft + scrollAmount;
+
       container.scrollTo({
         left: newScrollLeft,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
   };
-  
+
   if (isLoading) {
     return <div>Loading officials...</div>;
   }
@@ -73,33 +76,46 @@ export function SimpleOfficialsList({
     return (
       <div className="mb-10" key={category}>
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold flex items-center">
-            {category} <ArrowRight2 variant="Bold" size="24" className="ml-1 text-[#BFBFBF]" />
+          <h2 className="text-lg font-bold flex items-center">
+            {category}{" "}
+            <ArrowRight2
+              variant="Bold"
+              size="24"
+              className="ml-1 text-[#BFBFBF]"
+            />
           </h2>
           <div className="flex space-x-1">
-            <button 
+            <button
               className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-200 group"
-              onClick={() => scrollContainer(category, 'left')}
+              onClick={() => scrollContainer(category, "left")}
             >
-              <ArrowCircleLeft size="24" variant="Bold" className="text-[#BFBFBF] group-hover:text-[#737373]" />
+              <ArrowCircleLeft
+                size="24"
+                variant="Bold"
+                className="text-[#BFBFBF] group-hover:text-[#737373]"
+              />
             </button>
-            <button 
+            <button
               className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-gray-200 group"
-              onClick={() => scrollContainer(category, 'right')}
+              onClick={() => scrollContainer(category, "right")}
             >
-              <ArrowCircleRight size="24" variant="Bold" className="text-[#BFBFBF] group-hover:text-[#737373]" />
+              <ArrowCircleRight
+                size="24"
+                variant="Bold"
+                className="text-[#BFBFBF] group-hover:text-[#737373]"
+              />
             </button>
           </div>
         </div>
-        <div 
-          className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar"
-          ref={(el) => scrollContainerRefs.current[category] = el}
+        <div
+          className="flex overflow-x-auto gap-6 pb-2 hide-scrollbar"
+          ref={(el) => (scrollContainerRefs.current[category] = el)}
         >
           {displayOfficials.map((official) => (
-            <div 
-              key={official.id} 
-              className="h-full min-w-[220px] w-[220px] flex-shrink-0 cursor-pointer"
-              onClick={() => window.location.href = `/profile/${official.id}`}
+            <div
+              key={official.id}
+              className="h-full min-w-[200px] w-[22,0px] flex-shrink-0 cursor-pointer"
+              onClick={() => (window.location.href = `/profile/${official.id}`)}
             >
               <OfficialCard official={official} compact={true} />
             </div>
@@ -119,7 +135,7 @@ export function SimpleOfficialsList({
       {Object.entries(categorizedOfficials)
         .filter(([category]) => category !== "Popular")
         .map(([category, officials]) =>
-          renderCategorySection(category, officials),
+          renderCategorySection(category, officials)
         )}
 
       {/* Load more button */}
