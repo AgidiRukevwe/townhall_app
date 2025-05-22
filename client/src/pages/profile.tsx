@@ -167,7 +167,7 @@ export default function Profile() {
       />
       <div className="flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         <div className="flex gap-x-2 md:gap-x-4 items-center">
-          <Link href="/">
+          <Link href="">
             <Icon name="ArrowCircleLeft2" color="#262626" />
           </Link>
           <span className="text-lg font-bold">Official's profile</span>

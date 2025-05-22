@@ -24,7 +24,7 @@ export const SearchInput = ({
   };
 
   return (
-    <div className={`w-96 ${!showSearch && "hidden"}  ${className}`}>
+    <div className={`w-96 ${showSearch && "hidden"}  ${className}`}>
       <form onSubmit={handleSubmit}>
         <div className="relative w-full">
           <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">

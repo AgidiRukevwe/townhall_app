@@ -21,7 +21,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   initialSearchValue = "",
   username = "",
   classname = "",
-  showSearch = true,
+  showSearch,
   onLogout = () => {},
 }) => {
   const isMobile = useBreakpoint();
@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onSearch={onSearch}
                 placeholder={searchPlaceholder}
                 initialValue={initialSearchValue}
-                className={!showSearch ? "hidden" : ""}
+                className={showSearch ? "hidden" : ""}
               />
 
               <UserAvatar
