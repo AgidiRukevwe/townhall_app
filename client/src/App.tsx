@@ -10,14 +10,11 @@ import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
 import LoginPage from "./pages/login-page";
 import RegisterPage from "./pages/register-page";
+import { BrowserRouter } from "react-router-dom";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   // We don't need to pass props here since the Navbar in Home will handle search/user functionality
-  return (
-    <div className="flex flex-col min-h-screen">
-      {children}
-    </div>
-  );
+  return <div className="flex flex-col min-h-screen">{children}</div>;
 };
 
 function Router() {
