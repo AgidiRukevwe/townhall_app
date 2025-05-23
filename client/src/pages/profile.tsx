@@ -32,7 +32,8 @@ import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   // State to track the selected period and sector
-  const [selectedPeriod, setSelectedPeriod] = useState<Granularity>("1 Wk");
+  const [selectedApprovalRatingPeriod, setSelectedApprovalRatingPeriod] =
+    useState<Granularity>("1 Wk");
   const [selectedSector, setSelectedSector] = useState<string>("Health");
 
   const [sectorDatasets, setSectorDatasets] = useState<any>(null);
@@ -66,6 +67,10 @@ export default function Profile() {
     }
   };
 
+  const handlePeriodChange = (period: Granularity) => {
+    setSelectedApprovalRatingPeriod(period);
+  };
+
   const { data: fullData } = useFullRatingsData(id);
 
   const { approvalRating, isLoading: isLoadingApprovalRatingOverall } =
@@ -79,7 +84,8 @@ export default function Profile() {
     timeLabels,
     data: approvalRatingData,
     isLoading: isLoadingApproval,
-  } = useTimeBasedRatings(id, "1 Wk");
+    refetch: refetchApprovalData,
+  } = useTimeBasedRatings(id, selectedApprovalRatingPeriod);
 
   const approvaDataSet: DataMap = {
     overallRating: approvalRating,
@@ -92,6 +98,10 @@ export default function Profile() {
     labels: sectors.map((sector) => sector.name),
     data: sectors.map((sector) => sector.rating),
   };
+
+  useEffect(() => {
+    refetchApprovalData();
+  }, [selectedApprovalRatingPeriod]);
 
   const tabTriggerClass = cn(
     "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
@@ -192,6 +202,7 @@ export default function Profile() {
                   isLoading={
                     isLoadingApproval || isLoadingApprovalRatingOverall
                   }
+                  handlePeriodChange={handlePeriodChange}
                 />
 
                 <ChartCard
@@ -203,6 +214,8 @@ export default function Profile() {
                   isLoading={
                     isLoadingApproval || isLoadingApprovalRatingOverall
                   }
+                  handlePeriodChange={handlePeriodChange}
+                  showGranularity={false}
                 />
               </div>
             </div>
@@ -233,6 +246,7 @@ export default function Profile() {
                   isLoading={
                     isLoadingApproval || isLoadingApprovalRatingOverall
                   }
+                  handlePeriodChange={handlePeriodChange}
                 />
 
                 <ChartCard
@@ -244,6 +258,8 @@ export default function Profile() {
                   isLoading={
                     isLoadingApproval || isLoadingApprovalRatingOverall
                   }
+                  handlePeriodChange={handlePeriodChange}
+                  showGranularity={false}
                 />
               </div>
             </TabsContent>
