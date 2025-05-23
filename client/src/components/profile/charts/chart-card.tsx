@@ -37,11 +37,11 @@ export interface ChartCardProps {
   valueChange?: number;
   chartType?: "line" | "bar"; // extendable
   granularityOptions?: Granularity[];
-  // dataMap: Record<Granularity, { label: string[]; data: number[] }>;
-  // dataMap: PerformanceResponse;
   dataMap: DataMap;
   officialId?: string;
   isLoading: boolean;
+  handlePeriodChange: (period: Granularity) => void;
+  showGranularity?: boolean;
 }
 
 export const ChartCard = ({
@@ -52,6 +52,8 @@ export const ChartCard = ({
   dataMap,
   isLoading,
   officialId = "",
+  handlePeriodChange,
+  showGranularity = true,
 }: ChartCardProps) => {
   const [granularity, setGranularity] = useState<Granularity>(
     granularityOptions[0]
@@ -81,22 +83,28 @@ export const ChartCard = ({
         </div>
 
         <div className="md:ml-auto flex items-center">
-          <div className="bg-gray-100 rounded-full p-1 flex items-center">
-            {granularityOptions.map((option) => (
-              <button
-                key={option}
-                className={cn(
-                  "px-3 py-1 text-xs font-medium rounded-full transition-colors",
-                  granularity === option
-                    ? "bg-white text-black shadow-sm"
-                    : "text-gray-600"
-                )}
-                onClick={() => setGranularity(option)}
-              >
-                {option}
-              </button>
-            ))}
-          </div>
+          {showGranularity && (
+            <div className="bg-gray-100 rounded-full p-1 flex items-center">
+              {granularityOptions.map((option) => (
+                <button
+                  key={option}
+                  className={cn(
+                    "px-3 py-1 text-xs font-medium rounded-full transition-colors",
+                    granularity === option
+                      ? "bg-white text-black shadow-sm"
+                      : "text-gray-600"
+                  )}
+                  onClick={() => {
+                    setGranularity(option);
+                    handlePeriodChange(option);
+                    // refetch();
+                  }}
+                >
+                  {option}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -157,7 +157,7 @@ export function useTimeBasedRatings(
   period: string = "1 Wk",
   sector?: string
 ) {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, refetch, error } = useQuery({
     queryKey: [`/api/officials/${officialId}/approval-ratings`],
     queryFn: async () => {
       const res = await apiRequest(
@@ -183,6 +183,7 @@ export function useTimeBasedRatings(
     timeLabels: timeData?.timeLabels || [],
     data: timeData?.data || [],
     isLoading,
+    refetch,
     error,
   };
 }
