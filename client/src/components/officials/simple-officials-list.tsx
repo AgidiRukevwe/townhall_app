@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { ArrowCircleRight, ArrowCircleLeft, ArrowRight2 } from "iconsax-react";
 import { useRef } from "react";
 import { OfficialCard } from "./official-card";
+import { Icon } from "../ui/icon";
 
 interface SimpleOfficialsListProps {
   officials: Official[];
@@ -13,6 +14,10 @@ export function SimpleOfficialsList({
   officials,
   isLoading,
 }: SimpleOfficialsListProps) {
+  // Get search query from URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const searchQuery = urlParams.get("search") || "";
+
   // Create refs for scrollable containers
   const scrollContainerRefs = useRef<{ [key: string]: HTMLDivElement | null }>(
     {}
@@ -41,6 +46,42 @@ export function SimpleOfficialsList({
 
   if (!officials || officials.length === 0) {
     return <div>No officials found</div>;
+  }
+
+  // If we're searching, show a simpler list view with "showing results for" heading
+  if (searchQuery) {
+    return (
+      <div className="space-y-8">
+        <div className="mb-8 rounded-lg">
+          <div className="flex gap-x-2 md:gap-x-4 items-start">
+            <Link href="/">
+              <Icon name="ArrowCircleLeft2" color="#262626" />
+            </Link>
+            <div className="">
+              <span className="text-lg font-bold">
+                Showing results for "{searchQuery}"
+              </span>
+              <p className="text-text-secondary text-sm mt-0.5">
+                Found {officials.length} official
+                {officials.length !== 1 ? "s" : ""} matching your search
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {officials.map((official) => (
+            <div
+              key={official.id}
+              className="cursor-pointer"
+              onClick={() => (window.location.href = `/profile/${official.id}`)}
+            >
+              <OfficialCard official={official} compact={true} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   // Group officials by their position category
