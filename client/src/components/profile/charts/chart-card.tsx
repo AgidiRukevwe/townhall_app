@@ -3,11 +3,32 @@ import { cn } from "@/lib/utils";
 
 import { Icon } from "@/components/ui/icon";
 import DottedGridChart from "./dotted-chart";
+import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 
-// type Granularity = "Today" | "This week" | "This month" | "This year";
-// type DataSetKey = "daily" | "weekly" | "monthly" | "yearly";
+export type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
 
-type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
+export interface SectorData {
+  sectorId: string;
+  color: string;
+  data: number[];
+}
+
+export interface PerformanceResponse {
+  officialId: string;
+  overallRating: number;
+  timePeriod: string;
+  timeLabels: string[];
+  allSectors: {
+    [sectorName: string]: SectorData;
+  };
+  overallData: number[];
+}
+
+export interface DataMap {
+  overallRating: number;
+  labels: string[];
+  data: number[];
+}
 
 export interface ChartCardProps {
   chartKey?: string;
@@ -16,23 +37,38 @@ export interface ChartCardProps {
   valueChange?: number;
   chartType?: "line" | "bar"; // extendable
   granularityOptions?: Granularity[];
-  dataMap: Record<Granularity, { label: string[]; data: number[] }>;
+  // dataMap: Record<Granularity, { label: string[]; data: number[] }>;
+  // dataMap: PerformanceResponse;
+  dataMap: DataMap;
+  officialId?: string;
+  isLoading: boolean;
 }
 
 export const ChartCard = ({
   chartName = "Chart Title",
   chartType = "line",
-
   valueChange = 0,
   granularityOptions = ["1 Dy", "1 Wk", "1 Yr"],
   dataMap,
+  isLoading,
+  officialId = "",
 }: ChartCardProps) => {
   const [granularity, setGranularity] = useState<Granularity>(
     granularityOptions[0]
   );
 
-  const selectedDataset = dataMap[granularity];
-  const overallValue = selectedDataset.data.at(-1) ?? 0;
+  // const selectedDataset = dataMap[granularity];
+  const selectedDataset = dataMap;
+  // const overallValue = selectedDataset.data.at(-1) ?? 0;
+
+  if (isLoading || !selectedDataset) {
+    return (
+      <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
+        {/* Your loading placeholder */}
+        <p className="text-gray-500 text-sm">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
@@ -66,7 +102,7 @@ export const ChartCard = ({
 
       <div className="mb-4">
         <h2 className="text-4xl md:text-5xl font-medium text-gray-900">
-          {overallValue}%
+          {selectedDataset?.overallRating}%
         </h2>
         <div className="text-sm flex items-center mt-2">
           <Icon name="ArrowUp2" size={20} color="#4caf50" />
@@ -77,9 +113,16 @@ export const ChartCard = ({
       </div>
 
       <div className="h-[400px] w-full">
+        {/* <DottedGridChart
+          type={chartType}
+          labels={selectedDataset.timeLabels}
+          data={selectedDataset.overallData}
+          granularity={granularity}
+        /> */}
+
         <DottedGridChart
           type={chartType}
-          labels={selectedDataset.label}
+          labels={selectedDataset.labels}
           data={selectedDataset.data}
           granularity={granularity}
         />

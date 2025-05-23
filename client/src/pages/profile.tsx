@@ -1,7 +1,13 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useOfficialDetails } from "@/hooks/use-officials";
-import { usePerformanceData, useRatings } from "@/hooks/use-ratings";
+import {
+  useApprovalRating,
+  // usePerformanceData,
+  // useRatings,
+  useSectorRatings,
+  useTimeBasedRatings,
+} from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
 import { RatingModal } from "@/components/rating/rating-modal";
 import { useEffect, useState } from "react";
@@ -11,34 +17,35 @@ import { Navbar } from "@/components/layout/navbar";
 import { useAuth } from "@/hooks/use-auth";
 import { queryClient } from "@/lib/queryClient";
 import { OfficialProfileCard } from "@/components/profile/official-profile-card";
-import { ImprovedApprovalChart } from "@/components/profile/improved-approval-chart";
-import { SectorPerformanceChart } from "@/components/profile/sector-performance-chart";
-import DottedGridChart from "@/components/profile/charts/dotted-chart";
-import { ChartCard } from "@/components/profile/charts/chart-card";
+import {
+  ChartCard,
+  DataMap,
+  Granularity,
+} from "@/components/profile/charts/chart-card";
 import { Icon } from "@/components/ui/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { useBreakpoint } from "@/hooks/use-breakpoints";
 import ProfileHeader from "@/components/profile/profile-card-header";
+import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   // State to track the selected period and sector
-  const [selectedPeriod, setSelectedPeriod] = useState("1 Wk");
-  const [selectedSector, setSelectedSector] = useState("Health");
+  const [selectedPeriod, setSelectedPeriod] = useState<Granularity>("1 Wk");
+  const [selectedSector, setSelectedSector] = useState<string>("Health");
 
-  const [approvalDatasets, setApprovalDatasets] = useState<any>(null);
   const [sectorDatasets, setSectorDatasets] = useState<any>(null);
 
   const { id } = useParams<{ id: string }>();
-  const { data: official, isLoading, error } = useOfficialDetails(id);
-  // const { data: ratings, isLoading: loadingRatingDta } = usePerformanceData(
-  //   id,
-  //   selectedPeriod,
-  //   selectedSector
-  // );
-  // const { data: ratingSummary, isLoading: isLoadingRatings } = useRatings(id);
-  const { data: ratingData, isLoading: isLoadingRatings } = useRatings(id);
+  const {
+    data: official,
+    isLoading,
+    error,
+    isSuccess,
+  } = useOfficialDetails(id);
+
+  // const { data: ratingData, isLoading: isLoadingRatings } = useRatings(id);
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -59,75 +66,32 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    if (ratingData?.timeData?.periods && ratingData?.sectorRatings) {
-      // 1. Transform approval rating data (overall performance over time)
-      const approvalData = {
-        "1 Dy": {
-          label: ratingData.timeData.periods["1 Dy"].label,
-          data: ratingData.timeData.periods["1 Dy"].data,
-        },
-        "1 Wk": {
-          label: ratingData.timeData.periods["1 Wk"].label,
-          data: ratingData.timeData.periods["1 Wk"].data,
-        },
-        "1 Yr": {
-          label: ratingData.timeData.periods["1 Yr"].label,
-          data: ratingData.timeData.periods["1 Yr"].data,
-        },
-        "This year": {
-          label: ratingData.timeData.periods["This year"].label,
-          data: ratingData.timeData.periods["This year"].data,
-        },
-      };
+  const { data: fullData } = useFullRatingsData(id);
 
-      // 2. Transform sector performance data (current rating by sector)
-      // For the sector performance, we're creating a single dataset with all sectors
-      const sectors = ratingData.sectorRatings.map((sector) => sector.name);
-      const sectorValues = ratingData.sectorRatings.map(
-        (sector) => sector.rating
-      );
-      const sectorColors = ratingData.sectorRatings.map(
-        (sector) => sector.color
-      );
+  const { approvalRating, isLoading: isLoadingApprovalRatingOverall } =
+    useApprovalRating(id);
+  const {
+    sectors,
+    overallSectorRating,
+    isLoading: isLoadingSectorRatings,
+  } = useSectorRatings(id);
+  const {
+    timeLabels,
+    data: approvalRatingData,
+    isLoading: isLoadingApproval,
+  } = useTimeBasedRatings(id, "1 Wk");
 
-      const sectorData = {
-        Current: {
-          label: sectors,
-          data: sectorValues,
-          colors: sectorColors, // Add colors for each sector
-        },
-      };
-
-      setApprovalDatasets(approvalData);
-      setSectorDatasets(sectorData);
-    }
-  }, [ratingData]);
-
-  const handleLogout = () => {
-    // Make a POST request to logout endpoint directly
-    fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(() => {
-        // Clear user data from query cache
-        queryClient.setQueryData(["/api/user"], null);
-        // Redirect to login page
-        window.location.href = "/auth";
-      })
-      .catch((err) => {
-        console.error("Logout failed:", err);
-      });
+  const approvaDataSet: DataMap = {
+    overallRating: approvalRating,
+    labels: timeLabels,
+    data: approvalRatingData,
   };
 
-  // Debug official data
-  console.log("Profile page - official data:", official);
-  console.log("Profile page - education data:", official?.education);
-  console.log("Profile page - career data:", official?.careerHistory);
-  console.log("Profile page - sectors data:", official?.sectors);
-
-  console.log("Profile page - rating data:", ratingData);
+  const sectorDataSet: DataMap = {
+    overallRating: overallSectorRating,
+    labels: sectors.map((sector) => sector.name),
+    data: sectors.map((sector) => sector.rating),
+  };
 
   const tabTriggerClass = cn(
     "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
@@ -221,28 +185,25 @@ export default function Profile() {
               <div className=" md:w-[70%]">
                 <ChartCard
                   chartName="Approval rating"
-                  dataMap={approvalDatasets}
+                  dataMap={approvaDataSet}
                   chartType="line"
                   chartKey="4"
                   valueChange={2.5}
+                  isLoading={
+                    isLoadingApproval || isLoadingApprovalRatingOverall
+                  }
                 />
 
                 <ChartCard
                   chartName="Performance by sectors"
-                  dataMap={sectorDatasets}
+                  dataMap={sectorDataSet}
                   chartType="bar"
                   chartKey="4"
                   valueChange={2.5}
+                  isLoading={
+                    isLoadingApproval || isLoadingApprovalRatingOverall
+                  }
                 />
-
-                {/* <DottedGridChart labels={months} data={ratings} /> */}
-
-                {/* Sector Performance Chart Component */}
-                {/* <SectorPerformanceChart
-                sectorRatings={ratingSummary?.sectorRatings || []}
-                sectorAverage={ratingSummary?.sectorAverage}
-                sectorMonthlyChange={ratingSummary?.sectorMonthlyChange}
-              /> */}
               </div>
             </div>
           </div>
@@ -265,18 +226,24 @@ export default function Profile() {
               <div className="w-full">
                 <ChartCard
                   chartName="Approval rating"
-                  dataMap={approvalDatasets}
+                  dataMap={approvaDataSet}
                   chartType="line"
                   chartKey="4"
                   valueChange={2.5}
+                  isLoading={
+                    isLoadingApproval || isLoadingApprovalRatingOverall
+                  }
                 />
 
                 <ChartCard
                   chartName="Performance by sectors"
-                  dataMap={sectorDatasets}
+                  dataMap={sectorDataSet}
                   chartType="bar"
                   chartKey="4"
                   valueChange={2.5}
+                  isLoading={
+                    isLoadingApproval || isLoadingApprovalRatingOverall
+                  }
                 />
               </div>
             </TabsContent>
@@ -314,45 +281,19 @@ export default function Profile() {
   );
 }
 
-// const datasets = {
-//   "1 Dy": {
-//     label: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-//     data: [
-//       5, 6, 4, 7, 10, 12, 18, 22, 30, 35, 40, 38, 42, 45, 50, 55, 52, 50, 48,
-//       47, 46, 44, 40, 35,
-//     ],
-//   },
-//   "1 Wk": {
-//     label: [
-//       "May 7",
-//       "May 8",
-//       "May 9",
-//       "May 10",
-//       "May 11",
-//       "May 12",
-//       "May 13",
-//     ],
-//     data: [50, 52, 47, 55, 60, 58, 5],
-//   },
-//   "1 Yr": {
-//     label: [
-//       "JAN",
-//       "FEB",
-//       "MAR",
-//       "APR",
-//       "MAY",
-//       "JUN",
-//       "JUL",
-//       "AUG",
-//       "SEP",
-//       "OCT",
-//       "NOV",
-//       "DEC",
-//     ],
-//     data: [20, 25, 10, 5, 20, 35, 50, 70, 75, 68, 60, 55],
-//   },
-//   "This year": {
-//     label: ["2019", "2020", "2021", "2022", "2023", "2024", "2025"],
-//     data: [30, 40, 35, 50, 60, 70, 80],
-//   },
-// };
+const handleLogout = () => {
+  // Make a POST request to logout endpoint directly
+  fetch("/api/logout", {
+    method: "POST",
+    credentials: "include",
+  })
+    .then(() => {
+      // Clear user data from query cache
+      queryClient.setQueryData(["/api/user"], null);
+      // Redirect to login page
+      window.location.href = "/auth";
+    })
+    .catch((err) => {
+      console.error("Logout failed:", err);
+    });
+};
