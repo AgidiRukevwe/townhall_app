@@ -1,10 +1,10 @@
 import { useParams, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useOfficialDetails } from "@/hooks/use-officials";
-import { useRatings } from "@/hooks/use-ratings";
+import { usePerformanceData, useRatings } from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
 import { RatingModal } from "@/components/rating/rating-modal";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
@@ -22,10 +22,24 @@ import { useBreakpoint } from "@/hooks/use-breakpoints";
 import ProfileHeader from "@/components/profile/profile-card-header";
 
 export default function Profile() {
+  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  // State to track the selected period and sector
+  const [selectedPeriod, setSelectedPeriod] = useState("1 Wk");
+  const [selectedSector, setSelectedSector] = useState("Health");
+
+  const [approvalDatasets, setApprovalDatasets] = useState<any>(null);
+  const [sectorDatasets, setSectorDatasets] = useState<any>(null);
+
   const { id } = useParams<{ id: string }>();
   const { data: official, isLoading, error } = useOfficialDetails(id);
-  const { data: ratingSummary, isLoading: isLoadingRatings } = useRatings(id);
-  const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  // const { data: ratings, isLoading: loadingRatingDta } = usePerformanceData(
+  //   id,
+  //   selectedPeriod,
+  //   selectedSector
+  // );
+  // const { data: ratingSummary, isLoading: isLoadingRatings } = useRatings(id);
+  const { data: ratingData, isLoading: isLoadingRatings } = useRatings(id);
+
   const { toast } = useToast();
   const { user } = useAuth();
   const isMobile = useBreakpoint();
@@ -44,6 +58,51 @@ export default function Profile() {
       window.location.href = `/?${params.toString()}`;
     }
   };
+
+  useEffect(() => {
+    if (ratingData?.timeData?.periods && ratingData?.sectorRatings) {
+      // 1. Transform approval rating data (overall performance over time)
+      const approvalData = {
+        "1 Dy": {
+          label: ratingData.timeData.periods["1 Dy"].label,
+          data: ratingData.timeData.periods["1 Dy"].data,
+        },
+        "1 Wk": {
+          label: ratingData.timeData.periods["1 Wk"].label,
+          data: ratingData.timeData.periods["1 Wk"].data,
+        },
+        "1 Yr": {
+          label: ratingData.timeData.periods["1 Yr"].label,
+          data: ratingData.timeData.periods["1 Yr"].data,
+        },
+        "This year": {
+          label: ratingData.timeData.periods["This year"].label,
+          data: ratingData.timeData.periods["This year"].data,
+        },
+      };
+
+      // 2. Transform sector performance data (current rating by sector)
+      // For the sector performance, we're creating a single dataset with all sectors
+      const sectors = ratingData.sectorRatings.map((sector) => sector.name);
+      const sectorValues = ratingData.sectorRatings.map(
+        (sector) => sector.rating
+      );
+      const sectorColors = ratingData.sectorRatings.map(
+        (sector) => sector.color
+      );
+
+      const sectorData = {
+        Current: {
+          label: sectors,
+          data: sectorValues,
+          colors: sectorColors, // Add colors for each sector
+        },
+      };
+
+      setApprovalDatasets(approvalData);
+      setSectorDatasets(sectorData);
+    }
+  }, [ratingData]);
 
   const handleLogout = () => {
     // Make a POST request to logout endpoint directly
@@ -67,55 +126,14 @@ export default function Profile() {
   console.log("Profile page - education data:", official?.education);
   console.log("Profile page - career data:", official?.careerHistory);
   console.log("Profile page - sectors data:", official?.sectors);
-  console.log("Profile page - rating summary:", ratingSummary);
+
+  console.log("Profile page - rating data:", ratingData);
 
   const tabTriggerClass = cn(
     "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
     "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-white  data-[state=active]:font-bold data-[state=active]:border-b-2 data-[state=active]:border-text-primary data-[state=active]:-mb-px rounded-none"
   );
 
-  const datasets = {
-    "1 Dy": {
-      label: Array.from({ length: 24 }, (_, i) => `${i}:00`),
-      data: [
-        5, 6, 4, 7, 10, 12, 18, 22, 30, 35, 40, 38, 42, 45, 50, 55, 52, 50, 48,
-        47, 46, 44, 40, 35,
-      ],
-    },
-    "1 Wk": {
-      label: [
-        "May 7",
-        "May 8",
-        "May 9",
-        "May 10",
-        "May 11",
-        "May 12",
-        "May 13",
-      ],
-      data: [50, 52, 47, 55, 60, 58, 5],
-    },
-    "1 Yr": {
-      label: [
-        "JAN",
-        "FEB",
-        "MAR",
-        "APR",
-        "MAY",
-        "JUN",
-        "JUL",
-        "AUG",
-        "SEP",
-        "OCT",
-        "NOV",
-        "DEC",
-      ],
-      data: [20, 25, 10, 5, 20, 35, 50, 70, 75, 68, 60, 55],
-    },
-    "This year": {
-      label: ["2019", "2020", "2021", "2022", "2023", "2024", "2025"],
-      data: [30, 40, 35, 50, 60, 70, 80],
-    },
-  };
   // Determine education and career data from official
   const educationData = official?.education || [];
   const careerData = official?.careerHistory || [];
@@ -167,7 +185,7 @@ export default function Profile() {
       />
       <div className="flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         <div className="flex gap-x-2 md:gap-x-4 items-center">
-          <Link href="">
+          <Link href="/">
             <Icon name="ArrowCircleLeft2" color="#262626" />
           </Link>
           <span className="text-lg font-bold">Official's profile</span>
@@ -203,7 +221,7 @@ export default function Profile() {
               <div className=" md:w-[70%]">
                 <ChartCard
                   chartName="Approval rating"
-                  dataMap={datasets}
+                  dataMap={approvalDatasets}
                   chartType="line"
                   chartKey="4"
                   valueChange={2.5}
@@ -211,7 +229,7 @@ export default function Profile() {
 
                 <ChartCard
                   chartName="Performance by sectors"
-                  dataMap={datasets}
+                  dataMap={sectorDatasets}
                   chartType="bar"
                   chartKey="4"
                   valueChange={2.5}
@@ -247,7 +265,7 @@ export default function Profile() {
               <div className="w-full">
                 <ChartCard
                   chartName="Approval rating"
-                  dataMap={datasets}
+                  dataMap={approvalDatasets}
                   chartType="line"
                   chartKey="4"
                   valueChange={2.5}
@@ -255,7 +273,7 @@ export default function Profile() {
 
                 <ChartCard
                   chartName="Performance by sectors"
-                  dataMap={datasets}
+                  dataMap={sectorDatasets}
                   chartType="bar"
                   chartKey="4"
                   valueChange={2.5}
@@ -295,3 +313,46 @@ export default function Profile() {
     </main>
   );
 }
+
+// const datasets = {
+//   "1 Dy": {
+//     label: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+//     data: [
+//       5, 6, 4, 7, 10, 12, 18, 22, 30, 35, 40, 38, 42, 45, 50, 55, 52, 50, 48,
+//       47, 46, 44, 40, 35,
+//     ],
+//   },
+//   "1 Wk": {
+//     label: [
+//       "May 7",
+//       "May 8",
+//       "May 9",
+//       "May 10",
+//       "May 11",
+//       "May 12",
+//       "May 13",
+//     ],
+//     data: [50, 52, 47, 55, 60, 58, 5],
+//   },
+//   "1 Yr": {
+//     label: [
+//       "JAN",
+//       "FEB",
+//       "MAR",
+//       "APR",
+//       "MAY",
+//       "JUN",
+//       "JUL",
+//       "AUG",
+//       "SEP",
+//       "OCT",
+//       "NOV",
+//       "DEC",
+//     ],
+//     data: [20, 25, 10, 5, 20, 35, 50, 70, 75, 68, 60, 55],
+//   },
+//   "This year": {
+//     label: ["2019", "2020", "2021", "2022", "2023", "2024", "2025"],
+//     data: [30, 40, 35, 50, 60, 70, 80],
+//   },
+// };
