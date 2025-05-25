@@ -25,16 +25,18 @@ interface RatingModalProps {
   sectors: Sector[];
 }
 
-export function RatingModal({ 
-  open, 
+export function RatingModal({
+  open,
   onOpenChange,
   officialId,
   officialName,
-  sectors
+  sectors,
 }: RatingModalProps) {
   const [step, setStep] = useState(1);
   const [overallRating, setOverallRating] = useState(50);
-  const [sectorRatings, setSectorRatings] = useState<Record<string, number>>({});
+  const [sectorRatings, setSectorRatings] = useState<Record<string, number>>(
+    {}
+  );
   const { mutate: submitRating, isPending } = useSubmitRating();
   const { toast } = useToast();
   const { user, isLoading } = useAuth();
@@ -42,36 +44,40 @@ export function RatingModal({
   // Initialize sector ratings if they haven't been set yet
   if (sectors.length > 0 && Object.keys(sectorRatings).length === 0) {
     const initialRatings: Record<string, number> = {};
-    sectors.forEach(sector => {
+    sectors.forEach((sector) => {
       initialRatings[sector.id] = 50;
     });
     setSectorRatings(initialRatings);
   }
 
   const handleSectorRatingChange = (sectorId: string, value: number) => {
-    setSectorRatings(prev => ({
+    setSectorRatings((prev) => ({
       ...prev,
-      [sectorId]: value
+      [sectorId]: value,
     }));
   };
 
   const handleSubmit = () => {
-    const sectorRatingsArray = Object.entries(sectorRatings).map(([sectorId, rating]) => ({
-      sectorId,
-      rating
-    }));
+    const sectorRatingsArray = Object.entries(sectorRatings).map(
+      ([sectorId, rating]) => ({
+        sectorId,
+        rating,
+      })
+    );
 
     submitRating(
       {
         officialId,
         overallRating,
-        sectorRatings: sectorRatingsArray
+        sectorRatings: sectorRatingsArray,
       },
       {
         onSuccess: () => {
           toast({
             title: "Rating submitted",
             description: `Your rating for ${officialName} has been recorded.`,
+            variant: "success",
+            showClose: false,
           });
           onOpenChange(false);
           setStep(1);
@@ -82,9 +88,9 @@ export function RatingModal({
           toast({
             title: "Error submitting rating",
             description: error.message,
-            variant: "destructive"
+            variant: "destructive",
           });
-        }
+        },
       }
     );
   };
@@ -122,7 +128,7 @@ export function RatingModal({
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </Button>
-          
+
           {/* Progress bar (only show when authenticated) */}
           {user && (
             <div className="w-full bg-gray-200 rounded-full h-1.5 mb-6">
@@ -140,23 +146,29 @@ export function RatingModal({
             <DialogTitle className="text-center text-xl mb-4">
               Authentication Required
             </DialogTitle>
-            
+
             <DialogDescription className="text-center mb-6">
-              Please log in to rate public officials and contribute to transparency.
+              Please log in to rate public officials and contribute to
+              transparency.
             </DialogDescription>
-            
+
             <div className="flex flex-col items-center justify-center py-4">
               <LogIn className="h-12 w-12 text-primary mb-4" />
               <p className="text-center text-sm text-gray-600 mb-6">
-                Your ratings help other citizens make informed decisions and hold officials accountable.
+                Your ratings help other citizens make informed decisions and
+                hold officials accountable.
               </p>
             </div>
-            
+
             <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
-              <Button variant="outline" onClick={handleClose} className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                className="w-full sm:w-auto"
+              >
                 Cancel
               </Button>
-              <Button 
+              <Button
                 className="w-full sm:w-auto"
                 onClick={() => {
                   handleClose();
@@ -180,26 +192,24 @@ export function RatingModal({
                 <DialogTitle className="text-center text-xl mb-6">
                   How would you rate their overall job performance?
                 </DialogTitle>
-                
+
                 <div className="flex justify-center mb-8">
                   <span className="text-7xl font-bold">
                     {overallRating}
                     <span className="text-4xl">%</span>
                   </span>
                 </div>
-                
+
                 <RatingSlider
                   value={overallRating}
                   onChange={setOverallRating}
                 />
-                
+
                 <DialogFooter className="mt-8">
                   <Button variant="outline" onClick={handleClose}>
                     Cancel
                   </Button>
-                  <Button onClick={() => setStep(2)}>
-                    Continue
-                  </Button>
+                  <Button onClick={() => setStep(2)}>Continue</Button>
                 </DialogFooter>
               </>
             ) : (
@@ -208,9 +218,9 @@ export function RatingModal({
                 <DialogTitle className="text-center text-xl mb-6">
                   How would you rate their performance in these sectors?
                 </DialogTitle>
-                
+
                 <div className="space-y-6 max-h-[50vh] overflow-y-auto py-2 px-1">
-                  {sectors.map(sector => (
+                  {sectors.map((sector) => (
                     <div key={sector.id}>
                       <div className="flex justify-between mb-2">
                         <label className="block text-sm font-medium text-gray-700">
@@ -219,18 +229,24 @@ export function RatingModal({
                       </div>
                       <RatingSlider
                         value={sectorRatings[sector.id] || 50}
-                        onChange={(value) => handleSectorRatingChange(sector.id, value)}
+                        onChange={(value) =>
+                          handleSectorRatingChange(sector.id, value)
+                        }
                       />
                     </div>
                   ))}
                 </div>
-                
+
                 <DialogFooter className="mt-6">
-                  <Button variant="outline" onClick={handleClose} disabled={isPending}>
+                  <Button
+                    variant="outline"
+                    onClick={handleClose}
+                    disabled={isPending}
+                  >
                     Cancel
                   </Button>
                   <Button onClick={handleSubmit} disabled={isPending}>
-                    {isPending ? 'Submitting...' : 'Submit ratings'}
+                    {isPending ? "Submitting..." : "Submit ratings"}
                   </Button>
                 </DialogFooter>
               </>

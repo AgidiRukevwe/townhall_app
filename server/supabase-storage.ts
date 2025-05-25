@@ -1912,6 +1912,7 @@ export class SupabaseStorage implements IStorage {
           bio: leader.bio || null, // Added bio field mapping
           approvalRating: 50, // Default value
           approvalTrend: 0,
+          chamber: leader.chamber,
           createdAt: leader.created_at ? new Date(leader.created_at) : null,
           updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
           sectors: [], // Will be populated in the future
@@ -2023,6 +2024,7 @@ export class SupabaseStorage implements IStorage {
         bio: leader.bio || null, // Added bio field
         approvalRating: 50, // Default value
         approvalTrend: 0,
+        chamber: leader.chamber,
         createdAt: leader.created_at ? new Date(leader.created_at) : null,
         updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
         sectors: sectors, // Now populated with actual sectors from the database

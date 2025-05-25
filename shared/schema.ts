@@ -370,6 +370,7 @@ export type Official = {
   party: string;
   gender: string;
   term: string;
+  chamber: string;
   imageUrl: string | null;
   bio: string | null; // Added bio field
   approvalRating: number;

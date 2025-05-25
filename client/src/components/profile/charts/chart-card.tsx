@@ -42,6 +42,7 @@ export interface ChartCardProps {
   isLoading: boolean;
   handlePeriodChange: (period: Granularity) => void;
   showGranularity?: boolean;
+  autoSkipXAxisLabels?: boolean;
 }
 
 export const ChartCard = ({
@@ -54,6 +55,7 @@ export const ChartCard = ({
   officialId = "",
   handlePeriodChange,
   showGranularity = true,
+  autoSkipXAxisLabels,
 }: ChartCardProps) => {
   const [granularity, setGranularity] = useState<Granularity>(
     granularityOptions[0]
@@ -73,7 +75,8 @@ export const ChartCard = ({
   }
 
   return (
-    <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
+    // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
+    <div className="bg-white w-full mb-4 relative">
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
           <Icon name="Chart2" size={24} color="#328bf6" />
@@ -121,18 +124,12 @@ export const ChartCard = ({
       </div>
 
       <div className="h-[400px] w-full">
-        {/* <DottedGridChart
-          type={chartType}
-          labels={selectedDataset.timeLabels}
-          data={selectedDataset.overallData}
-          granularity={granularity}
-        /> */}
-
         <DottedGridChart
           type={chartType}
           labels={selectedDataset.labels}
           data={selectedDataset.data}
           granularity={granularity}
+          autoSkipXAxisLabels={autoSkipXAxisLabels}
         />
       </div>
     </div>

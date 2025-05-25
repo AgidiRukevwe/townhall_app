@@ -52,13 +52,13 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   return (
     <div className="overflow-hidden bg-white">
       {/* Image with 24px border radius and no black background */}
-      <div className="relative h-56">
+      <div className="relative h-48">
         {!showAvatar ? (
           <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
             <img
               src={official.imageUrl ?? ""}
               alt={formattedName}
-              className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              className="absolute w-[140%] h-[140%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
               style={{
                 objectFit: "cover",
                 objectPosition: "center 20%",
@@ -78,8 +78,8 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
 
       {/* Official details */}
       <div className="py-3 ga">
-        <h3 className="font-medium md:mb-1 text-sm">{formattedName}</h3>
-        <p className="text-gray-500 font-medium text-xs">
+        <h3 className="font-semibold md:mb-1 text-sm">{formattedName}</h3>
+        <p className="text-text-secondary font-medium text-xs">
           {/* {formattedPosition} */}
           {formattedLocation ? `${formattedLocation}` : ""}
         </p>

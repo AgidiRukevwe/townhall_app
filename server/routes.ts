@@ -388,11 +388,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // If time period is specified
       if (period && typeof period === "string") {
         if (!ratingsData.timeData?.periods[period as PeriodKey]) {
-          return res
-            .status(400)
-            .json({
-              message: `Invalid time period: ${period}. Valid options are: 1 Dy, 1 Wk, 1 Yr, This year`,
-            });
+          return res.status(400).json({
+            message: `Invalid time period: ${period}. Valid options are: 1 Dy, 1 Wk, 1 Yr, This year`,
+          });
         }
 
         response.timePeriod = period;
@@ -426,11 +424,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
             response.color = data.color;
             response.data = data.data;
           } else {
-            return res
-              .status(404)
-              .json({
-                message: `No data found for sector: ${sector} in period: ${period}`,
-              });
+            return res.status(404).json({
+              message: `No data found for sector: ${sector} in period: ${period}`,
+            });
           }
         }
         // If only time period is specified, return data for all sectors in that period
