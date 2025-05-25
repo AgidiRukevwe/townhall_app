@@ -6,31 +6,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { Navbar } from "@/components/layout/navbar";
+import EmptyState from "@/components/shared/empty-state";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
-  // const { officials, isLoading, error } = useOfficials();
-  // const { user } = useAuth();
-  // const [, navigate] = useLocation();
-  // const [searchInput, setSearchInput] = useState("");
-
-  // // Get username or use default
-  // const userName: string =
-  //   user && user !== null && typeof user === "object" && "username" in user
-  //     ? (user.username as string)
-  //     : "";
-
-  // // Get search params
-  // const searchParams = new URLSearchParams(window.location.search);
-  // const searchQuery = searchParams.get("search");
-
-  // const handleSearch = (query: string) => {
-  //   if (query.trim()) {
-  //     const params = new URLSearchParams();
-  //     params.set("search", query);
-  //     navigate(`/?${params.toString()}`);
-  //   }
-  // };
-
   const [, navigate] = useLocation();
 
   // Get search parameter from URL
@@ -41,7 +20,14 @@ export default function Home() {
   const [searchInput, setSearchInput] = useState(urlSearchQuery);
 
   // Use our enhanced useOfficials hook with search parameter
-  const { officials, isLoading, error, searchQuery } = useOfficials({
+  const {
+    officials,
+    isLoading,
+    error,
+    searchQuery,
+    refetch: refetchOfficials,
+    isRefetching,
+  } = useOfficials({
     search: urlSearchQuery,
   });
 
@@ -52,24 +38,6 @@ export default function Home() {
     user && user !== null && typeof user === "object" && "username" in user
       ? (user.username as string)
       : "";
-
-  // Update searchInput when URL changes
-  // useEffect(() => {
-  //   const newParams = new URLSearchParams(window.location.search);
-  //   const newSearchQuery = newParams.get("search") || "";
-  //   setSearchInput(newSearchQuery);
-  // }, [window.location.search]);
-
-  // const handleSearch = (query: string) => {
-  //   if (query.trim()) {
-  //     const params = new URLSearchParams();
-  //     params.set("search", query);
-  //     navigate(`/?${params.toString()}`);
-  //   } else {
-  //     // If search is empty, remove search param
-  //     navigate("/");
-  //   }
-  // };
 
   const handleSearch = (query: string) => {
     setSearchInput(query);
@@ -118,33 +86,41 @@ export default function Home() {
     : officials;
 
   if (error) {
+    // if (error.message)
     return (
-      <div className="flex justify-center py-12">
-        <p className="text-red-500">
-          Error loading officials:{" "}
-          {error instanceof Error ? error.message : String(error)}
-        </p>
+      <div className="min-h-screen w-full flex items-center justify-center bg-surface rounded-3xl">
+        <EmptyState
+          type="no-internet"
+          title="Failed to Load Data"
+          description="We had trouble loading the information. Please check your internet connection and try again."
+          onRetry={refetchOfficials}
+          showRetry
+          retryLabel="Retry"
+        />
       </div>
     );
   }
 
   return (
-    <main className="flex-1 bg-white">
+    <main className="flex-1 min-h-screen bg-white">
       <Navbar
         onSearch={handleSearch}
         initialSearchValue={searchInput}
         username={userName}
         onLogout={handleLogout}
+        showSearch
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pt-14   ">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6   ">
         {/* Main Content */}
-        {isLoading ? (
-          <Loading />
+        {isLoading || isRefetching ? (
+          <div className="flex flex-col items-center justify-center">
+            <Loading message="Fetching officials" />
+          </div>
         ) : (
           <SimpleOfficialsList
             officials={filteredOfficials}
-            isLoading={isLoading}
+            isLoading={isLoading || isRefetching}
           />
         )}
       </div>

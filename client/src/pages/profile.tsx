@@ -28,25 +28,21 @@ import { cn } from "@/lib/utils";
 import { useBreakpoint } from "@/hooks/use-breakpoints";
 import ProfileHeader from "@/components/profile/profile-card-header";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
+import EmptyState from "@/components/shared/empty-state";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   // State to track the selected period and sector
   const [selectedApprovalRatingPeriod, setSelectedApprovalRatingPeriod] =
-    useState<Granularity>("1 Wk");
-  const [selectedSector, setSelectedSector] = useState<string>("Health");
+    useState<Granularity>("1 Dy");
 
-  const [sectorDatasets, setSectorDatasets] = useState<any>(null);
+  // const [selectedSector, setSelectedSector] = useState<string>("Health");
+  // const [sectorDatasets, setSectorDatasets] = useState<any>(null);
+
+  const [chartEmpty, setChartEmpty] = useState<boolean>(true);
 
   const { id } = useParams<{ id: string }>();
-  const {
-    data: official,
-    isLoading,
-    error,
-    isSuccess,
-  } = useOfficialDetails(id);
-
-  // const { data: ratingData, isLoading: isLoadingRatings } = useRatings(id);
+  const { data: official, isLoading, error } = useOfficialDetails(id);
 
   const { toast } = useToast();
   const { user } = useAuth();
@@ -103,9 +99,17 @@ export default function Profile() {
     refetchApprovalData();
   }, [selectedApprovalRatingPeriod]);
 
+  useEffect(() => {
+    console.log(fullData);
+    if (approvalRating === 0 && overallSectorRating === 0) {
+      setChartEmpty(false);
+    }
+  }, [approvalRating, overallSectorRating]);
+
   const tabTriggerClass = cn(
     "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
-    "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-white  data-[state=active]:font-bold data-[state=active]:border-b-2 data-[state=active]:border-text-primary data-[state=active]:-mb-px rounded-none"
+    "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-white  data-[state=active]:font-bold",
+    "data-[state=active]:border-b-2 data-[state=active]:border-text-primary data-[state=active]:-mb-px rounded-none"
   );
 
   // Determine education and career data from official
@@ -156,6 +160,7 @@ export default function Profile() {
         username={userName}
         onLogout={handleLogout}
         classname="sticky top-0 z-50"
+        showSearch={false}
       />
       <div className="flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         <div className="flex gap-x-2 md:gap-x-4 items-center">
@@ -166,10 +171,11 @@ export default function Profile() {
         </div>
 
         <div className="ml-auto">
-          {!isMobile && (
+          {!isMobile && !chartEmpty && (
             <Button
               onClick={() => setRatingModalOpen(true)}
-              className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
+              className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full py-3"
+              size="sm"
             >
               Rate this leader
             </Button>
@@ -192,32 +198,48 @@ export default function Profile() {
                 careerData={careerData}
                 classname="w-full md:w-[20%] sticky top-24"
               />
-              <div className=" md:w-[70%]">
-                <ChartCard
-                  chartName="Approval rating"
-                  dataMap={approvaDataSet}
-                  chartType="line"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                />
 
-                <ChartCard
-                  chartName="Performance by sectors"
-                  dataMap={sectorDataSet}
-                  chartType="bar"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                  showGranularity={false}
-                />
-              </div>
+              {chartEmpty ? (
+                /* <div className=" md:w-[70%] border border-[#D9D9D9] bg-[#FCFCFC] py-8 items-center justify-center rounded-3xl"> */
+                <div className=" md:w-[70%] py-8 items-center justify-center rounded-3xl">
+                  <EmptyState
+                    type="no-content"
+                    title="No one has rated this leader yet."
+                    description="Your rating helps others understand this leader’s impact.."
+                    customAction={{
+                      label: "Rate this leader",
+                      onClick: () => setRatingModalOpen(true),
+                    }}
+                  />
+                </div>
+              ) : (
+                <div className=" md:w-[70%]">
+                  <ChartCard
+                    chartName="Approval rating"
+                    dataMap={approvaDataSet}
+                    chartType="line"
+                    chartKey="4"
+                    valueChange={2.5}
+                    isLoading={
+                      isLoadingApproval || isLoadingApprovalRatingOverall
+                    }
+                    handlePeriodChange={handlePeriodChange}
+                  />
+
+                  <ChartCard
+                    chartName="Performance by sectors"
+                    dataMap={sectorDataSet}
+                    chartType="bar"
+                    chartKey="4"
+                    valueChange={2.5}
+                    isLoading={
+                      isLoadingApproval || isLoadingApprovalRatingOverall
+                    }
+                    handlePeriodChange={handlePeriodChange}
+                    showGranularity={false}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -247,6 +269,7 @@ export default function Profile() {
                     isLoadingApproval || isLoadingApprovalRatingOverall
                   }
                   handlePeriodChange={handlePeriodChange}
+                  autoSkipXAxisLabels={true}
                 />
 
                 <ChartCard
@@ -260,6 +283,7 @@ export default function Profile() {
                   }
                   handlePeriodChange={handlePeriodChange}
                   showGranularity={false}
+                  autoSkipXAxisLabels={false}
                 />
               </div>
             </TabsContent>

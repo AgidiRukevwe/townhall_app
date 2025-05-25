@@ -163,7 +163,7 @@ export function useOfficials(filters?: {
   // Use filters.search if provided, else fallback to URL param
   const searchQuery = filters?.search ?? urlSearchQuery;
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: [
       "/api/officials",
       filters?.location,
@@ -189,6 +189,8 @@ export function useOfficials(filters?: {
     isLoading,
     error,
     searchQuery,
+    refetch,
+    isRefetching,
   };
 }
 

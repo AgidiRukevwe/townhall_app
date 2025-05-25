@@ -8,13 +8,13 @@ interface ProfileHeaderProps {
 
 function ProfileHeader({ official }: ProfileHeaderProps) {
   return (
-    <div className="flex flex-row md:block items-center gap-x-2 ">
+    <div className="flex flex-row md:flex-col items-center gap-x-2">
       {official.imageUrl ? (
-        <div className="w-24 h-24 md:w-40 md:h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
+        <div className="w-24 h-24 bg-red- md:w-40 md:h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
           <img
             src={official.imageUrl ?? ""}
             alt={official.name}
-            className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover"
+            className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover md:mx-auto"
           />
         </div>
       ) : (
@@ -30,7 +30,7 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
         <h2 className="text-lg md:text-xl font-bold text-gray-900">
           {toTitleCase(official.name)}
         </h2>
-        <p className="text-gray-500 mb-6 text-sm">{official.location}</p>
+        <p className="text-text-secondary mb-6 text-sm">{official.location}</p>
       </div>
     </div>
   );
