@@ -3,20 +3,20 @@ import { Official } from "@shared/schema";
 import { Loader2 } from "lucide-react";
 import { ArrowRight, FilterSquare, Sort } from "iconsax-react";
 import { Button } from "@/components/ui/button";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuRadioGroup, 
-  DropdownMenuRadioItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 interface OfficialsGridProps {
@@ -27,19 +27,25 @@ interface OfficialsGridProps {
 export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
   const [locationFilter, setLocationFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("default");
-  
+
   console.log("OfficialsGrid Component - Officials received:", officials);
   console.log("OfficialsGrid Component - Officials count:", officials.length);
-  
+
   // Filter officials based on location
-  const filteredOfficials = locationFilter === "all" 
-    ? officials 
-    : officials.filter(official => 
-        official.location && official.location.toLowerCase() === locationFilter.toLowerCase()
-      );
-  
-  console.log("OfficialsGrid Component - Filtered officials:", filteredOfficials);
-  
+  const filteredOfficials =
+    locationFilter === "all"
+      ? officials
+      : officials.filter(
+          (official) =>
+            official.location &&
+            official.location.toLowerCase() === locationFilter.toLowerCase()
+        );
+
+  console.log(
+    "OfficialsGrid Component - Filtered officials:",
+    filteredOfficials
+  );
+
   // Sort officials based on sortBy value
   const sortedOfficials = [...filteredOfficials].sort((a, b) => {
     switch (sortBy) {
@@ -53,24 +59,24 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
         return 0; // Default sort from API
     }
   });
-  
+
   console.log("OfficialsGrid Component - Sorted officials:", sortedOfficials);
-  
+
   // Get unique locations for filtering (filter out undefined/null values)
   const availableLocations = officials
-    .map(official => official.location)
+    .map((official) => official.location)
     .filter((location): location is string => !!location);
-  
+
   // Create unique locations array manually to avoid Set iteration issues
   const uniqueLocations: string[] = [];
-  availableLocations.forEach(location => {
+  availableLocations.forEach((location) => {
     if (!uniqueLocations.includes(location)) {
       uniqueLocations.push(location);
     }
   });
-  
+
   const locations = ["all", ...uniqueLocations];
-  
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-12">
@@ -78,7 +84,7 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
       </div>
     );
   }
-  
+
   return (
     <div>
       {/* Filters and sorting */}
@@ -86,19 +92,23 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
         <Select value={locationFilter} onValueChange={setLocationFilter}>
           <SelectTrigger className="w-[180px] bg-white">
             <div className="flex items-center">
-              <FilterSquare size="18" className="mr-2 text-gray-500" variant="Outline" />
+              <FilterSquare
+                size="18"
+                className="mr-2 text-gray-500"
+                variant="Outline"
+              />
               <SelectValue placeholder="Filter by location" />
             </div>
           </SelectTrigger>
           <SelectContent>
-            {locations.map(location => (
+            {locations.map((location) => (
               <SelectItem key={location} value={location}>
                 {location === "all" ? "All locations" : location}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
@@ -107,20 +117,30 @@ export function OfficialsGrid({ officials, isLoading }: OfficialsGridProps) {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup value={sortBy} onValueChange={setSortBy}>
-              <DropdownMenuRadioItem value="default">Default</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="name">Name (A-Z)</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="rating-high">Rating (High-Low)</DropdownMenuRadioItem>
-              <DropdownMenuRadioItem value="rating-low">Rating (Low-High)</DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="default">
+                Default
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="name">
+                Name (A-Z)
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="rating-high">
+                Rating (High-Low)
+              </DropdownMenuRadioItem>
+              <DropdownMenuRadioItem value="rating-low">
+                Rating (Low-High)
+              </DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      
+
       {/* Officials grid */}
       {sortedOfficials.length > 0 ? (
         <div>
           <div className="mb-4">
-            <p className="text-green-600 font-bold">Debug: Found {sortedOfficials.length} officials to display</p>
+            <p className="text-green-600 font-bold">
+              Debug: Found {sortedOfficials.length} officials to display
+            </p>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sortedOfficials.map((official, index) => (

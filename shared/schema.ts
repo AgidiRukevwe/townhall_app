@@ -374,6 +374,7 @@ export type Official = {
   bio: string | null; // Added bio field
   approvalRating: number;
   approvalTrend: number;
+  chamber: string;
   createdAt: Date | null;
   updatedAt: Date | null;
   sectors: Sector[];

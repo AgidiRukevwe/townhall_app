@@ -80,6 +80,9 @@ export function RatingModal({
       }
     );
   };
+  useEffect(() => {
+    console.log("User:", user);
+  }, []);
 
   const resetModal = () => {
     onOpenChange(false);

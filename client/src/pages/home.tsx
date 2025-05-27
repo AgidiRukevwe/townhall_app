@@ -53,6 +53,10 @@ export default function Home() {
       ? (user.username as string)
       : "";
 
+  useEffect(() => {
+    console.log("User:", user);
+  }, []);
+
   // Update searchInput when URL changes
   // useEffect(() => {
   //   const newParams = new URLSearchParams(window.location.search);

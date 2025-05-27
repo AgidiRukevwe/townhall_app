@@ -37,12 +37,13 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
 
             <div className="flex items-center">
-              <SearchInput
-                onSearch={onSearch}
-                placeholder={searchPlaceholder}
-                initialValue={initialSearchValue}
-                className={showSearch ? "hidden" : ""}
-              />
+              {showSearch && (
+                <SearchInput
+                  onSearch={onSearch}
+                  placeholder={searchPlaceholder}
+                  initialValue={initialSearchValue}
+                />
+              )}
 
               <UserAvatar
                 username={username}
@@ -68,12 +69,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                 className="profile-search-spacing"
               />
             </div>
-            <SearchInput
-              onSearch={onSearch}
-              placeholder={searchPlaceholder}
-              initialValue={initialSearchValue}
-              showSearch={showSearch}
-            />
+
+            {showSearch && (
+              <div className="w-full">
+                <SearchInput
+                  onSearch={onSearch}
+                  placeholder={searchPlaceholder}
+                  initialValue={initialSearchValue}
+                />
+              </div>
+            )}
           </div>
         </div>
       )}

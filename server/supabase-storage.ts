@@ -1910,8 +1910,9 @@ export class SupabaseStorage implements IStorage {
           term: "", // Not available in leaders table
           imageUrl: leader.avatar_url || null,
           bio: leader.bio || null, // Added bio field mapping
-          approvalRating: 50, // Default value
+          approvalRating: 0, // Default value
           approvalTrend: 0,
+          chamber: leader.chamber || "", // Added chamber field mapping
           createdAt: leader.created_at ? new Date(leader.created_at) : null,
           updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
           sectors: [], // Will be populated in the future
@@ -2021,8 +2022,9 @@ export class SupabaseStorage implements IStorage {
         term: "", // Not available in leaders table
         imageUrl: leader.avatar_url || null,
         bio: leader.bio || null, // Added bio field
-        approvalRating: 50, // Default value
+        approvalRating: 0, // Default value
         approvalTrend: 0,
+        chamber: leader.chamber, // Added chamber field
         createdAt: leader.created_at ? new Date(leader.created_at) : null,
         updatedAt: leader.updated_at ? new Date(leader.updated_at) : null,
         sectors: sectors, // Now populated with actual sectors from the database
