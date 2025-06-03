@@ -26,7 +26,9 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const isMobile = useBreakpoint();
   return (
-    <header className={`bg-white border-b  border-gray-200 ${classname}`}>
+    <header
+      className={`bg-white/50 backdrop-blur-2xl border-b fixed top-0 left-0 right-0 z-50  border-gray-200 ${classname}`}
+    >
       {!isMobile ? (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
           <div className="flex justify-between items-center">

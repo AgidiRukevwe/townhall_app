@@ -52,9 +52,9 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   return (
     <div className="overflow-hidden bg-white">
       {/* Image with 24px border radius and no black background */}
-      <div className="relative h-48">
+      <div className="relative h-40 md:h-48">
         {!showAvatar ? (
-          <div className="w-full h-full rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
+          <div className="w-full h-full rounded-2xl md:rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
             <img
               src={official.imageUrl ?? ""}
               alt={formattedName}
@@ -77,27 +77,12 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       </div>
 
       {/* Official details */}
-      <div className="py-3 ga">
+      <div className="pt-3 md:py-3">
         <h3 className="font-semibold md:mb-1 text-sm">{formattedName}</h3>
         <p className="text-text-secondary font-medium text-xs">
           {/* {formattedPosition} */}
           {formattedLocation ? `${formattedLocation}` : ""}
         </p>
-
-        {/* {official.approvalRating !== undefined && (
-          <div className="mt-2 flex items-center">
-            <span
-              className={`text-sm font-medium ${official.approvalTrend >= 0 ? "text-green-500" : "text-red-500"}`}
-            >
-              {official.approvalRating?.toFixed(1)}%
-              {official.approvalTrend !== 0 && (
-                <span className="ml-1">
-                  {official.approvalTrend > 0 ? "▲" : "▼"}
-                </span>
-              )}
-            </span>
-          </div>
-        )} */}
 
         {!compact && (
           <div className="mt-4">

@@ -102,7 +102,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex-1 min-h-screen bg-white">
+    <main className="pt-24 md:pt-16 flex-1 min-h-screen bg-white">
       <Navbar
         onSearch={handleSearch}
         initialSearchValue={searchInput}

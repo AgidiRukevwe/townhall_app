@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { useOfficialDetails } from "@/hooks/use-officials";
 import {
   useApprovalRating,
-  // usePerformanceData,
-  // useRatings,
   useSectorRatings,
   useTimeBasedRatings,
 } from "@/hooks/use-ratings";
@@ -122,7 +120,7 @@ export default function Profile() {
 
   if (error || !official) {
     return (
-      <main className="flex-1 bg-white">
+      <main className="flex-1 bg-white ">
         <Navbar
           onSearch={handleSearch}
           username={userName}
@@ -151,19 +149,17 @@ export default function Profile() {
     );
   }
 
-  // All month navigation is now handled within the components
-
   return (
     <main className="flex-1 bg-white w-full overflow-hidden">
       <Navbar
         onSearch={handleSearch}
         username={userName}
         onLogout={handleLogout}
-        classname="sticky top-0 z-50"
+        classname=""
         showSearch={false}
       />
-      <div className="flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        <div className="flex gap-x-2 md:gap-x-4 items-center">
+      <div className="fixed pt:32 top-0 right-0 z-10 left-0 bg-white md:pt-24 flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex  gap-x-2 md:gap-x-4 items-center">
           <Link href="/">
             <Icon name="ArrowCircleLeft2" color="#262626" />
           </Link>
@@ -185,18 +181,18 @@ export default function Profile() {
 
       {!isMobile ? (
         // {/* FOR DESKTOP VIEW  */}
-        <div className="bg-white  hidden md:block md:flex-row">
+        <div className="pt-32 md:pt-24 bg-white  hidden md:block md:flex-row">
           <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
             {/* Official's profile header */}
 
-            <div className="flex flex-col md:flex-row items-start w-full justify-between">
+            <div className="md:pt-16 flex flex-col md:flex-row items-start w-full justify-between">
               {/* Official Profile Card Component */}
 
               <OfficialProfileCard
                 official={official}
                 educationData={educationData}
                 careerData={careerData}
-                classname="w-full md:w-[20%] sticky top-24"
+                classname="w-full md:w-[20%]"
               />
 
               {chartEmpty ? (
@@ -245,7 +241,14 @@ export default function Profile() {
         </div>
       ) : (
         // {/* FOR MOBILE VIEW  */}
-        <div className="pt-0 px-4 pb-40">
+        <div className="pt-24 px-4 pb-40">
+          <div className="flex  gap-x-2 md:gap-x-4 items-center pb-4">
+            <Link href="/">
+              <Icon name="ArrowCircleLeft2" color="#262626" />
+            </Link>
+            <span className="text-lg font-bold">Official's profile</span>
+          </div>
+
           <ProfileHeader official={official} />
 
           <Tabs defaultValue="performance">
