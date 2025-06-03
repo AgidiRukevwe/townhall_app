@@ -361,14 +361,22 @@ export type InsertUserProfile = z.infer<typeof userProfileSchema>;
 export type Leader = typeof leaders.$inferSelect;
 export type InsertLeader = z.infer<typeof leaderSchema>;
 
+export type Party = {
+  id: string;
+  name: string;
+  acronym: string;
+  logo_url: string;
+};
+
 // Compatibility alias for transitioning from officials to leaders
 export type Official = {
   id: string;
   name: string;
   position: string;
   location: string;
-  party: string;
-  gender: string;
+  // party: string;
+  party: Party;
+  gender?: string;
   term: string;
   chamber: string;
   imageUrl: string | null;

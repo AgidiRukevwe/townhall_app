@@ -12,4 +12,5 @@ if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
   console.log("💾 Using in-memory storage for development");
 }
 
-export const storage = useSupabase ? new SupabaseStorage() : new MemStorage();
+// export const storage = useSupabase ? new SupabaseStorage() : new MemStorage();
+export const storage = new SupabaseStorage();

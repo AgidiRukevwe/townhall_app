@@ -48,17 +48,17 @@ export function OfficialProfileCard({
         </CollapsibleSection>
         <CollapsibleSection defaultOpen icon="Profile" title="Political party">
           <span className="flex flex-row gap-x-2 items-center">
-            <div className="h-4 w-4 md:h-8 md:w-8 rounded-full items-center justify-center overflow-hidden bg-red-200">
+            <div className="h-3 w-3 md:h-8 md:w-8 rounded-full items-center justify-center overflow-hidden bg-red-200">
               <img
-                src={official.imageUrl || ""}
+                src={official.party.logo_url || ""}
                 alt={`photo of ${official.name}`}
-                width={24}
-                height={24}
+                width={20}
+                height={20}
                 className="object-cover h-full w-full"
               />
             </div>
             <p className="font-medium text-sm md:text-sm text-text-secondary">
-              Apc
+              {official.party.acronym || "No party found"}
             </p>
           </span>
         </CollapsibleSection>
