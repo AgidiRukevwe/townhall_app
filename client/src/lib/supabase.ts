@@ -1,8 +1,12 @@
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@shared/schema';
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@shared/schema";
+import { SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
 
-const supabaseUrl = 'https://buenrbnwgxewfqvwovta.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ1ZW5yYm53Z3hld2ZxdndvdnRhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzIxNDAsImV4cCI6MjA2MjgwODE0MH0.2VW5vAoGpcuCr92_L2fAY7e4pzKC1C9zx9Ccaic78IQ';
+// const supabaseUrl = import.meta.env.SUPABASE_URL as string;
+// const supabaseAnonKey = import.meta.env.SUPABASE_ANON_KEY as string;
+
+const supabaseUrl = SUPABASE_URL as string;
+const supabaseAnonKey = SUPABASE_ANON_KEY as string;
 
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
@@ -10,10 +14,10 @@ export async function anonymousLogin(deviceId: string) {
   // Sign in anonymously by using device ID as an identifier
   const { data, error } = await supabase.auth.signInWithPassword({
     email: `${deviceId}@anonymous.townhall.ng`,
-    password: deviceId
+    password: deviceId,
   });
 
-  if (error && error.message.includes('Invalid login credentials')) {
+  if (error && error.message.includes("Invalid login credentials")) {
     // If the user doesn't exist, sign them up
     return signUpAnonymous(deviceId);
   }
@@ -28,26 +32,28 @@ async function signUpAnonymous(deviceId: string) {
     options: {
       data: {
         anonymous: true,
-        device_id: deviceId
-      }
-    }
+        device_id: deviceId,
+      },
+    },
   });
 
   return { data, error };
 }
 
-export async function createUserProfile(userId: string, deviceId: string, ipAddress: string | null) {
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .upsert(
-      {
-        id: userId,
-        device_id: deviceId,
-        ip_address: ipAddress,
-        created_at: new Date().toISOString()
-      },
-      { onConflict: 'id' }
-    );
+export async function createUserProfile(
+  userId: string,
+  deviceId: string,
+  ipAddress: string | null
+) {
+  const { data, error } = await supabase.from("user_profiles").upsert(
+    {
+      id: userId,
+      device_id: deviceId,
+      ip_address: ipAddress,
+      created_at: new Date().toISOString(),
+    },
+    { onConflict: "id" }
+  );
 
   return { data, error };
 }

@@ -27,15 +27,17 @@ import { useBreakpoint } from "@/hooks/use-breakpoints";
 import ProfileHeader from "@/components/profile/profile-card-header";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 import EmptyState from "@/components/shared/empty-state";
+import ProfileMobileView from "@/components/profile/views/mobile-view";
+import ProfileDesktopView from "@/components/profile/views/desktop-view";
+import { char } from "drizzle-orm/mysql-core";
+import { handleLogout } from "@/utils/handle-logout";
+import { useSearchHandler } from "@/hooks/use-search";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
   // State to track the selected period and sector
   const [selectedApprovalRatingPeriod, setSelectedApprovalRatingPeriod] =
     useState<Granularity>("1 Dy");
-
-  // const [selectedSector, setSelectedSector] = useState<string>("Health");
-  // const [sectorDatasets, setSectorDatasets] = useState<any>(null);
 
   const [chartEmpty, setChartEmpty] = useState<boolean>(true);
 
@@ -52,14 +54,7 @@ export default function Profile() {
       ? (user.username as string)
       : "";
 
-  const handleSearch = (query: string) => {
-    // Redirect to home page with search query
-    if (query.trim()) {
-      const params = new URLSearchParams();
-      params.set("search", query);
-      window.location.href = `/?${params.toString()}`;
-    }
-  };
+  const { searchInput, handleSearch } = useSearchHandler();
 
   const handlePeriodChange = (period: Granularity) => {
     setSelectedApprovalRatingPeriod(period);
@@ -103,12 +98,6 @@ export default function Profile() {
       setChartEmpty(false);
     }
   }, [approvalRating, overallSectorRating]);
-
-  const tabTriggerClass = cn(
-    "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
-    "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-white  data-[state=active]:font-bold",
-    "data-[state=active]:border-b-2 data-[state=active]:border-text-primary data-[state=active]:-mb-px rounded-none"
-  );
 
   // Determine education and career data from official
   const educationData = official?.education || [];
@@ -155,151 +144,36 @@ export default function Profile() {
         onSearch={handleSearch}
         username={userName}
         onLogout={handleLogout}
-        classname=""
-        showSearch={false}
+        // classname=""
+        showSearch={true}
       />
-      <div className="fixed pt:32 top-0 right-0 z-10 left-0 bg-white md:pt-24 flex items-center mb-2 md:mb-6 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex  gap-x-2 md:gap-x-4 items-center">
-          <Link href="/">
-            <Icon name="ArrowCircleLeft2" color="#262626" />
-          </Link>
-          <span className="text-lg font-bold">Official's profile</span>
-        </div>
-
-        <div className="ml-auto">
-          {!isMobile && !chartEmpty && (
-            <Button
-              onClick={() => setRatingModalOpen(true)}
-              className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full py-3"
-              size="sm"
-            >
-              Rate this leader
-            </Button>
-          )}
-        </div>
-      </div>
 
       {!isMobile ? (
-        // {/* FOR DESKTOP VIEW  */}
-        <div className="pt-32 md:pt-24 bg-white  hidden md:block md:flex-row">
-          <div className="max-w-7xl  mx-auto px-4 sm:px-6 lg:px-8">
-            {/* Official's profile header */}
-
-            <div className="md:pt-16 flex flex-col md:flex-row items-start w-full justify-between">
-              {/* Official Profile Card Component */}
-
-              <OfficialProfileCard
-                official={official}
-                educationData={educationData}
-                careerData={careerData}
-                classname="w-full md:w-[20%]"
-              />
-
-              {chartEmpty ? (
-                /* <div className=" md:w-[70%] border border-[#D9D9D9] bg-[#FCFCFC] py-8 items-center justify-center rounded-3xl"> */
-                <div className=" md:w-[70%] py-8 items-center justify-center rounded-3xl">
-                  <EmptyState
-                    type="no-content"
-                    title="No one has rated this leader yet."
-                    description="Your rating helps others understand this leader’s impact.."
-                    customAction={{
-                      label: "Rate this leader",
-                      onClick: () => setRatingModalOpen(true),
-                    }}
-                  />
-                </div>
-              ) : (
-                <div className=" md:w-[70%]">
-                  <ChartCard
-                    chartName="Approval rating"
-                    dataMap={approvaDataSet}
-                    chartType="line"
-                    chartKey="4"
-                    valueChange={2.5}
-                    isLoading={
-                      isLoadingApproval || isLoadingApprovalRatingOverall
-                    }
-                    handlePeriodChange={handlePeriodChange}
-                  />
-
-                  <ChartCard
-                    chartName="Performance by sectors"
-                    dataMap={sectorDataSet}
-                    chartType="bar"
-                    chartKey="4"
-                    valueChange={2.5}
-                    isLoading={
-                      isLoadingApproval || isLoadingApprovalRatingOverall
-                    }
-                    handlePeriodChange={handlePeriodChange}
-                    showGranularity={false}
-                  />
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        // {/* FOR DESKTOP VIEW  */}s
+        <ProfileDesktopView
+          official={official}
+          approvaDataSet={approvaDataSet}
+          sectorDataSet={sectorDataSet}
+          isLoadingApproval={isLoadingApproval}
+          isLoadingApprovalRatingOverall={isLoadingApprovalRatingOverall}
+          handlePeriodChange={handlePeriodChange}
+          educationData={educationData}
+          careerData={careerData}
+          chartEmpty={chartEmpty}
+          setRatingModalOpen={setRatingModalOpen}
+        />
       ) : (
         // {/* FOR MOBILE VIEW  */}
-        <div className="pt-24 px-4 pb-40">
-          <div className="flex  gap-x-2 md:gap-x-4 items-center pb-4">
-            <Link href="/">
-              <Icon name="ArrowCircleLeft2" color="#262626" />
-            </Link>
-            <span className="text-lg font-bold">Official's profile</span>
-          </div>
-
-          <ProfileHeader official={official} />
-
-          <Tabs defaultValue="performance">
-            <TabsList className="flex justify-start bg-white rouunded-none w-full border-b-2 border-[#EAECF0] rounded-none mb-8">
-              <TabsTrigger value="performance" className={tabTriggerClass}>
-                Performance
-              </TabsTrigger>
-              <TabsTrigger value="about" className={tabTriggerClass}>
-                About
-              </TabsTrigger>
-            </TabsList>
-            <TabsContent value="performance">
-              <div className="w-full">
-                <ChartCard
-                  chartName="Approval rating"
-                  dataMap={approvaDataSet}
-                  chartType="line"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                  autoSkipXAxisLabels={true}
-                />
-
-                <ChartCard
-                  chartName="Performance by sectors"
-                  dataMap={sectorDataSet}
-                  chartType="bar"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                  showGranularity={false}
-                  autoSkipXAxisLabels={false}
-                />
-              </div>
-            </TabsContent>
-            <TabsContent value="about">
-              <OfficialProfileCard
-                official={official}
-                educationData={educationData}
-                careerData={careerData}
-                classname="w-full md:w-[20%]"
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
+        <ProfileMobileView
+          official={official}
+          approvaDataSet={approvaDataSet}
+          sectorDataSet={sectorDataSet}
+          isLoadingApproval={isLoadingApproval}
+          isLoadingApprovalRatingOverall={isLoadingApprovalRatingOverall}
+          handlePeriodChange={handlePeriodChange}
+          educationData={educationData}
+          careerData={careerData}
+        />
       )}
 
       {/* Rating Modal */}
@@ -323,20 +197,3 @@ export default function Profile() {
     </main>
   );
 }
-
-const handleLogout = () => {
-  // Make a POST request to logout endpoint directly
-  fetch("/api/logout", {
-    method: "POST",
-    credentials: "include",
-  })
-    .then(() => {
-      // Clear user data from query cache
-      queryClient.setQueryData(["/api/user"], null);
-      // Redirect to login page
-      window.location.href = "/auth";
-    })
-    .catch((err) => {
-      console.error("Logout failed:", err);
-    });
-};

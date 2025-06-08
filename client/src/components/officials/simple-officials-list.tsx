@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { OfficialCard } from "./official-card";
 import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
+import EmptyState from "../shared/empty-state";
+import { Loading } from "../shared/loading";
 
 interface SimpleOfficialsListProps {
   officials: Official[];
@@ -29,33 +31,6 @@ export function SimpleOfficialsList({
 
   const navigate = useLocation();
 
-  // const updateScrollState = (category: string) => {
-  //   const container = scrollRefs.current[category];
-  //   if (!container) return;
-
-  //   const maxScrollLeft = container.scrollWidth - container.clientWidth;
-  //   setScrollState((prev) => ({
-  //     ...prev,
-  //     [category]: {
-  //       atStart: container.scrollLeft <= 5,
-  //       atEnd: container.scrollLeft >= maxScrollLeft - 5,
-  //     },
-  //   }));
-  // };
-
-  // useEffect(() => {
-  //   Object.keys(scrollRefs.current).forEach((category) => {
-  //     const container = scrollRefs.current[category];
-  //     if (container) {
-  //       const handleScroll = () => updateScrollState(category);
-  //       container.addEventListener("scroll", handleScroll);
-  //       updateScrollState(category); // initial state
-
-  //       return () => container.removeEventListener("scroll", handleScroll);
-  //     }
-  //   });
-  // }, [officials]);
-
   const getCategory = (position: string) => {
     if (/Senator|Senate/i.test(position)) return "Senate";
     if (/Rep|House of Representatives|House or reps/i.test(position))
@@ -74,9 +49,9 @@ export function SimpleOfficialsList({
     {}
   );
 
-  if (isLoading) return <div>Loading officials...</div>;
+  if (isLoading) return <Loading message="loading officials" />;
   if (!officials || officials.length === 0)
-    return <div>No officials found</div>;
+    return <EmptyState type="not-found" title="No officials found" />;
 
   if (searchQuery) {
     return (

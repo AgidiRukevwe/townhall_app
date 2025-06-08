@@ -1,16 +1,17 @@
 import React from "react";
 import { ArrowDown2, Logout } from "iconsax-react";
 import { Icon } from "./icon";
+import { handleLogout } from "@/utils/handle-logout";
 
 interface UserAvatarProps {
   username: string;
-  onLogout: () => void;
+  // onLogout: () => void;
   className?: string;
 }
 
 export const UserAvatar = ({
   username,
-  onLogout,
+  // onLogout,
   className = "",
 }: UserAvatarProps) => {
   const displayName = username || "Guest";
@@ -31,7 +32,7 @@ export const UserAvatar = ({
           <p className="text-sm font-medium">{displayName}</p>
         </div>
         <button
-          onClick={onLogout}
+          onClick={handleLogout}
           className="w-full mt-2 text-left px-4 py-2 text-sm rounded-xl text-text-primary hover:bg-gray-100 flex items-center gap-x-2"
         >
           <Icon name="Logout" size={16} color="#737373" /> Log out

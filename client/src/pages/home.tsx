@@ -8,6 +8,8 @@ import { queryClient } from "@/lib/queryClient";
 import { Navbar } from "@/components/layout/navbar";
 import EmptyState from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
+import { handleLogout } from "@/utils/handle-logout";
+import { useSearchHandler } from "@/hooks/use-search";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -16,8 +18,9 @@ export default function Home() {
   const searchParams = new URLSearchParams(window.location.search);
   const urlSearchQuery = searchParams.get("search") || "";
 
-  // Initialize searchInput state with URL search query
-  const [searchInput, setSearchInput] = useState(urlSearchQuery);
+  // // Initialize searchInput state with URL search query
+  // const [searchInput, setSearchInput] = useState(urlSearchQuery);
+  const { searchInput, handleSearch, setSearchInput } = useSearchHandler();
 
   // Use our enhanced useOfficials hook with search parameter
   const {
@@ -39,38 +42,9 @@ export default function Home() {
       ? (user.username as string)
       : "";
 
-  const handleSearch = (query: string) => {
-    setSearchInput(query);
-
-    if (query.trim()) {
-      const params = new URLSearchParams();
-      params.set("search", query);
-      navigate(`/?${params.toString()}`);
-    } else {
-      navigate(`/`); // clear search query if input empty
-    }
-  };
-
   useEffect(() => {
     setSearchInput(urlSearchQuery);
   }, [urlSearchQuery]);
-
-  const handleLogout = () => {
-    // Make a POST request to logout endpoint directly
-    fetch("/api/logout", {
-      method: "POST",
-      credentials: "include",
-    })
-      .then(() => {
-        // Clear user data from query cache
-        queryClient.setQueryData(["/api/user"], null);
-        // Redirect to login page
-        navigate("/auth");
-      })
-      .catch((err) => {
-        console.error("Logout failed:", err);
-      });
-  };
 
   // Filter officials based on search query
   const filteredOfficials = searchQuery
@@ -102,7 +76,7 @@ export default function Home() {
   }
 
   return (
-    <main className="pt-24 md:pt-16 flex-1 min-h-screen bg-white">
+    <main className="pt-20 md:pt-16 flex-1 min-h-screen bg-white">
       <Navbar
         onSearch={handleSearch}
         initialSearchValue={searchInput}

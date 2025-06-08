@@ -368,6 +368,18 @@ export type Party = {
   logo_url: string;
 };
 
+export type CareerHistory = {
+  id: string;
+  officialId: string;
+  position: string;
+  party: string;
+  location: string;
+  startYear: number;
+  endYear: number;
+  date?: string;
+  createdAt?: Date;
+}[];
+
 // Compatibility alias for transitioning from officials to leaders
 export type Official = {
   id: string;

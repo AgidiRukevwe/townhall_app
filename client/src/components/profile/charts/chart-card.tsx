@@ -76,11 +76,11 @@ export const ChartCard = ({
 
   return (
     // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
-    <div className="bg-white w-full mb-4 relative">
+    <div className="bg-white w-full mb-6 relative">
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
           <Icon name="Chart2" size={24} color="#328bf6" />
-          <span className="text-sm md:text-base font-medium text-text-primary">
+          <span className="text-sm md:text-base font-semibold text-text-primary">
             {chartName}
           </span>
         </div>
@@ -112,13 +112,13 @@ export const ChartCard = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-4xl md:text-5xl font-medium text-gray-900">
+        <h2 className="text-5xl md:text-5xl font-semibold md:font-medium text-gray-900">
           {selectedDataset?.overallRating}%
         </h2>
         <div className="text-sm flex items-center mt-2">
           <Icon name="ArrowUp2" size={20} color="#4caf50" />
           <span className="font-medium text-xs text-text-secondary">
-            {valueChange}% change
+            {valueChange}%
           </span>
         </div>
       </div>

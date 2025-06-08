@@ -1,4 +1,4 @@
-import { toTitleCase } from "@/helpers/to-title-case";
+import { toTitleCase } from "@/utils/to-title-case";
 import { Official } from "@shared/schema";
 import React from "react";
 

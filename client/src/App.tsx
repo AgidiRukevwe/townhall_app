@@ -12,6 +12,7 @@ import LoginPage from "./pages/login-page";
 import RegisterPage from "./pages/register-page";
 import { BrowserRouter } from "react-router-dom";
 import OfficialsCategoryPage from "./pages/officials-by-category.tsx";
+import SearchPage from "./pages/search-page.tsx";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   // We don't need to pass props here since the Navbar in Home will handle search/user functionality
@@ -40,9 +41,9 @@ function Router() {
           <OfficialsCategoryPage />
         </ProtectedLayout>
       </Route>
-      <Route path="/debug-officials">
+      <Route path="/search">
         <ProtectedLayout>
-          <OfficialsDebug />
+          <SearchPage />
         </ProtectedLayout>
       </Route>
       <Route component={NotFound} />

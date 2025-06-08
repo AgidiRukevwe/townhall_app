@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { OfficialCard } from "@/components/officials/official-card";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
-import { toTitleCase } from "@/helpers/to-title-case";
+import { toTitleCase } from "@/utils/to-title-case";
 
 export default function OfficialsCategoryPage() {
   const [location, navigate] = useLocation();
@@ -56,7 +56,7 @@ export default function OfficialsCategoryPage() {
         showSearch
       />
 
-      <div className="pt-32 md:pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
+      <div className="pt-24 md:pt-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 min-h-screen">
         {/* <h1 className="text-2xl font-semibold mb-6 capitalize">{category}</h1> */}
         <div className="flex gap-x-2 md:gap-x-4 items-center mb-6">
           <Link href="/">

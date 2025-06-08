@@ -11,7 +11,7 @@ import { CareerHistoryItem } from "./career-item";
 import { off } from "node:process";
 import { EducationHistoryItem } from "./education-item";
 import { CareerTimelineProps } from "./career-timeline";
-import { toTitleCase } from "@/helpers/to-title-case";
+import { toTitleCase } from "@/utils/to-title-case";
 import ProfileHeader from "./profile-card-header";
 import { useBreakpoint } from "@/hooks/use-breakpoints";
 
