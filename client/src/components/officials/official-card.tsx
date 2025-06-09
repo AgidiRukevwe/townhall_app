@@ -50,7 +50,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   }, [official.imageUrl]);
 
   return (
-    <div className="overflow-hidden bg-white">
+    <div className="overflow-hidden bg-white cursor-pointer">
       {/* Image with 24px border radius and no black background */}
       <div className="relative h-32 md:h-48">
         {!showAvatar ? (

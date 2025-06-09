@@ -28,7 +28,7 @@ export function WelcomeModal({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       {/* // <Dialog open={isOpen}> */}
       <DialogContent
-        className="w-[340px] md:max-w-md bg-white rounded-xl md:rounded-3xl p-4"
+        className="w-[340px] md:w-[450px] bg-white rounded-xl md:rounded-3xl p-2 md:p-4"
         style={{ borderRadius: isMobile ? "1.2rem" : "1.5rem" }}
         showClose={false}
       >
@@ -36,7 +36,7 @@ export function WelcomeModal({
           <div className="relative p-2">
             {/* Header */}
             <div className="text-left mb-8">
-              <h1 className="text-2xl font-medium text-left">
+              <h1 className="text-xl md:text-2xl font-medium text-left">
                 👋 Welcome to Townhall
               </h1>
             </div>
