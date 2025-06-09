@@ -37,12 +37,12 @@ function ProfileMobileView({
 
   return (
     <div className="pt-20 px-4 pb-40">
-      <div className="flex  gap-x-2 md:gap-x-4 items-center pb-4">
+      {/* <div className="flex  gap-x-2 md:gap-x-4 items-center pb-4">
         <Link href="/">
           <Icon name="ArrowCircleLeft2" color="#262626" />
-        </Link>
-        {/* <span className="text-lg font-bold">Official's profile</span> */}
-      </div>
+        </Link> */}
+      {/* <span className="text-lg font-bold">Official's profile</span> */}
+      {/* </div> */}
 
       <ProfileHeader official={official} />
 

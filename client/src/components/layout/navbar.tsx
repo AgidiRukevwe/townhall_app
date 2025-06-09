@@ -129,6 +129,7 @@ import { THLogo } from "@/components/ui/th-logo";
 import { useBreakpoint } from "@/hooks/use-breakpoints";
 import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
+import { useScrollFade } from "@/hooks/use-scroll-fade";
 
 interface NavbarProps {
   onSearch?: (query: string) => void;
@@ -138,6 +139,7 @@ interface NavbarProps {
   className?: string;
   onLogout?: () => void;
   showSearch?: boolean;
+  showBackButton?: boolean; // Optional prop to show back button
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
@@ -147,9 +149,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   username = "",
   className = "",
   showSearch,
+  showBackButton,
   onLogout = () => {},
 }) => {
   const isMobile = useBreakpoint();
+  const isScrolling = useScrollFade(1000); // fade in after 150ms of inactivity
+
   const [_, navigate] = useLocation();
   const [searchActive, setSearchActive] = useState(false);
 
@@ -161,9 +166,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   const renderDesktopNav = () => (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
       <div className="flex justify-between items-center">
-        <Link href="/">
-          <THLogo />
-        </Link>
+        <div className={isMobile ? `h-12 w-12 bg-red-200` : " "}>
+          <Link href="/">
+            <THLogo />
+          </Link>
+        </div>
+
         <div className="flex items-center">
           {showSearch && (
             <SearchInput
@@ -183,14 +191,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       {!searchActive ? (
         <div className="flex flex-col gap-y-2 justify-between items-center">
           <div className="flex items-center justify-between w-full">
-            <Link href="/">
-              <THLogo />
-            </Link>
+            {showBackButton ? (
+              <Link href="/" className="mr-4">
+                <Icon name="ArrowCircleLeft2" size={24} color="#262626" />
+              </Link>
+            ) : (
+              <Link href="/">
+                <THLogo />
+              </Link>
+            )}
             <div className="flex space-x-4 items-center">
               {showSearch && (
                 <Icon
                   name="SearchNormal1"
-                  size={24}
+                  size={20}
                   color="#737373"
                   onClick={() => setSearchActive(true)}
                   aria-label="Open search"
@@ -224,7 +238,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className={`bg-white/50 backdrop-blur-2xl border-b fixed top-0 left-0 right-0 z-50 border-gray-200 ${className}`}
+      className={`bg-white/50 backdrop-blur-2xl border-b fixed top-0 left-0 right-0 z-50 border-gray-200  ${
+        isScrolling
+          ? "opacity-0 -translate-y-4 pointer-events-none"
+          : "opacity-100 translate-y-0"
+      } ${className}`}
     >
       {isMobile ? renderMobileNav() : renderDesktopNav()}
     </header>

@@ -115,6 +115,7 @@ export default function Profile() {
           username={userName}
           onLogout={handleLogout}
           showSearch={false}
+          showBackButton={isMobile ? true : false}
         />
 
         <div className="bg-white py-8">
@@ -146,6 +147,7 @@ export default function Profile() {
         onLogout={handleLogout}
         // classname=""
         showSearch={true}
+        showBackButton={true}
       />
 
       {!isMobile ? (

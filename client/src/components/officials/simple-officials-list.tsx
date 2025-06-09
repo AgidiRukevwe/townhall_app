@@ -53,40 +53,40 @@ export function SimpleOfficialsList({
   if (!officials || officials.length === 0)
     return <EmptyState type="not-found" title="No officials found" />;
 
-  if (searchQuery) {
-    return (
-      <div className="md:space-y-8 space-y-2">
-        <div className="mb-8 rounded-lg">
-          <div className="flex gap-x-2 md:gap-x-4 items-start">
-            <Link href="/">
-              <Icon name="ArrowCircleLeft2" color="#262626" />
-            </Link>
-            <div>
-              <span className="text-lg font-bold">
-                Showing results for "{searchQuery}"
-              </span>
-              <p className="text-text-secondary text-sm mt-0.5">
-                Found {officials.length} official
-                {officials.length !== 1 ? "s" : ""} matching your search
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {officials.map((official) => (
-            <div
-              key={official.id}
-              className="cursor-pointer"
-              onClick={() => (window.location.href = `/profile/${official.id}`)}
-              // onClick={() => navigate(`/profile/${official.id}`)}
-            >
-              <OfficialCard official={official} compact />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  // if (searchQuery) {
+  //   return (
+  //     <div className="md:space-y-8 space-y-2">
+  //       <div className="mb-8 rounded-lg">
+  //         <div className="flex gap-x-2 md:gap-x-4 items-start">
+  //           <Link href="/">
+  //             <Icon name="ArrowCircleLeft2" color="#262626" />
+  //           </Link>
+  //           <div>
+  //             <span className="text-lg font-bold">
+  //               Showing results for "{searchQuery}"
+  //             </span>
+  //             <p className="text-text-secondary text-sm mt-0.5">
+  //               Found {officials.length} official
+  //               {officials.length !== 1 ? "s" : ""} matching your search
+  //             </p>
+  //           </div>
+  //         </div>
+  //       </div>
+  //       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+  //         {officials.map((official) => (
+  //           <div
+  //             key={official.id}
+  //             className="cursor-pointer"
+  //             onClick={() => (window.location.href = `/profile/${official.id}`)}
+  //             // onClick={() => navigate(`/profile/${official.id}`)}
+  //           >
+  //             <OfficialCard official={official} compact />
+  //           </div>
+  //         ))}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const renderCategory = (category: string, officials: Official[]) => {
     const scrollInfo = scrollState[category] || {
@@ -97,11 +97,13 @@ export function SimpleOfficialsList({
     return (
       <div className=" md:mb-10" key={category}>
         <div className="flex w-full justify-between items-center mb-2">
-          <h2 className="text-lg font-bold flex items-center">{category}</h2>
+          <h2 className="text-base md:text-lg font-bold flex items-center">
+            {category}
+          </h2>
           <div className="flex space-x-1">
             <Link href={`/officials/${category.toLowerCase()}`}>
               <Button variant="ghost" size="sm">
-                See all <Icon name="ArrowRight2" size={16} color="#262626" />
+                See all <Icon name="ArrowRight2" size={16} color="#737373" />
               </Button>
             </Link>
           </div>

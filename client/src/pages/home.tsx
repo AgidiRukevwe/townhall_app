@@ -10,6 +10,8 @@ import EmptyState from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { handleLogout } from "@/utils/handle-logout";
 import { useSearchHandler } from "@/hooks/use-search";
+import { WelcomeModal } from "@/components/shared/welcome-modal";
+import { useWelcomeModal } from "@/hooks/use-welcome-modal";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -18,9 +20,8 @@ export default function Home() {
   const searchParams = new URLSearchParams(window.location.search);
   const urlSearchQuery = searchParams.get("search") || "";
 
-  // // Initialize searchInput state with URL search query
-  // const [searchInput, setSearchInput] = useState(urlSearchQuery);
   const { searchInput, handleSearch, setSearchInput } = useSearchHandler();
+  const { showWelcome, markWelcomeAsSeen } = useWelcomeModal();
 
   // Use our enhanced useOfficials hook with search parameter
   const {
@@ -98,6 +99,11 @@ export default function Home() {
           />
         )}
       </div>
+      <WelcomeModal
+        isOpen={showWelcome}
+        onClose={markWelcomeAsSeen}
+        onContinue={markWelcomeAsSeen}
+      />
     </main>
   );
 }

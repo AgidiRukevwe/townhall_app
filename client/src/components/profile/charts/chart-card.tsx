@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/icon";
 import DottedGridChart from "./dotted-chart";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
+import { Loading } from "@/components/shared/loading";
 
 export type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
 
@@ -69,7 +70,7 @@ export const ChartCard = ({
     return (
       <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
         {/* Your loading placeholder */}
-        <p className="text-gray-500 text-sm">Loading...</p>
+        <Loading message="Loading data..." />
       </div>
     );
   }
@@ -112,7 +113,7 @@ export const ChartCard = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-5xl md:text-5xl font-semibold md:font-medium text-gray-900">
+        <h2 className="text-4xl md:text-5xl font-medium md:font-medium text-gray-900">
           {selectedDataset?.overallRating}%
         </h2>
         <div className="text-sm flex items-center mt-2">
