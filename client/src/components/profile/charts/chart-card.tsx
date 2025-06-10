@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/icon";
 import DottedGridChart from "./dotted-chart";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 import { Loading } from "@/components/shared/loading";
+import { useBreakpoint } from "@/hooks/use-breakpoints";
 
 export type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
 
@@ -64,7 +65,12 @@ export const ChartCard = ({
 
   // const selectedDataset = dataMap[granularity];
   const selectedDataset = dataMap;
-  // const overallValue = selectedDataset.data.at(-1) ?? 0;
+  const isMobile = useBreakpoint();
+
+  const truncatedLabels = selectedDataset.labels.map((label) => {
+    const limit = isMobile ? 15 : 25;
+    return label.length > limit ? label.slice(0, limit) + "…" : label;
+  });
 
   if (isLoading || !selectedDataset) {
     return (
@@ -113,7 +119,7 @@ export const ChartCard = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-4xl md:text-5xl font-medium md:font-medium text-gray-900">
+        <h2 className="text-2xl md:text-5xl font-medium md:font-medium text-gray-900">
           {selectedDataset?.overallRating}%
         </h2>
         <div className="text-sm flex items-center mt-2">
@@ -127,7 +133,7 @@ export const ChartCard = ({
       <div className="h-[400px] w-full">
         <DottedGridChart
           type={chartType}
-          labels={selectedDataset.labels}
+          labels={truncatedLabels}
           data={selectedDataset.data}
           granularity={granularity}
           autoSkipXAxisLabels={autoSkipXAxisLabels}

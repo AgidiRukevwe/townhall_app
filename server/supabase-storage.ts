@@ -418,14 +418,26 @@ export class SupabaseStorage implements IStorage {
 
       // Fetch sectors from the database
       const { data: sectorsData, error: sectorsError } = await supabase
-        .from("sectors")
-        .select("*");
+        .from("leader_sectors")
+        .select("*")
+        .eq("leader_id", leader.id);
+
+      // .from("sectors")
+      // .select("*");
 
       if (sectorsError) {
         console.error("Error fetching sectors:", sectorsError.message);
       }
 
+      // const sectors = sectorsData || [];
+      type Sector = {
+        id: string;
+        name: string;
+        created_at: string; // or Date if you convert it
+      };
       const sectors = sectorsData || [];
+
+      console.log("Sectors fetched:", sectors);
 
       // Create a leader object that maps to our Official interface
       return {
@@ -484,51 +496,67 @@ export class SupabaseStorage implements IStorage {
 
   async getOfficialRatings(officialId: string): Promise<RatingSummary> {
     try {
-      console.log(`Fetching ratings for official: ${officialId}`);
-
-      // Get all ratings for this official with complete information
       const { data: allRatings, error: allRatingsError } = await supabase
         .from("ratings")
         .select("id, rating, sector_id, user_id, created_at")
         .eq("leader_id", officialId);
 
       if (allRatingsError) {
-        console.error("Error fetching ratings:", allRatingsError.message);
         throw allRatingsError;
       }
 
-      console.log(`Found ${allRatings ? allRatings.length : 0} total ratings`);
+      if (!allRatings || allRatings.length === 0) {
+        return {
+          overallRating: 0,
+          monthlyChange: 0,
+          monthlyData: [],
+          sectorAverage: 0,
+          sectorMonthlyChange: 0,
+          sectorRatings: [],
+          timeData: {
+            periods: {
+              "1 Dy": {
+                label: [""],
+                data: [],
+              },
+              "1 Wk": {
+                label: [""],
+                data: [],
+              },
+              "1 Yr": {
+                label: [""],
+                data: [],
+              },
+              "This year": {
+                label: [""],
+                data: [],
+              },
+            },
+            sectorData: {
+              "1 Dy": {},
+              "1 Wk": {},
+              "1 Yr": {},
+              "This year": {},
+            },
+          },
+        }; // ✅ FIX: don't proceed if no ratings
+      }
 
-      // Separate overall ratings from sector-specific ratings
-      const overallRatings = allRatings
-        ? allRatings.filter(
-            (r) =>
-              !r.sector_id ||
-              r.sector_id === "00000000-0000-0000-0000-000000000000"
-          )
-        : [];
+      const overallRatings = allRatings.filter(
+        (r) =>
+          !r.sector_id || r.sector_id === "00000000-0000-0000-0000-000000000000"
+      );
 
-      const sectorSpecificRatings = allRatings
-        ? allRatings.filter(
-            (r) =>
-              r.sector_id &&
-              r.sector_id !== "00000000-0000-0000-0000-000000000000"
-          )
-        : [];
+      const sectorRatingsRaw = allRatings.filter(
+        (r) =>
+          r.sector_id && r.sector_id !== "00000000-0000-0000-0000-000000000000"
+      );
 
-      // Calculate overall rating from actual database values or default to 0
-      const overallRating =
-        overallRatings.length > 0
-          ? Math.round(
-              overallRatings.reduce((sum, r) => sum + r.rating, 0) /
-                overallRatings.length
-            )
-          : 0;
+      const overallRating = Math.round(
+        overallRatings.reduce((sum, r) => sum + r.rating, 0) /
+          overallRatings.length
+      );
 
-      console.log(`Overall rating calculated: ${overallRating}`);
-
-      // Generate monthly data (last 6 months) using actual rating data
-      const monthlyData = [];
       const monthNames = [
         "Jan",
         "Feb",
@@ -543,81 +571,62 @@ export class SupabaseStorage implements IStorage {
         "Nov",
         "Dec",
       ];
+      const monthlyData = [];
       const currentDate = new Date();
 
-      // Track previous month's rating for continuity
       let previousMonthRating = overallRating;
 
       for (let i = 5; i >= 0; i--) {
-        const month = new Date(
+        const date = new Date(
           currentDate.getFullYear(),
           currentDate.getMonth() - i,
           1
         );
-        const monthIdx = month.getMonth();
-        const yearVal = month.getFullYear();
+        const monthIdx = date.getMonth();
+        const year = date.getFullYear();
 
-        // Find all ratings for this specific month
         const monthRatings = overallRatings.filter((r) => {
           const ratingDate = new Date(r.created_at);
           return (
-            ratingDate.getMonth() === monthIdx &&
-            ratingDate.getFullYear() === yearVal
+            ratingDate.getFullYear() === year &&
+            ratingDate.getMonth() === monthIdx
           );
         });
 
-        // Calculate this month's rating from actual data when available
-        let monthlyRating;
+        let monthlyRating =
+          monthRatings.length > 0
+            ? Math.round(
+                monthRatings.reduce((sum, r) => sum + r.rating, 0) /
+                  monthRatings.length
+              )
+            : previousMonthRating;
 
-        if (monthRatings.length > 0) {
-          // Use actual ratings for this month
-          monthlyRating = Math.round(
-            monthRatings.reduce((sum, r) => sum + r.rating, 0) /
-              monthRatings.length
-          );
-          previousMonthRating = monthlyRating; // Save for continuity
-        } else if (i === 0) {
-          // Current month with no ratings yet, use overall
-          monthlyRating = overallRating;
-        } else {
-          // For past months with no ratings, use the previous month's value
-          // with a slight difference to show some trend (max ±3)
-          const variation = Math.min(
-            3,
-            Math.max(-3, previousMonthRating - overallRating)
-          );
-          monthlyRating = Math.max(
-            0,
-            Math.min(100, previousMonthRating - variation)
-          );
-          previousMonthRating = monthlyRating;
-        }
+        previousMonthRating = monthlyRating;
 
         monthlyData.push({
-          month: `${monthNames[monthIdx]} ${yearVal}`,
+          month: `${monthNames[monthIdx]} ${year}`,
           rating: monthlyRating,
           isCurrentMonth: i === 0,
         });
       }
 
-      // Calculate month-over-month change using actual calculated values
       const monthlyChange =
         monthlyData.length >= 2
           ? monthlyData[monthlyData.length - 1].rating -
             monthlyData[monthlyData.length - 2].rating
           : 0;
 
-      // Get all sectors from the database
       const { data: sectorData, error: sectorError } = await supabase
-        .from("sectors")
-        .select("id, name");
+        .from("leader_sectors")
+        .select("*")
+        .eq("leader_id", officialId);
+      // .from("sectors")
+      // .select("id, name");
 
       if (sectorError) {
-        console.error("Error fetching sectors:", sectorError.message);
         throw sectorError;
       }
 
-      // Generate sector ratings using actual sector rating data where available
       const sectorColors = [
         "#4CAF50",
         "#FFC107",
@@ -625,60 +634,26 @@ export class SupabaseStorage implements IStorage {
         "#E91E63",
         "#673AB7",
       ];
-      let sectorRatings = [];
 
-      if (sectorData && sectorData.length > 0) {
-        sectorRatings = sectorData.map((sector, index) => {
-          // Find all ratings for this specific sector
-          const sectorRatings = sectorSpecificRatings.filter(
-            (r) => r.sector_id === sector.id
-          );
+      const sectorRatings = sectorData.map((sector, index) => {
+        const relevantRatings = sectorRatingsRaw.filter(
+          (r) => r.sector_id === sector.id
+        );
+        const rating =
+          relevantRatings.length > 0
+            ? Math.round(
+                relevantRatings.reduce((sum, r) => sum + r.rating, 0) /
+                  relevantRatings.length
+              )
+            : overallRating;
 
-          // Calculate rating for this sector from actual data when available
-          let sectorRating;
-
-          if (sectorRatings.length > 0) {
-            // Use actual sector ratings
-            sectorRating = Math.round(
-              sectorRatings.reduce((sum: number, r) => sum + r.rating, 0) /
-                sectorRatings.length
-            );
-          } else {
-            // No ratings for this sector yet, derive from overall with small offset
-            // Use a deterministic offset based on sector ID to ensure consistency
-            const sectorIdSum = sector.id
-              .split("")
-              .reduce(
-                (sum: number, char: string) => sum + char.charCodeAt(0),
-                0
-              );
-            const offset = (sectorIdSum % 10) - 5; // -5 to +4 range
-            sectorRating = Math.max(0, Math.min(100, overallRating + offset));
-          }
-
-          return {
-            name: sector.name,
-            rating: sectorRating,
-            color: sectorColors[index % sectorColors.length],
-          };
-        });
-      } else {
-        console.warn("No sectors found in database, using default sectors");
-        const defaultSectors = [
-          "Healthcare",
-          "Education",
-          "Infrastructure",
-          "Economy",
-          "Security",
-        ];
-        sectorRatings = defaultSectors.map((name, index) => ({
-          name,
-          rating: overallRating, // Use overall for all sectors
+        return {
+          name: sector.name,
+          rating,
           color: sectorColors[index % sectorColors.length],
-        }));
-      }
+        };
+      });
 
-      // Calculate sector average using actual sector ratings - limited to 1 decimal place
       const sectorAverage = parseFloat(
         (
           sectorRatings.reduce((sum, s) => sum + s.rating, 0) /
@@ -686,25 +661,22 @@ export class SupabaseStorage implements IStorage {
         ).toFixed(1)
       );
 
-      // Use the actual change calculated from sector ratings
       const sectorMonthlyChange = parseFloat(monthlyChange.toFixed(1));
 
-      // Format the ratings data to include timestamps and sector info
       const formattedRatings = allRatings.map((rating) => {
-        // Find the sector info for this rating if it has a sector_id
         const sectorInfo = rating.sector_id
-          ? sectorData?.find((s) => s.id === rating.sector_id)
+          ? sectorData.find((s) => s.id === rating.sector_id)
           : null;
 
         const sectorName = sectorInfo?.name || "";
 
         return {
-          id: rating.id || randomUUID(),
-          officialId: officialId,
+          id: rating.id,
+          officialId,
           userId: rating.user_id || "anonymous",
           overallRating: rating.rating,
           sectorId: rating.sector_id,
-          sectorName: sectorName,
+          sectorName,
           sectorColor: sectorName
             ? sectorColors[
                 sectorRatings.findIndex((s) => s.name === sectorName) %
@@ -716,25 +688,18 @@ export class SupabaseStorage implements IStorage {
         };
       });
 
-      // Prepare sector info for the time-based data generator
       const sectorInfoForTimeData = sectorRatings.map((s) => ({
         id: s.name.toLowerCase().replace(/\s+/g, "_"),
         name: s.name,
         color: s.color,
       }));
 
-      console.log(
-        `Generating time-based data from ${formattedRatings.length} ratings with timestamps`
-      );
-
-      // Generate time-based data with sector breakdowns using actual ratings data
       const timeData = generateTimeBasedData(
         formattedRatings,
         sectorInfoForTimeData
       );
 
-      // Ensure timeData is included in the response
-      const response = {
+      return {
         overallRating,
         monthlyChange,
         monthlyData,
@@ -743,16 +708,283 @@ export class SupabaseStorage implements IStorage {
         sectorRatings,
         timeData,
       };
-
-      // Log to verify timeData is present
-      console.log("timeData included in response:", !!response.timeData);
-
-      return response;
     } catch (error) {
-      console.error("Error fetching official ratings:", error);
+      console.error("Error in getOfficialRatings:", error);
       throw error;
     }
   }
+
+  // async getOfficialRatings(officialId: string): Promise<RatingSummary> {
+  //   try {
+  //     console.log(`Fetching ratings for official: ${officialId}`);
+
+  //     // Get all ratings for this official with complete information
+  //     const { data: allRatings, error: allRatingsError } = await supabase
+  //       .from("ratings")
+  //       .select("id, rating, sector_id, user_id, created_at")
+  //       .eq("leader_id", officialId);
+
+  //     if (allRatingsError) {
+  //       console.error("Error fetching ratings:", allRatingsError.message);
+  //       throw allRatingsError;
+  //     }
+
+  //     console.log(`Found ${allRatings ? allRatings.length : 0} total ratings`);
+
+  //     // Separate overall ratings from sector-specific ratings
+  //     const overallRatings = allRatings
+  //       ? allRatings.filter(
+  //           (r) =>
+  //             !r.sector_id ||
+  //             r.sector_id === "00000000-0000-0000-0000-000000000000"
+  //         )
+  //       : [];
+
+  //     const sectorSpecificRatings = allRatings
+  //       ? allRatings.filter(
+  //           (r) =>
+  //             r.sector_id &&
+  //             r.sector_id !== "00000000-0000-0000-0000-000000000000"
+  //         )
+  //       : [];
+
+  //     // Calculate overall rating from actual database values or default to 0
+  //     const overallRating =
+  //       overallRatings.length > 0
+  //         ? Math.round(
+  //             overallRatings.reduce((sum, r) => sum + r.rating, 0) /
+  //               overallRatings.length
+  //           )
+  //         : 0;
+
+  //     console.log(`Overall rating calculated: ${overallRating}`);
+
+  //     // Generate monthly data (last 6 months) using actual rating data
+  //     const monthlyData = [];
+  //     const monthNames = [
+  //       "Jan",
+  //       "Feb",
+  //       "Mar",
+  //       "Apr",
+  //       "May",
+  //       "Jun",
+  //       "Jul",
+  //       "Aug",
+  //       "Sep",
+  //       "Oct",
+  //       "Nov",
+  //       "Dec",
+  //     ];
+  //     const currentDate = new Date();
+
+  //     // Track previous month's rating for continuity
+  //     let previousMonthRating = overallRating;
+
+  //     for (let i = 5; i >= 0; i--) {
+  //       const month = new Date(
+  //         currentDate.getFullYear(),
+  //         currentDate.getMonth() - i,
+  //         1
+  //       );
+  //       const monthIdx = month.getMonth();
+  //       const yearVal = month.getFullYear();
+
+  //       // Find all ratings for this specific month
+  //       const monthRatings = overallRatings.filter((r) => {
+  //         const ratingDate = new Date(r.created_at);
+  //         return (
+  //           ratingDate.getMonth() === monthIdx &&
+  //           ratingDate.getFullYear() === yearVal
+  //         );
+  //       });
+
+  //       // Calculate this month's rating from actual data when available
+  //       let monthlyRating;
+
+  //       if (monthRatings.length > 0) {
+  //         // Use actual ratings for this month
+  //         monthlyRating = Math.round(
+  //           monthRatings.reduce((sum, r) => sum + r.rating, 0) /
+  //             monthRatings.length
+  //         );
+  //         previousMonthRating = monthlyRating; // Save for continuity
+  //       } else if (i === 0) {
+  //         // Current month with no ratings yet, use overall
+  //         monthlyRating = overallRating;
+  //       } else {
+  //         // For past months with no ratings, use the previous month's value
+  //         // with a slight difference to show some trend (max ±3)
+  //         const variation = Math.min(
+  //           3,
+  //           Math.max(-3, previousMonthRating - overallRating)
+  //         );
+  //         monthlyRating = Math.max(
+  //           0,
+  //           Math.min(100, previousMonthRating - variation)
+  //         );
+  //         previousMonthRating = monthlyRating;
+  //       }
+
+  //       monthlyData.push({
+  //         month: `${monthNames[monthIdx]} ${yearVal}`,
+  //         rating: monthlyRating,
+  //         isCurrentMonth: i === 0,
+  //       });
+  //     }
+
+  //     // Calculate month-over-month change using actual calculated values
+  //     const monthlyChange =
+  //       monthlyData.length >= 2
+  //         ? monthlyData[monthlyData.length - 1].rating -
+  //           monthlyData[monthlyData.length - 2].rating
+  //         : 0;
+
+  //     // Get all sectors from the database
+  //     const { data: sectorData, error: sectorError } = await supabase
+  //       .from("sectors")
+  //       .select("id, name");
+
+  //     if (sectorError) {
+  //       console.error("Error fetching sectors:", sectorError.message);
+  //       throw sectorError;
+  //     }
+
+  //     // Generate sector ratings using actual sector rating data where available
+  //     const sectorColors = [
+  //       "#4CAF50",
+  //       "#FFC107",
+  //       "#2196F3",
+  //       "#E91E63",
+  //       "#673AB7",
+  //     ];
+  //     let sectorRatings = [];
+
+  //     if (sectorData && sectorData.length > 0) {
+  //       sectorRatings = sectorData.map((sector, index) => {
+  //         // Find all ratings for this specific sector
+  //         const sectorRatings = sectorSpecificRatings.filter(
+  //           (r) => r.sector_id === sector.id
+  //         );
+
+  //         // Calculate rating for this sector from actual data when available
+  //         let sectorRating;
+
+  //         if (sectorRatings.length > 0) {
+  //           // Use actual sector ratings
+  //           sectorRating = Math.round(
+  //             sectorRatings.reduce((sum: number, r) => sum + r.rating, 0) /
+  //               sectorRatings.length
+  //           );
+  //         } else {
+  //           // No ratings for this sector yet, derive from overall with small offset
+
+  //           const sectorIdSum = sector.id
+  //             .split("")
+  //             .reduce(
+  //               (sum: number, char: string) => sum + char.charCodeAt(0),
+  //               0
+  //             );
+  //           const offset = (sectorIdSum % 10) - 5; // -5 to +4 range
+  //           sectorRating = Math.max(0, Math.min(100, overallRating + offset));
+  //         }
+
+  //         return {
+  //           name: sector.name,
+  //           rating: sectorRating,
+  //           color: sectorColors[index % sectorColors.length],
+  //         };
+  //       });
+  //     } else {
+  //       console.warn("No sectors found in database, using default sectors");
+  //       const defaultSectors = [
+  //         "Healthcare",
+  //         "Education",
+  //         "Infrastructure",
+  //         "Economy",
+  //         "Security",
+  //       ];
+  //       sectorRatings = defaultSectors.map((name, index) => ({
+  //         name,
+  //         rating: overallRating, // Use overall for all sectors
+  //         color: sectorColors[index % sectorColors.length],
+  //       }));
+  //     }
+
+  //     // Calculate sector average using actual sector ratings - limited to 1 decimal place
+  //     const sectorAverage = parseFloat(
+  //       (
+  //         sectorRatings.reduce((sum, s) => sum + s.rating, 0) /
+  //         sectorRatings.length
+  //       ).toFixed(1)
+  //     );
+
+  //     // Use the actual change calculated from sector ratings
+  //     const sectorMonthlyChange = parseFloat(monthlyChange.toFixed(1));
+
+  //     // Format the ratings data to include timestamps and sector info
+  //     const formattedRatings = allRatings.map((rating) => {
+  //       // Find the sector info for this rating if it has a sector_id
+  //       const sectorInfo = rating.sector_id
+  //         ? sectorData?.find((s) => s.id === rating.sector_id)
+  //         : null;
+
+  //       const sectorName = sectorInfo?.name || "";
+
+  //       return {
+  //         id: rating.id || randomUUID(),
+  //         officialId: officialId,
+  //         userId: rating.user_id || "anonymous",
+  //         overallRating: rating.rating,
+  //         sectorId: rating.sector_id,
+  //         sectorName: sectorName,
+  //         sectorColor: sectorName
+  //           ? sectorColors[
+  //               sectorRatings.findIndex((s) => s.name === sectorName) %
+  //                 sectorColors.length
+  //             ]
+  //           : "#BDBDBD",
+  //         rating: rating.rating,
+  //         createdAt: new Date(rating.created_at),
+  //       };
+  //     });
+
+  //     // Prepare sector info for the time-based data generator
+  //     const sectorInfoForTimeData = sectorRatings.map((s) => ({
+  //       id: s.name.toLowerCase().replace(/\s+/g, "_"),
+  //       name: s.name,
+  //       color: s.color,
+  //     }));
+
+  //     console.log(
+  //       `Generating time-based data from ${formattedRatings.length} ratings with timestamps`
+  //     );
+
+  //     // Generate time-based data with sector breakdowns using actual ratings data
+  //     const timeData = generateTimeBasedData(
+  //       formattedRatings,
+  //       sectorInfoForTimeData
+  //     );
+
+  //     // Ensure timeData is included in the response
+  //     const response = {
+  //       overallRating,
+  //       monthlyChange,
+  //       monthlyData,
+  //       sectorAverage,
+  //       sectorMonthlyChange,
+  //       sectorRatings,
+  //       timeData,
+  //     };
+
+  //     // Log to verify timeData is present
+  //     console.log("timeData included in response:", !!response.timeData);
+
+  //     return response;
+  //   } catch (error) {
+  //     console.error("Error fetching official ratings:", error);
+  //     throw error;
+  //   }
+  // }
 
   async submitRating(
     ratingData: RatingPayload & { userId: string }

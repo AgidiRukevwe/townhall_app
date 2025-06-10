@@ -7,6 +7,8 @@ import ProfileHeader from "../profile-card-header";
 import { OfficialProfileCard } from "../official-profile-card";
 import { CareerHistory, Official } from "@shared/schema";
 import { cn } from "@/lib/utils";
+import EmptyState from "@/components/shared/empty-state";
+import { Button } from "@/components/ui/button";
 
 interface ProfileMobileViewProps {
   official: Official;
@@ -17,6 +19,8 @@ interface ProfileMobileViewProps {
   handlePeriodChange: (period: Granularity) => void;
   educationData: any;
   careerData: CareerHistory;
+  chartEmpty?: boolean;
+  setRatingModalOpen: (value: boolean) => void;
 }
 
 function ProfileMobileView({
@@ -28,6 +32,8 @@ function ProfileMobileView({
   handlePeriodChange,
   educationData,
   careerData,
+  chartEmpty,
+  setRatingModalOpen,
 }: ProfileMobileViewProps) {
   const tabTriggerClass = cn(
     "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
@@ -56,30 +62,52 @@ function ProfileMobileView({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="performance">
-          <div className="w-full">
-            <ChartCard
-              chartName="Approval rating"
-              dataMap={approvaDataSet}
-              chartType="line"
-              chartKey="4"
-              valueChange={2.5}
-              isLoading={isLoadingApproval || isLoadingApprovalRatingOverall}
-              handlePeriodChange={handlePeriodChange}
-              autoSkipXAxisLabels={true}
-            />
+          {chartEmpty ? (
+            <div className=" md:w-[70%] py-8 items-center justify-center rounded-3xl">
+              <EmptyState
+                type="no-content"
+                title="No one has rated this leader yet."
+                description="Your rating helps others understand this leader’s impact.."
+                customAction={{
+                  label: "Rate this leader",
+                  onClick: () => setRatingModalOpen(true),
+                }}
+              />
+            </div>
+          ) : (
+            <div className="w-full">
+              <ChartCard
+                chartName="Approval rating"
+                dataMap={approvaDataSet}
+                chartType="line"
+                chartKey="4"
+                valueChange={2.5}
+                isLoading={isLoadingApproval || isLoadingApprovalRatingOverall}
+                handlePeriodChange={handlePeriodChange}
+                autoSkipXAxisLabels={true}
+              />
 
-            <ChartCard
-              chartName="Performance by sectors"
-              dataMap={sectorDataSet}
-              chartType="bar"
-              chartKey="4"
-              valueChange={2.5}
-              isLoading={isLoadingApproval || isLoadingApprovalRatingOverall}
-              handlePeriodChange={handlePeriodChange}
-              showGranularity={false}
-              autoSkipXAxisLabels={false}
-            />
-          </div>
+              <ChartCard
+                chartName="Performance by sectors"
+                dataMap={sectorDataSet}
+                chartType="bar"
+                chartKey="4"
+                valueChange={2.5}
+                isLoading={isLoadingApproval || isLoadingApprovalRatingOverall}
+                handlePeriodChange={handlePeriodChange}
+                showGranularity={false}
+                autoSkipXAxisLabels={false}
+              />
+              <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-4 z-50 backdrop-blur-md bg-white/70">
+                <Button
+                  onClick={() => setRatingModalOpen(true)}
+                  className="w-full bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
+                >
+                  Rate this leader
+                </Button>
+              </div>
+            </div>
+          )}
         </TabsContent>
         <TabsContent value="about">
           <OfficialProfileCard

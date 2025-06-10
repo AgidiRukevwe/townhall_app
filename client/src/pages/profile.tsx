@@ -95,9 +95,11 @@ export default function Profile() {
   useEffect(() => {
     console.log(fullData);
     if (approvalRating === 0 && overallSectorRating === 0) {
+      setChartEmpty(true);
+    } else {
       setChartEmpty(false);
     }
-  }, [approvalRating, overallSectorRating]);
+  }, [approvalRating, overallSectorRating, fullData]);
 
   // Determine education and career data from official
   const educationData = official?.education || [];
@@ -175,6 +177,8 @@ export default function Profile() {
           handlePeriodChange={handlePeriodChange}
           educationData={educationData}
           careerData={careerData}
+          chartEmpty={chartEmpty}
+          setRatingModalOpen={setRatingModalOpen}
         />
       )}
 
@@ -186,7 +190,7 @@ export default function Profile() {
         officialName={official.name}
         sectors={official.sectors}
       />
-      {isMobile && (
+      {/* {isMobile && (
         <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-4 z-50 backdrop-blur-md bg-white/70">
           <Button
             onClick={() => setRatingModalOpen(true)}
@@ -195,7 +199,7 @@ export default function Profile() {
             Rate this leader
           </Button>
         </div>
-      )}
+      )} */}
     </main>
   );
 }

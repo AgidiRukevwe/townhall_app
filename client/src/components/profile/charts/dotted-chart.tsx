@@ -96,7 +96,7 @@ export default function DottedGridChart({
             maxRotation: 0,
             minRotation: 0,
             maxTicksLimit: isMobile ? 8 : 15,
-            autoSkip: autoSkipXAxisLabels,
+            autoSkip: labels.length < 10 ? false : true,
           },
         },
         y: {
@@ -115,11 +115,11 @@ export default function DottedGridChart({
       plugins: {
         tooltip: {
           enabled: true,
-          backgroundColor: "rgba(0,0,0,0.8)",
+          backgroundColor: "rgba(0,0,0,1)",
           titleColor: "#fff",
           bodyColor: "#fff",
-          padding: 10,
-          cornerRadius: 24,
+          padding: 16,
+          cornerRadius: 16,
           displayColors: false,
         },
       },
@@ -135,49 +135,6 @@ export default function DottedGridChart({
       behavior: "smooth",
     });
   }, [labels]);
-
-  // useEffect(() => {
-  //   const chart = chartRef.current;
-  //   if (!chart) return;
-
-  //   const drawExtras = () => {
-  //     const ctx = chart.canvas.getContext("2d");
-  //     const { chartArea } = chart;
-  //     if (!chartArea) return;
-
-  //     ctx.save();
-  //     // ctx.fillStyle = "rgba(0,0,0,0.1)";
-  //     // ctx.fillStyle = "rgba(0,0,0,0.07)";
-  //     ctx.fillStyle = "#c4c4c4";
-  //     const xStep = chartArea.width / 45;
-  //     const yStep = chartArea.height / 20;
-  //     for (let x = chartArea.left; x <= chartArea.right; x += xStep) {
-  //       for (let y = chartArea.top; y <= chartArea.bottom; y += yStep) {
-  //         ctx.beginPath();
-  //         ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-  //         ctx.fill();
-  //       }
-  //     }
-
-  //     if (highlight) {
-  //       const xPos = chart.scales.x.getPixelForValue(highlight.index);
-  //       ctx.beginPath();
-  //       ctx.strokeStyle = "rgba(0,0,0,0.2)";
-  //       ctx.moveTo(xPos, chartArea.top);
-  //       ctx.lineTo(xPos, chartArea.bottom);
-  //       ctx.stroke();
-  //     }
-
-  //     ctx.restore();
-  //   };
-
-  //   chart.options.animation = { onComplete: drawExtras };
-  //   drawExtras();
-
-  //   const ro = new ResizeObserver(drawExtras);
-  //   ro.observe(chart.canvas);
-  //   return () => ro.disconnect();
-  // }, [chartData, highlight]);
 
   const dottedBackgroundPlugin = {
     id: "dottedBackground",
@@ -228,7 +185,7 @@ export default function DottedGridChart({
   return (
     <div style={{ height, overflowX: "auto" }} className="w-full">
       <div
-        className="min-w-[768px] md:min-w-full z-50"
+        className="min-w-[768px]  overflow-hidden md:min-w-full z-50"
         style={{ height: "100%" }}
       >
         <ChartComponent ref={chartRef} data={chartData} options={options} />

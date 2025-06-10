@@ -421,7 +421,7 @@ function createEmptyTimeData(
   })();
 
   // Default value for empty data
-  const defaultValue = 50;
+  const defaultValue = 0;
 
   const timeData = {
     periods: {
