@@ -4,9 +4,9 @@ on:
   schedule:
     - cron: "*/14 * * * *" # every 14 minutes
 
-jobs:
-  ping:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Curl your Render app
-        run: curl -s https://townhall-ng.onrender.com > /dev/null
+# jobs:
+#   ping:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Curl your Render app
+#         run: curl -s https://townhall-ng.onrender.com > /dev/null
