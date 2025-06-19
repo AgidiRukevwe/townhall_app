@@ -23,7 +23,7 @@ export const SearchInput = ({
   };
 
   return (
-    <div className={`w-72  ${className}`}>
+    <div className={`w-96  ${className}`}>
       <form onSubmit={handleSubmit}>
         <div className="relative w-full">
           <div className="absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none">
@@ -33,13 +33,8 @@ export const SearchInput = ({
           <input
             type="search"
             placeholder={placeholder}
-            className={`input-standard w-full bg-[#F0F4F9] focus:bg-white placeholder:text-text-secondary focus:ring-1 focus:ring-surface-brand focus:border-2 transition-all duration-300 ease-in-out ${className}`}
-            style={{
-              paddingLeft: "48px",
-              // backgroundColor: "#F0F4F9",
-              outline: "none",
-              border: "none",
-            }}
+            className={`input-standard w-full bg-red-200 focus:ring-1 focus:ring-surface-brand placeholder:text-text-secondary ${className}`}
+            style={{ paddingLeft: "48px", border: "none" }}
             value={value}
             onChange={(e) => setValue(e.target.value)}
           />

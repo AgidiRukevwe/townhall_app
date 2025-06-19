@@ -172,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </Link>
 
         <div className="flex items-center">
-          {showSearch && (
+          {!showSearch && (
             <SearchInput
               onSearch={onSearch}
               placeholder={searchPlaceholder}
@@ -222,6 +222,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             onSearch={onSearch}
             placeholder={searchPlaceholder}
             initialValue={initialSearchValue}
+            className="bg-red-100"
           />
           <Button
             variant="ghost"
