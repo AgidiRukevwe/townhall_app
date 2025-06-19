@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import EmptyState from "../shared/empty-state";
 import { Loading } from "../shared/loading";
 
-interface SimpleOfficialsListProps {
+interface OfficialsListProps {
   officials: Official[];
   isLoading: boolean;
 }
@@ -18,10 +18,7 @@ interface ScrollState {
   atEnd: boolean;
 }
 
-export function SimpleOfficialsList({
-  officials,
-  isLoading,
-}: SimpleOfficialsListProps) {
+export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
   const searchQuery =
     new URLSearchParams(window.location.search).get("search") || "";
   const scrollRefs = useRef<Record<string, HTMLDivElement | null>>({});
@@ -53,41 +50,6 @@ export function SimpleOfficialsList({
   if (!officials || officials.length === 0)
     return <EmptyState type="not-found" title="No officials found" />;
 
-  // if (searchQuery) {
-  //   return (
-  //     <div className="md:space-y-8 space-y-2">
-  //       <div className="mb-8 rounded-lg">
-  //         <div className="flex gap-x-2 md:gap-x-4 items-start">
-  //           <Link href="/">
-  //             <Icon name="ArrowCircleLeft2" color="#262626" />
-  //           </Link>
-  //           <div>
-  //             <span className="text-lg font-bold">
-  //               Showing results for "{searchQuery}"
-  //             </span>
-  //             <p className="text-text-secondary text-sm mt-0.5">
-  //               Found {officials.length} official
-  //               {officials.length !== 1 ? "s" : ""} matching your search
-  //             </p>
-  //           </div>
-  //         </div>
-  //       </div>
-  //       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-  //         {officials.map((official) => (
-  //           <div
-  //             key={official.id}
-  //             className="cursor-pointer"
-  //             onClick={() => (window.location.href = `/profile/${official.id}`)}
-  //             // onClick={() => navigate(`/profile/${official.id}`)}
-  //           >
-  //             <OfficialCard official={official} compact />
-  //           </div>
-  //         ))}
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   const renderCategory = (category: string, officials: Official[]) => {
     const scrollInfo = scrollState[category] || {
       atStart: true,
@@ -102,14 +64,15 @@ export function SimpleOfficialsList({
           </h2>
           <div className="flex space-x-1">
             <Link href={`/officials/${category.toLowerCase()}`}>
-              <Button variant="ghost" size="sm">
-                See all <Icon name="ArrowRight2" size={16} color="#737373" />
+              <Button variant="outline" size="sm" className="p-3">
+                See all{" "}
+                <Icon name="ArrowCircleRight" size={16} color="#737373" />
               </Button>
             </Link>
           </div>
         </div>
         <div
-          className="flex overflow-x-auto gap-4 md:gap-12 pb-2 hide-scrollbar"
+          className="flex overflow-x-auto gap-x-6 hide-scrollbar"
           ref={(el) => (scrollRefs.current[category] = el)}
         >
           {officials.slice(0, 10).map((official) => (

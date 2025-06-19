@@ -164,13 +164,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const renderDesktopNav = () => (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+    // <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+    <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
       <div className="flex justify-between items-center">
-        <div className={isMobile ? `h-12 w-12 bg-red-200` : " "}>
-          <Link href="/">
-            <THLogo />
-          </Link>
-        </div>
+        <Link href="/">
+          <THLogo />
+        </Link>
 
         <div className="flex items-center">
           {showSearch && (
@@ -238,7 +237,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header
-      className={`bg-white/50 backdrop-blur-2xl border-b fixed top-0 left-0 right-0 z-50 border-gray-200  ${
+      className={`bg-white/50 backdrop-blur-2xl fixed top-0 left-0 right-0 z-50 border-gray-200 transition-all duration-300 ease-in-out  ${
         isScrolling
           ? "opacity-0 -translate-y-4 pointer-events-none"
           : "opacity-100 translate-y-0"

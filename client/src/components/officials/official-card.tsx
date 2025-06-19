@@ -3,6 +3,8 @@ import { Official } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { ArrowRight } from "iconsax-react";
+import { Badge } from "../ui/badge";
+import { cn } from "@/lib/utils";
 
 interface OfficialCardProps {
   official: Official;
@@ -49,41 +51,64 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
     }
   }, [official.imageUrl]);
 
+  const noRating =
+    official.approvalRating === 0 || official.approvalRating === null;
+  const lowRating = official.approvalRating < 20;
+  const midRating =
+    official.approvalRating >= 20 && official.approvalRating < 70;
+  const highRating = official.approvalRating >= 70;
+
+  const badgeClass = cn(
+    "absolute translate-x-1/4 z-50 bottom-3 right-3 translate-y-1/4",
+    highRating &&
+      "bg-[#EBFAEF] border border-[#34C759] hover:bg-[#EBFAEF] hover:border-[#34C759] text-[#34C759]",
+    midRating &&
+      "bg-[#FFFBEA] border border-[#FFC107] hover:bg-[#FFFBEA] hover:border-[#FFC107] text-[#FFC107]",
+    lowRating &&
+      "bg-[#FFF0F0] border border-[#FF3B30] hover:bg-[#FFF0F0] hover:border-[#FF3B30] text-[#FF3B30]",
+    noRating && "hidden"
+  );
+
   return (
-    <div className="overflow-hidden bg-white cursor-pointer">
-      {/* Image with 24px border radius and no black background */}
-      <div className="relative h-32 md:h-48">
-        {!showAvatar ? (
-          <div className="w-full h-full rounded-xl md:rounded-[24px] overflow-hidden bg-[#e6f4ff] relative">
-            <img
-              src={official.imageUrl ?? ""}
-              alt={formattedName}
-              className="absolute w-[140%] h-[140%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-              style={{
-                objectFit: "cover",
-                objectPosition: "center 20%",
-              }}
-            />
-          </div>
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-[#e6f4ff] rounded-xl md:rounded-[24px]">
-            <div className="h-24 w-24 rounded-full bg-white flex items-center justify-center">
-              <span className="text-[#1476FF] text-4xl font-bold">
-                {initials}
-              </span>
+    <div className="group overflow-hidden bg-white cursor-pointer border-[1px] border-[#EAECF0] rounded-2xl md:rounded-[32px] p-6 hover:border-surface-brand hover:bg-surface-brand/10 transition-all duration-300 ease-in-out">
+      <div className="flex items-center justify-center">
+        <div>
+          {!showAvatar ? (
+            <div className="w-32 h-32 rounded-full overflow-hidden bg-transparent relative">
+              <Badge className={badgeClass}>{official.approvalRating}</Badge>
+              <img
+                src={official.imageUrl ?? ""}
+                alt={formattedName}
+                className="absolute w-full h-full rounded-full scale-150 bg-surface-brand/20 left-1/2 top-1/2 brightness-120  grayscale group-hover:grayscale-0 group-hover:border-white group-hover:border-[4px] transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-in-out "
+                style={{
+                  objectFit: "cover",
+                  objectPosition: "center 20%",
+                }}
+              />
             </div>
-          </div>
-        )}
+          ) : (
+            // <div className="w-full h-full flex items-center justify-center bg-[#e6f4ff] rounded-xl md:rounded-[24px]">
+            <div className="w-32 h-32 rounded-xl md:rounded-[24px] overflow-hidden bg-transparent relative">
+              <div className="w-32 h-32 flex rounded-full items-center justify-center overflow-hidden bg-surface-brand/5 group-hover:bg-white relative">
+                <span className="flex  text-[#1476FF] text-4xl font-bold">
+                  {initials}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Official details */}
       <div className="pt-3 md:py-3">
-        <h3 className="font-semibold md:mb-1 text-sm">{formattedName}</h3>
-        <p className="text-text-secondary font-regular md:font-medium text-xs">
+        <h3 className="font-semibold md:mb-1 text-center text-sm truncate">
+          {formattedName}
+        </h3>
+        <p className="text-text-secondary text-center font-regular text-xs truncate">
           {/* {formattedPosition} */}
           {formattedLocation ? `${formattedLocation}` : ""}
         </p>
-
+        {/* 
         {!compact && (
           <div className="mt-4">
             <Link href={`/profile/${official.id}`}>
@@ -96,7 +121,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
               </Button>
             </Link>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

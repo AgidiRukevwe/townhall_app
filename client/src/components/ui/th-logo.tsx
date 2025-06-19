@@ -1,5 +1,5 @@
 import React from "react";
-import thLogo from "../../public/assets/th_logo.png"; // Adjust the path as necessary
+import thLogo from "../../public/assets/th_logo_v2.png"; // Adjust the path as necessary
 import { useBreakpoint } from "@/hooks/use-breakpoints";
 
 export const THLogo = ({ className = "" }: { className?: string }) => {

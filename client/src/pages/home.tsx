@@ -1,4 +1,4 @@
-import { SimpleOfficialsList } from "@/components/officials/simple-officials-list";
+import { OfficialsList } from "@/components/officials/simple-officials-list";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { useEffect, useState } from "react";
@@ -12,6 +12,9 @@ import { handleLogout } from "@/utils/handle-logout";
 import { useSearchHandler } from "@/hooks/use-search";
 import { WelcomeModal } from "@/components/shared/welcome-modal";
 import { useWelcomeModal } from "@/hooks/use-welcome-modal";
+import { Chart } from "iconsax-react";
+import ChartIllustration from "@/public/assets/illustrations/chart-illustration";
+import ProfileModal from "@/components/profile/profile-modal";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -77,7 +80,7 @@ export default function Home() {
   }
 
   return (
-    <main className="pt-20 md:pt-16 flex-1 min-h-screen bg-white">
+    <main className="pt-16 md:pt-16 flex-1 min-h-screen bg-white">
       <Navbar
         onSearch={handleSearch}
         initialSearchValue={searchInput}
@@ -86,14 +89,27 @@ export default function Home() {
         showSearch
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6   ">
+      <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-6  ">
         {/* Main Content */}
+
+        <div className="flex flex-row gap-2 justify-between items-start md:items-center py-8">
+          <div className="flex flex-col gap-3 pb-8 ">
+            <h1 className="font-medium text-4xl">
+              See how your leaders are doing.
+            </h1>
+            <p className="text-text-secondary font-normal">
+              Start by checking who represents you and how they’re performing.
+            </p>
+          </div>
+
+          <ChartIllustration className="w-16 h-16 md:w-32 md:h-32" />
+        </div>
         {isLoading || isRefetching ? (
           <div className="flex flex-col items-center justify-center">
             <Loading message="Fetching officials" />
           </div>
         ) : (
-          <SimpleOfficialsList
+          <OfficialsList
             officials={filteredOfficials}
             isLoading={isLoading || isRefetching}
           />
@@ -104,6 +120,7 @@ export default function Home() {
         onClose={markWelcomeAsSeen}
         onContinue={markWelcomeAsSeen}
       />
+      <ProfileModal officials={filteredOfficials} />
     </main>
   );
 }
