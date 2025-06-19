@@ -74,7 +74,7 @@ export const ChartCard = ({
 
   if (isLoading || !selectedDataset) {
     return (
-      <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
+      <div className=" md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
         {/* Your loading placeholder */}
         <Loading message="Loading data..." />
       </div>
@@ -83,11 +83,11 @@ export const ChartCard = ({
 
   return (
     // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
-    <div className="bg-white w-full mb-6 relative">
+    <div className="bg-white/0 w-full mb-6 relative">
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
-          <Icon name="Chart2" size={24} color="#328bf6" />
-          <span className="text-sm md:text-base font-semibold text-text-primary">
+          <Icon name="Chart2" size={16} color="#BFBFBF" variant="Bold" />
+          <span className="text-sm md:text-base font-medium text-text-primary">
             {chartName}
           </span>
         </div>
@@ -123,8 +123,8 @@ export const ChartCard = ({
           {selectedDataset?.overallRating}%
         </h2>
         <div className="text-sm flex items-center mt-2">
-          <Icon name="ArrowUp2" size={20} color="#4caf50" />
-          <span className="font-medium text-xs text-text-secondary">
+          <Icon name="ArrowUp" size={20} color="#4caf50" />
+          <span className="font-medium text-xs text-[#4caf50]">
             {valueChange}%
           </span>
         </div>

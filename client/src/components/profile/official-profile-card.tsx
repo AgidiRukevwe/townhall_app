@@ -14,6 +14,7 @@ import { CareerTimelineProps } from "./career-timeline";
 import { toTitleCase } from "@/utils/to-title-case";
 import ProfileHeader from "./profile-card-header";
 import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useOfficialModalStore } from "@/store/official-modal-store";
 
 interface OfficialProfileCardProps {
   official: Official;
@@ -29,16 +30,18 @@ export function OfficialProfileCard({
   classname,
 }: OfficialProfileCardProps) {
   const isMobile = useBreakpoint();
+
+  const { isOpen: profileModal, closeModal } = useOfficialModalStore();
   return (
     <div
       className={`flex flex-col items-center text-center mb-12 ${classname}`}
     >
       {/* Profile image */}
-      {!isMobile && <ProfileHeader official={official} />}
+      {!isMobile && !profileModal && <ProfileHeader official={official} />}
 
       {/* Profile information in accordions */}
 
-      <div className="w-full max-w-md md:mt-4">
+      <div className="w-full  md:mt-4">
         <CollapsibleSection icon="Box" title="Bio">
           <p className="text-text-secondary text-sm text-left">
             You can run the following SQL query in the Supabase SQL editor to

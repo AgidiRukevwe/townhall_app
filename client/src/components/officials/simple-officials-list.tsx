@@ -7,6 +7,8 @@ import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
 import EmptyState from "../shared/empty-state";
 import { Loading } from "../shared/loading";
+import { useOfficialModalStore } from "@/store/official-modal-store";
+import { useBreakpoint } from "@/hooks/use-breakpoints";
 
 interface OfficialsListProps {
   officials: Official[];
@@ -25,8 +27,12 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
   const [scrollState, setScrollState] = useState<Record<string, ScrollState>>(
     {}
   );
+  //trigger profile Modal when in desktp mode
+  const { openModal: openProfileModal } = useOfficialModalStore();
 
-  const navigate = useLocation();
+  const isMobile = useBreakpoint();
+
+  const [, navigate] = useLocation();
 
   const getCategory = (position: string) => {
     if (/Senator|Senate/i.test(position)) return "Senate";
@@ -79,7 +85,12 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
             <div
               key={official.id}
               className="md:h-full w-[170px] md:min-w-[200px] md:w-[100px] flex-shrink-0 cursor-auto"
-              onClick={() => (window.location.href = `/profile/${official.id}`)}
+              // onClick={() => (window.location.href = `/profile/${official.id}`)}
+              onClick={
+                isMobile
+                  ? () => navigate(`/profile/${official.id}`)
+                  : () => openProfileModal(official.id)
+              }
             >
               <OfficialCard official={official} compact />
             </div>

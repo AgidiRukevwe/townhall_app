@@ -1,4 +1,7 @@
 import type { Config } from "tailwindcss";
+import animate from "tailwindcss-animate";
+import typography from "@tailwindcss/typography";
+import scrollbarHide from "tailwind-scrollbar-hide";
 
 export default {
   darkMode: ["class"],
@@ -104,5 +107,16 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+
+  plugins: [
+    animate,
+    typography,
+    scrollbarHide,
+    // Add any other plugins you need here
+  ],
+  // plugins: [
+  //   require("tailwindcss-animate"),
+  //   require("@tailwindcss/typography"),
+  //   require("tailwind-scrollbar-hide"),
+  // ],
 } satisfies Config;

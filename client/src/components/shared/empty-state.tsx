@@ -29,6 +29,7 @@ type EmptyStateProps = {
   title?: string;
   description?: string;
   showRetry?: boolean;
+  showButton?: boolean;
   onRetry?: () => void;
   retryLabel?: string;
   customAction?: {
@@ -45,6 +46,7 @@ function EmptyState({
   retryLabel,
   onRetry,
   customAction,
+  showButton = true,
 }: EmptyStateProps) {
   const navigate = useNavigate();
 
@@ -79,7 +81,7 @@ function EmptyState({
       );
     }
 
-    if (showRetry && onRetry) {
+    if (showRetry && showButton && onRetry) {
       return (
         <Button size="sm" onClick={() => window.location.reload()}>
           {retryLabel}
@@ -87,11 +89,13 @@ function EmptyState({
       );
     }
 
-    return (
-      <Button size="sm" onClick={() => navigate("/")}>
-        Go home
-      </Button>
-    );
+    if (showButton) {
+      return (
+        <Button size="sm" onClick={() => navigate("/")}>
+          Go home
+        </Button>
+      );
+    }
   };
 
   return (

@@ -14,7 +14,8 @@ import { WelcomeModal } from "@/components/shared/welcome-modal";
 import { useWelcomeModal } from "@/hooks/use-welcome-modal";
 import { Chart } from "iconsax-react";
 import ChartIllustration from "@/public/assets/illustrations/chart-illustration";
-import ProfileModal from "@/components/profile/profile-modal";
+import ProfileModal from "@/components/profile/views/profile-modal";
+import { useOfficialModalStore } from "@/store/official-modal-store";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -40,11 +41,15 @@ export default function Home() {
 
   const { user } = useAuth();
 
+  const { selectedOfficialId } = useOfficialModalStore();
+
   // Get username or use default
   const userName: string =
     user && user !== null && typeof user === "object" && "username" in user
       ? (user.username as string)
       : "";
+
+  const { isOpen, closeModal } = useOfficialModalStore();
 
   useEffect(() => {
     setSearchInput(urlSearchQuery);
@@ -120,7 +125,8 @@ export default function Home() {
         onClose={markWelcomeAsSeen}
         onContinue={markWelcomeAsSeen}
       />
-      <ProfileModal officials={filteredOfficials} />
+
+      <ProfileModal open={isOpen} onOpenChange={closeModal} />
     </main>
   );
 }
