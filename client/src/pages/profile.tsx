@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth.tsx";
 import { queryClient } from "@/lib/queryClient";
 import { OfficialProfileCard } from "@/components/profile/official-profile-card";
 import {

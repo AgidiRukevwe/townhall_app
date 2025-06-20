@@ -1,5 +1,6 @@
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { toTitleCase } from "@/utils/to-title-case";
+import { truncateText } from "@/utils/truncate-text";
 import { Official } from "@shared/schema";
 import React from "react";
 
@@ -13,7 +14,7 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
   return (
     <>
       {!profileModal ? (
-        <div className="flex flex-row md:flex-col items-center gap-x-2 bg-red-100">
+        <div className="flex flex-row md:flex-col items-center gap-x-2 ">
           {official.imageUrl ? (
             <div className="w-24 h-24 bg-red- md:w-40 md:h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
               <img
@@ -31,11 +32,11 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
           )}
 
           {/* Official name and position */}
-          <div>
+          <div className="">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">
               {toTitleCase(official.name)}
             </h2>
-            <p className="text-text-secondary mb-6 text-sm">
+            <p className="text-text-secondary mb-6 text-sm truncate">
               {official.location}
             </p>
           </div>
@@ -53,7 +54,7 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
           ) : (
             <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
               <span className="text-[#1476FF] text-2xl font-bold">
-                {official.name}
+                {truncateText(official.name, 15)}
               </span>
             </div>
           )}
@@ -63,8 +64,9 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
             <h2 className="text-lg md:text-xl font-semibold text-text-primary">
               {toTitleCase(official.name)}
             </h2>
-            <p className="text-text-secondary mb-6 text-sm">
-              {official.location}
+            <p className="text-text-secondary mb-6 text-sm truncate">
+              {truncateText(official.location, 35)}
+              {/* {official.location} */}
             </p>
           </div>
         </div>

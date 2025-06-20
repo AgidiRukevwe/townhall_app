@@ -17,6 +17,8 @@ import ChartIllustration from "@/public/assets/illustrations/chart-illustration"
 import ProfileModal from "@/components/profile/views/profile-modal";
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { RatingModal } from "@/components/rating/rating-modal-updated";
+import { useRatingModalStore } from "@/store/rating-store";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -43,7 +45,7 @@ export default function Home() {
 
   const { user } = useAuth();
 
-  const { selectedOfficialId } = useOfficialModalStore();
+  const { official } = useSelectedOfficialStore();
 
   // Get username or use default
   const userName: string =
@@ -52,6 +54,11 @@ export default function Home() {
       : "";
 
   const { isOpen, closeModal } = useOfficialModalStore();
+  const {
+    openModal: openRatingModal,
+    isOpen: isRatingModalOpen,
+    closeModal: closeRatingModal,
+  } = useRatingModalStore();
 
   useEffect(() => {
     setSearchInput(urlSearchQuery);
@@ -129,8 +136,9 @@ export default function Home() {
       />
 
       <RatingModal
-        open={openTestRatingModal}
-        onOpenChange={setTestRatingModal}
+        open={isRatingModalOpen}
+        onOpenChange={closeRatingModal}
+        sectors={official?.sectors ?? []}
       />
 
       <ProfileModal open={isOpen} onOpenChange={closeModal} />

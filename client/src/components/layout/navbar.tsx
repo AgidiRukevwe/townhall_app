@@ -7,6 +7,7 @@ import { useBreakpoint } from "@/hooks/use-breakpoints";
 import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
+import { useAuth } from "@/hooks/use-auth";
 
 interface NavbarProps {
   onSearch?: (query: string) => void;
@@ -29,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   showBackButton,
   onLogout = () => {},
 }) => {
+  const { user } = useAuth();
   const isMobile = useBreakpoint();
   const isScrolling = useScrollFade(1000); // fade in after 150ms of inactivity
 
@@ -40,6 +42,8 @@ export const Navbar: React.FC<NavbarProps> = ({
     navigate("/");
   };
 
+  console.log("Navbar rendered with user:", user);
+
   const renderDesktopNav = () => (
     // <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
     <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
@@ -48,15 +52,25 @@ export const Navbar: React.FC<NavbarProps> = ({
           <THLogo />
         </Link>
 
-        <div className="flex items-center">
-          {!showSearch && (
+        <div className="flex items-center gap-4">
+          {showSearch && (
             <SearchInput
               onSearch={onSearch}
               placeholder={searchPlaceholder}
               initialValue={initialSearchValue}
             />
           )}
-          <UserAvatar username={username} className="profile-search-spacing" />
+          {user ? (
+            <Button variant="default" size="sm">
+              <Icon name="Google" size={16} color="#f5f5f5" variant="Bold" />
+              Sign in with Google
+            </Button>
+          ) : (
+            <UserAvatar
+              username={username}
+              className="profile-search-spacing"
+            />
+          )}
         </div>
       </div>
     </div>

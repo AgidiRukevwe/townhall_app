@@ -143,7 +143,7 @@ export default function DottedGridChart({
       if (!chartArea) return;
 
       ctx.save();
-      ctx.fillStyle = "#c4c4c4";
+      ctx.fillStyle = "#D9D9D9";
       const xStep = chartArea.width / 45;
       const yStep = chartArea.height / 20;
       for (let x = chartArea.left; x <= chartArea.right; x += xStep) {

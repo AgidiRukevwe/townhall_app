@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth.tsx";
 import { Sector } from "@shared/schema";
 import { Icon } from "../ui/icon";
+import { useRatingModalStore } from "@/store/rating-store";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
 
 interface RatingModalProps {
   open: boolean;
@@ -66,8 +68,6 @@ const mockSectors: Sector[] = [
 ];
 
 export function RatingModal({
-  open,
-  onOpenChange,
   officialId = "mock-official",
   officialName = "Pres. Bola Tinubu",
   officialTitle = "President",
@@ -89,8 +89,11 @@ export function RatingModal({
   const { mutate: submitRating, isPending } = useSubmitRating();
   const { toast } = useToast();
   const { user, isLoading } = useAuth();
+  const { isOpen: open, closeModal } = useRatingModalStore();
 
-  // Initialize sector ratings when modal opens
+  const { official } = useSelectedOfficialStore();
+
+  // Initialize sector ratings when modal opens`
   useEffect(() => {
     if (open && sectors.length > 0) {
       const initialRatings: Record<string, number> = {};
@@ -105,42 +108,6 @@ export function RatingModal({
   const handleRatingSelect = (sectorId: string, value: number) => {
     setSectorRatings((prev) => ({ ...prev, [sectorId]: value }));
   };
-
-  //   const handleSubmit = () => {
-  //     const sectorRatingsArray = Object.entries(sectorRatings).map(
-  //       ([sectorId, rating]) => ({ sectorId, rating })
-  //     );
-
-  //     try {
-  //       submitRating(
-  //         { officialId, overallRating, sectorRatings: sectorRatingsArray },
-  //         {
-  //           onSuccess: () => {
-  //             toast({
-  //               title: "Rating submitted",
-  //               description: `Your rating for ${officialName} has been recorded.`,
-  //             });
-  //             resetModal();
-  //           },
-  //           onError: (error) => {
-  //             toast({
-  //               title: "Error submitting rating",
-  //               description: error.message,
-  //               variant: "destructive",
-  //             });
-  //           },
-  //         }
-  //       );
-  //     } catch (error) {
-  //       toast({
-  //         title: "Error submitting rating",
-  //         description:
-  //           "An unexpected error occurred while submitting your rating.",
-  //         variant: "destructive",
-  //       });
-  //       return;
-  //     }
-  //   };
 
   const handleSubmit = () => {
     const sectorRatingsArray = Object.entries(sectorRatings).map(
@@ -157,12 +124,16 @@ export function RatingModal({
 
     console.log(
       "Submitting ratings",
-      officialId,
+      official?.id,
       overallRating,
       sectorRatingsArray
     );
     submitRating(
-      { officialId, overallRating, sectorRatings: sectorRatingsArray },
+      {
+        officialId: official?.id ?? "",
+        overallRating,
+        sectorRatings: sectorRatingsArray,
+      },
       {
         onSuccess: () => {
           toast({
@@ -209,6 +180,7 @@ export function RatingModal({
 
   const resetModal = () => {
     // onOpenChange(false)
+    closeModal();
     setTimeout(() => {
       setCurrentStep(0);
       setSectorRatings({});
@@ -220,7 +192,7 @@ export function RatingModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={closeModal}>
       <DialogContent
         showClose={false}
         className="w-auto flex flex-col h-auto  bg-surface-secondary border-2 border-white rounded-3xl p-0 gap-0 overflow-y-auto hide-scrollbar"

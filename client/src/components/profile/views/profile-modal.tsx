@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth } from "@/hooks/use-auth.tsx";
 import { queryClient } from "@/lib/queryClient";
 import { OfficialProfileCard } from "@/components/profile/official-profile-card";
 import {
@@ -34,6 +34,8 @@ import { handleLogout } from "@/utils/handle-logout";
 import { useSearchHandler } from "@/hooks/use-search";
 import { Official } from "@shared/schema";
 import { useOfficialModalStore } from "@/store/official-modal-store";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
+import { useRatingModalStore } from "@/store/rating-store";
 
 interface ProfileModalProps {
   open: boolean;
@@ -66,7 +68,8 @@ export default function ProfileModal({
 
   const { toast } = useToast();
   const { user } = useAuth();
-  const isMobile = useBreakpoint();
+
+  const { openModal: openRatingModal } = useRatingModalStore();
 
   // Get username or use default
   const userName: string =
@@ -104,6 +107,13 @@ export default function ProfileModal({
     isLoading,
     error,
   } = useOfficialDetails(selectedOfficialId ?? "");
+
+  const { setOfficial } = useSelectedOfficialStore();
+  useEffect(() => {
+    if (official) {
+      setOfficial(official as Official);
+    }
+  }, [official, setOfficial]);
 
   const approvaDataSet: DataMap = {
     overallRating: approvalRating,
@@ -182,7 +192,7 @@ export default function ProfileModal({
           <ProfileHeader official={official} />
           <Button
             size="sm"
-            onClick={() => setRatingModalOpen(true)}
+            onClick={openRatingModal}
             className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
           >
             Rate this leader

@@ -119,15 +119,15 @@ export const ChartCard = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-2xl md:text-5xl font-medium md:font-medium text-gray-900">
+        <h2 className="text-xl md:text-5xl font-medium md:font-medium text-gray-900">
           {selectedDataset?.overallRating}%
         </h2>
-        <div className="text-sm flex items-center mt-2">
+        {/* <div className="text-sm flex items-center mt-2">
           <Icon name="ArrowUp" size={20} color="#4caf50" />
           <span className="font-medium text-xs text-[#4caf50]">
             {valueChange}%
           </span>
-        </div>
+        </div> */}
       </div>
 
       <div className="h-[400px] w-full">
