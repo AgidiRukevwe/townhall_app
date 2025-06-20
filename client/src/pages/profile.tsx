@@ -8,6 +8,7 @@ import {
 } from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
 import { RatingModal } from "@/components/rating/rating-modal";
+import { RatingModal as TestRatingModal } from "@/components/rating/rating-modal-updated";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
@@ -35,6 +36,8 @@ import { useSearchHandler } from "@/hooks/use-search";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
+  const [openTestRatingModal, setTestRatingModal] = useState(true);
+
   // State to track the selected period and sector
   const [selectedApprovalRatingPeriod, setSelectedApprovalRatingPeriod] =
     useState<Granularity>("1 Dy");
@@ -189,6 +192,13 @@ export default function Profile() {
         officialId={official.id}
         officialName={official.name}
         sectors={official.sectors}
+      />
+
+      <TestRatingModal
+        open={openTestRatingModal}
+        onOpenChange={setTestRatingModal}
+        sectors={official.sectors}
+        officialId={official.id}
       />
       {/* {isMobile && (
         <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-4 z-50 backdrop-blur-md bg-white/70">

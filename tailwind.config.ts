@@ -40,7 +40,7 @@ export default {
           secondary: "#737373", // Secondary text (Medium gray)
           tertiary: "#BFBFBF", // Tertiary text (Light gray)
           inverse: "#FFFFFF", // Inverse text (For dark backgrounds)
-          brand: "#32D583", // Brand color
+          brand: "#007aFF", // Brand color
         },
         surface: {
           DEFAULT: "#FFFFFF",
@@ -50,6 +50,7 @@ export default {
           brand: "#007AFF",
           brand_secondary: "#3395FF",
         },
+
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",

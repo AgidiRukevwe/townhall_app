@@ -60,6 +60,13 @@ export function RatingModal({
       ([sectorId, rating]) => ({ sectorId, rating })
     );
 
+    console.log(
+      "Submitting ratings",
+      officialId,
+      overallRating,
+      sectorRatingsArray
+    );
+
     submitRating(
       { officialId, overallRating, sectorRatings: sectorRatingsArray },
       {
@@ -107,7 +114,7 @@ export function RatingModal({
               className="items-center absolute left-4 top-4 cursor-pointer"
             />
           )}
-          {/* Dotted Progress Bar */}
+
           {user && (
             <div className="flex justify-center mb-6">
               <div className="flex items-center gap-1">
@@ -130,45 +137,6 @@ export function RatingModal({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : (
-          // : !user ? (
-          //   // Not logged in
-          //   <>
-          //     <DialogTitle className="text-center text-xl mb-4">
-          //       Authentication Required
-          //     </DialogTitle>
-          //     <DialogDescription className="text-center mb-6">
-          //       Please log in to rate public officials and contribute to
-          //       transparency.
-          //     </DialogDescription>
-          //     <div className="flex flex-col items-center justify-center py-4">
-          //       <LogIn className="h-12 w-12 text-primary mb-4" />
-          //       <p className="text-center text-sm text-gray-600 mb-6">
-          //         Your ratings help other citizens make informed decisions and
-          //         hold officials accountable.
-          //       </p>
-          //     </div>
-          //     <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0">
-          //       <Button
-          //         variant="outline"
-          //         onClick={resetModal}
-          //         className="w-full sm:w-auto"
-          //       >
-          //         Cancel
-          //       </Button>
-          //       <Button
-          //         className="w-full sm:w-auto"
-          //         onClick={() => {
-          //           resetModal();
-          //           window.location.href = "/auth";
-          //         }}
-          //       >
-          //         Log in
-          //       </Button>
-          //     </DialogFooter>
-          //   </>
-          // )
-
-          // Authenticated Rating Steps
           <>
             {step === 1 ? (
               <>

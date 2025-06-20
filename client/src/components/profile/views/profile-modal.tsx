@@ -163,12 +163,12 @@ export default function ProfileModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-end">
-      {/* Overlay background */}
+      {/* Overlay background */}``
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={closeProfileModal}
       />
-      <div className="absolute right-5 top-5 h-[95%] w-[40%] z-50 bg-white/90 backdrop-blur-lg border-2 border-white rounded-3xl p-6 overflow-y-auto scrollbar-hide">
+      <div className="absolute right-5 top-5 h-[95%] w-[40%] z-50 bg-white backdrop-blur-lg border-2 border-white rounded-3xl p-6 overflow-y-auto hide-scrollbar scrollar-hide scrollbar-none">
         <div className="flex flex-row justify-between items-center pb-6">
           <h4>Official's profile</h4>{" "}
           <Icon
@@ -181,6 +181,7 @@ export default function ProfileModal({
         <div className="flex flex-row justify-between items-center">
           <ProfileHeader official={official} />
           <Button
+            size="sm"
             onClick={() => setRatingModalOpen(true)}
             className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
           >

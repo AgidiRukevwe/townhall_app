@@ -16,6 +16,7 @@ import { Chart } from "iconsax-react";
 import ChartIllustration from "@/public/assets/illustrations/chart-illustration";
 import ProfileModal from "@/components/profile/views/profile-modal";
 import { useOfficialModalStore } from "@/store/official-modal-store";
+import { RatingModal } from "@/components/rating/rating-modal-updated";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -26,6 +27,7 @@ export default function Home() {
 
   const { searchInput, handleSearch, setSearchInput } = useSearchHandler();
   const { showWelcome, markWelcomeAsSeen } = useWelcomeModal();
+  const [openTestRatingModal, setTestRatingModal] = useState(true);
 
   // Use our enhanced useOfficials hook with search parameter
   const {
@@ -126,7 +128,19 @@ export default function Home() {
         onContinue={markWelcomeAsSeen}
       />
 
+      <RatingModal
+        open={openTestRatingModal}
+        onOpenChange={setTestRatingModal}
+      />
+
       <ProfileModal open={isOpen} onOpenChange={closeModal} />
+
+      {/* <ProfileModal
+        open={isOpen}
+        onOpenChange={closeModal}
+        sectors={official.sectors}
+        officialId={official.id}
+      /> */}
     </main>
   );
 }
