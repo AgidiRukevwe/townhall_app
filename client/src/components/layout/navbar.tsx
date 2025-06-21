@@ -48,10 +48,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { loginWithGoogle, user, loading } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, [user, navigate]);
+    console.log("Avatar URL:", user);
+  }, [user]);
 
   const handleGoogleSignIn = async () => {
     try {
@@ -84,10 +82,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               Sign in
             </Button>
           ) : (
-            <UserAvatar
-              username={username}
-              className="profile-search-spacing"
-            />
+            <UserAvatar className="profile-search-spacing" />
           )}
         </div>
       </div>
@@ -118,10 +113,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   aria-label="Open search"
                 />
               )}
-              <UserAvatar
-                username={username}
-                className="profile-search-spacing"
-              />
+              <UserAvatar className="profile-search-spacing" />
             </div>
           </div>
         </div>

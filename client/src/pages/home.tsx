@@ -2,7 +2,7 @@ import { OfficialsList } from "@/components/officials/simple-officials-list";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { useEffect, useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+// import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { queryClient } from "@/lib/queryClient";
 import { Navbar } from "@/components/layout/navbar";
@@ -19,6 +19,9 @@ import { useOfficialModalStore } from "@/store/official-modal-store";
 import { RatingModal } from "@/components/rating/rating-modal-updated";
 import { useRatingModalStore } from "@/store/rating-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
+import { useAuthStore } from "@/store/auth-store";
+import { useGoogleAuth } from "@/hooks/auth-hooks/use-google-auth";
+import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -44,14 +47,27 @@ export default function Home() {
   });
 
   const { user } = useAuth();
+  //test
 
   const { official } = useSelectedOfficialStore();
+
+  const { initialize } = useAuthStore();
+  const { handleOAuthRedirect } = useGoogleAuth();
+  useEffect(() => {
+    handleOAuthRedirect();
+    initialize();
+    // console.log(user?.avatar_url);
+  }, [user?.avatar_url]);
 
   // Get username or use default
   const userName: string =
     user && user !== null && typeof user === "object" && "username" in user
       ? (user.username as string)
       : "";
+
+  useEffect(() => {
+    console.log("Avatar URL from home:", user?.avatar_url);
+  }, [user]);
 
   const { isOpen, closeModal } = useOfficialModalStore();
   const {

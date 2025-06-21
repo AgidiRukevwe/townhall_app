@@ -13,8 +13,9 @@ import {
 import { useSubmitRating } from "@/hooks/use-ratings";
 import { useToast } from "@/hooks/use-toast";
 import { Sector } from "@shared/schema";
-import { useAuth } from "@/hooks/use-auth.tsx";
+// import { useAuth } from "@/hooks/use-auth.tsx";
 import { Icon } from "../ui/icon";
+import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
 
 interface RatingModalProps {
   open: boolean;
@@ -38,7 +39,7 @@ export function RatingModal({
   );
   const { mutate: submitRating, isPending } = useSubmitRating();
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuth();
 
   // Initialize sector ratings when modal opens
   useEffect(() => {
@@ -132,7 +133,7 @@ export function RatingModal({
         </DialogHeader>
 
         {/* Loading State */}
-        {isLoading ? (
+        {loading ? (
           <div className="flex items-center justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>

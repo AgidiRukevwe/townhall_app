@@ -23,6 +23,7 @@ export function useAuth() {
             deviceId: supabaseUser.user_metadata?.device_id ?? "unknown",
             anonymous: !supabaseUser.email,
             email: supabaseUser.email ?? "",
+            username: supabaseUser.user_metadata.username,
           });
         } else if (event === "SIGNED_OUT") {
           setUser(null);
@@ -46,7 +47,14 @@ export function useAuth() {
     loginAnonymously: anonymous.loginAnonymously,
     logout: async () => {
       await supabase.auth.signOut();
-      setUser(null);
+      // setUser(null);
+
+      // useAuthStore.setState({
+      //   user: null,
+      //   initialized: false,
+      //   loading: false,
+      // });
+      // localStorage.removeItem("auth-storage");
     },
   };
 }

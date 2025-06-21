@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/auth-store";
+import { getDeviceId } from "@/lib/fingerprint";
 
 export function useGoogleAuth() {
   const [loading, setLoading] = useState(false);
@@ -47,18 +48,19 @@ export function useGoogleAuth() {
     if (session) {
       const supaUser = session.user;
 
+      const { full_name, picture, email, provider_id, name } =
+        supaUser.user_metadata;
+
       // Prepare user data
       const userPayload = {
         id: supaUser.id,
-        device_id: supaUser.user_metadata?.device_id ?? "google",
-        username:
-          supaUser.user_metadata?.full_name ??
-          supaUser.email?.split("@")[0] ??
-          "unknown",
-        provider: "google",
-        email: supaUser.email ?? "",
+        device_id: (await getDeviceId()) ?? "google",
+        username: full_name ?? name ?? email?.split("@")[0] ?? "unknown",
+        provider: provider_id ?? "google",
+        email: email ?? "",
         password: null, // Google users won't have this
         is_anonymous: false,
+        avatar_url: picture,
       };
 
       // Upsert into `users` table
@@ -77,6 +79,9 @@ export function useGoogleAuth() {
         id: userPayload.id,
         anonymous: false,
         deviceId: userPayload.device_id,
+        avatar_url: userPayload.avatar_url,
+        username: userPayload.username,
+        email: userPayload.username,
       });
     }
   };

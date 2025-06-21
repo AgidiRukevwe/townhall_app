@@ -13,14 +13,9 @@ function TestPage() {
   const [location, navigate] = useLocation();
 
   useEffect(() => {
-    // handleOAuthRedirect();
-    initialize();
-  }, []);
-
-  useEffect(() => {
     if (user) {
-      navigate("/");
-      console.log("this is user info from the store: ", user);
+      // navigate("/");
+      console.log(user.username, "is logged in");
     }
   }, [user, navigate]);
 

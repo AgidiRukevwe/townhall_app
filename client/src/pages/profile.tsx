@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
-import { useAuth } from "@/hooks/use-auth.tsx";
+// import { useAuth } from "@/hooks/use-auth.tsx";
 import { queryClient } from "@/lib/queryClient";
 import { OfficialProfileCard } from "@/components/profile/official-profile-card";
 import {
@@ -33,6 +33,7 @@ import ProfileDesktopView from "@/components/profile/views/desktop-view";
 import { char } from "drizzle-orm/mysql-core";
 import { handleLogout } from "@/utils/handle-logout";
 import { useSearchHandler } from "@/hooks/use-search";
+import { useAuthStore } from "@/store/auth-store";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
@@ -48,7 +49,7 @@ export default function Profile() {
   const { data: official, isLoading, error } = useOfficialDetails(id);
 
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user } = useAuthStore();
   const isMobile = useBreakpoint();
 
   // Get username or use default

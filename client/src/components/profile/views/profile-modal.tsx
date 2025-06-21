@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
-import { useAuth } from "@/hooks/use-auth.tsx";
+// import { useAuth } from "@/hooks/use-auth.tsx";
 import { queryClient } from "@/lib/queryClient";
 import { OfficialProfileCard } from "@/components/profile/official-profile-card";
 import {
@@ -36,6 +36,7 @@ import { Official } from "@shared/schema";
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
 import { useRatingModalStore } from "@/store/rating-store";
+import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
 
 interface ProfileModalProps {
   open: boolean;

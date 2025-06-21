@@ -13,7 +13,7 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 export async function anonymousLogin(deviceId: string) {
   // Sign in anonymously by using device ID as an identifier
   const { data, error } = await supabase.auth.signInWithPassword({
-    email: `${deviceId}@anonymous.townhall.ng`,
+    email: `${deviceId}@anon.townhall.ng`,
     password: deviceId,
   });
 
@@ -27,7 +27,7 @@ export async function anonymousLogin(deviceId: string) {
 
 async function signUpAnonymous(deviceId: string) {
   const { data, error } = await supabase.auth.signUp({
-    email: `${deviceId}@anonymous.townhall.ng`,
+    email: `${deviceId}@anon.townhall.ng`,
     password: deviceId,
     options: {
       data: {

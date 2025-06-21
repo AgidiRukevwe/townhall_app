@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useSubmitRating } from "@/hooks/use-ratings";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth.tsx";
+// import { useAuth } from "@/hooks/use-auth.tsx";
 import { Sector } from "@shared/schema";
 import { Icon } from "../ui/icon";
 import { useRatingModalStore } from "@/store/rating-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
+import { useAuthStore } from "@/store/auth-store";
 
 interface RatingModalProps {
   open: boolean;
@@ -88,7 +89,7 @@ export function RatingModal({
 
   const { mutate: submitRating, isPending } = useSubmitRating();
   const { toast } = useToast();
-  const { user, isLoading } = useAuth();
+  const { user, loading } = useAuthStore();
   const { isOpen: open, closeModal } = useRatingModalStore();
 
   const { official } = useSelectedOfficialStore();

@@ -6,6 +6,7 @@ import { storage } from "./storage";
 import { ratingSchema } from "../shared/schema";
 import { z } from "zod";
 import { setupAuth } from "./auth";
+import { authenticate } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication routes
@@ -280,17 +281,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/ratings", async (req, res) => {
+  app.post("/api/ratings", authenticate, async (req, res) => {
     try {
-      // Check if user is authenticated
-      if (!req.isAuthenticated()) {
-        return res.status(401).json({ message: "Authentication required" });
+      console.log("this is the request", req);
+
+      if (!req.user) {
+        return res.status(401).json({ message: "User not authenticated" });
       }
+      const userId = req?.user?.id;
 
-      // Use the authenticated user's ID
-      const userId = req.user.id;
-
-      // Validate request body
       const ratingPayloadSchema = z.object({
         officialId: z.string().uuid(),
         overallRating: z.number().min(0).max(100),
@@ -302,35 +301,76 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ),
       });
 
-      const validatedData = ratingPayloadSchema.parse({
-        officialId: req.body.officialId,
-        overallRating: req.body.overallRating,
-        sectorRatings: req.body.sectorRatings,
-      });
+      const validatedData = ratingPayloadSchema.parse(req.body);
 
-      // Submit rating with userId from authenticated user
       const result = await storage.submitRating({
         ...validatedData,
         userId,
       });
 
-      console.log(
-        `Rating submitted for official ${validatedData.officialId} by user ${userId}`
-      );
-
       res.status(201).json(result);
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({
-          message: "Invalid rating data",
-          errors: error.errors,
-        });
+        return res
+          .status(400)
+          .json({ message: "Invalid data", errors: error.errors });
       }
-
-      console.error("Error submitting rating:", error);
-      res.status(500).json({ message: "Failed to submit rating" });
+      console.error("Submit rating error:", error);
+      res.status(500).json({ message: "Internal Server Error" });
     }
   });
+
+  // app.post("/api/ratings", async (req, res) => {
+  //   try {
+  //     // Check if user is authenticated
+  //     if (!req.isAuthenticated()) {
+  //       return res.status(401).json({ message: "Authentication required" });
+  //     }
+
+  //     // Use the authenticated user's ID
+  //     const userId = req.user.id;
+
+  //     // Validate request body
+  //     const ratingPayloadSchema = z.object({
+  //       officialId: z.string().uuid(),
+  //       overallRating: z.number().min(0).max(100),
+  //       sectorRatings: z.array(
+  //         z.object({
+  //           sectorId: z.string().uuid(),
+  //           rating: z.number().min(0).max(100),
+  //         })
+  //       ),
+  //     });
+
+  //     const validatedData = ratingPayloadSchema.parse({
+  //       officialId: req.body.officialId,
+  //       overallRating: req.body.overallRating,
+  //       sectorRatings: req.body.sectorRatings,
+  //     });
+
+  //     // Submit rating with userId from authenticated user
+  //     const result = await storage.submitRating({
+  //       ...validatedData,
+  //       userId,
+  //     });
+
+  //     console.log(
+  //       `Rating submitted for official ${validatedData.officialId} by user ${userId}`
+  //     );
+
+  //     res.status(201).json(result);
+  //   } catch (error) {
+  //     if (error instanceof z.ZodError) {
+  //       return res.status(400).json({
+  //         message: "Invalid rating data",
+  //         errors: error.errors,
+  //       });
+  //     }
+
+  //     console.error("Error submitting rating:", error);
+  //     res.status(500).json({ message: "Failed to submit rating" });
+  //   }
+  // });
 
   // Petitions placeholder route
   app.post("/api/petitions", async (req, res) => {

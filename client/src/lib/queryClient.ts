@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { supabase } from "./supabase";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -6,9 +7,9 @@ async function throwIfResNotOk(res: Response) {
     try {
       const textResponse = await res.text();
       errorText = textResponse || res.statusText;
-      
+
       // Try to parse as JSON if it looks like JSON
-      if (textResponse.startsWith('{') && textResponse.endsWith('}')) {
+      if (textResponse.startsWith("{") && textResponse.endsWith("}")) {
         try {
           const jsonError = JSON.parse(textResponse);
           if (jsonError.message) {
@@ -23,7 +24,7 @@ async function throwIfResNotOk(res: Response) {
       errorText = res.statusText;
       console.error("Failed to get error text from response:", e);
     }
-    
+
     console.error(`API Error: ${res.status} - ${errorText}`);
     throw new Error(`${res.status}: ${errorText}`);
   }
@@ -33,10 +34,28 @@ export async function apiRequest(
   method: string,
   url: string,
   data?: unknown | undefined,
+  headers: Record<string, string> = {}
 ): Promise<Response> {
+  const {
+    data: { session },
+    error,
+  } = await supabase.auth.getSession();
+
+  // if (error || !session) {
+  //   throw new Error("Could not get Supabase session");
+  // }
+
+  // const accessToken = session.access_token;
+
+  // ///////////////////////////////////
   const res = await fetch(url, {
     method,
-    headers: data ? { "Content-Type": "application/json" } : {},
+    headers: data ? { "Content-Type": "application/json", ...headers } : {},
+    // headers: {
+    //   Authorization: `Bearer ${accessToken}`,
+    //   "Content-Type": "application/json",
+    // },
+
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
