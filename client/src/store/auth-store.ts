@@ -1,11 +1,12 @@
-import { create } from 'zustand';
-import { getDeviceId, getUserIP } from '@/lib/fingerprint';
-import { anonymousLogin, createUserProfile, getSession } from '@/lib/supabase';
+import { create } from "zustand";
+import { getDeviceId, getUserIP } from "@/lib/fingerprint";
+import { anonymousLogin, createUserProfile, getSession } from "@/lib/supabase";
 
 interface User {
   id: string;
   anonymous: boolean;
   deviceId: string;
+  email?: string;
 }
 
 interface AuthState {
@@ -21,57 +22,127 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
   loading: true,
   initialized: false,
-  
+
   setUser: (user) => set({ user }),
   setLoading: (loading) => set({ loading }),
-  
+
   initialize: async () => {
     if (get().initialized) return;
-    
+
     try {
-      // Check for existing session
       const { session } = await getSession();
-      
+
       if (session) {
+        const supaUser = session.user;
+        const provider = supaUser.app_metadata?.provider;
+
+        // If it's Google login
+        if (provider === "google") {
+          const deviceId = supaUser.user_metadata?.device_id ?? "google";
+
+          set({
+            user: {
+              id: supaUser.id,
+              anonymous: false,
+              deviceId,
+              email: supaUser.email ?? "",
+            },
+            loading: false,
+            initialized: true,
+          });
+
+          return;
+        }
+
+        // Else, treat as anonymous
         set({
           user: {
-            id: session.user.id,
+            id: supaUser.id,
             anonymous: true,
-            deviceId: session.user.user_metadata.device_id || 'unknown'
+            deviceId: supaUser.user_metadata.device_id || "unknown",
+            email: supaUser.email ?? "",
           },
           loading: false,
-          initialized: true
+          initialized: true,
         });
+
         return;
       }
 
-      // No session exists, proceed with anonymous login
+      // No session — do anonymous login
       const deviceId = await getDeviceId();
       const ipAddress = await getUserIP();
-      
+
       const { data, error } = await anonymousLogin(deviceId);
-      
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       if (data?.user) {
-        // Create or update user profile with device ID and IP
         await createUserProfile(data.user.id, deviceId, ipAddress);
-        
+
         set({
           user: {
             id: data.user.id,
             anonymous: true,
-            deviceId
+            deviceId,
           },
           loading: false,
-          initialized: true
+          initialized: true,
         });
       }
     } catch (err) {
-      console.error('Authentication initialization error:', err);
+      console.error("Auth init error:", err);
       set({ loading: false, initialized: true });
     }
-  }
+  },
+
+  // initialize: async () => {
+  //   if (get().initialized) return;
+
+  //   try {
+  //     // Check for existing session
+  //     const { session } = await getSession();
+
+  //     if (session) {
+  //       set({
+  //         user: {
+  //           id: session.user.id,
+  //           anonymous: true,
+  //           deviceId: session.user.user_metadata.device_id || "unknown",
+  //           email: session.user.email ?? "",
+  //         },
+  //         loading: false,
+  //         initialized: true,
+  //       });
+  //       return;
+  //     }
+
+  //     // No session exists, proceed with anonymous login
+  //     const deviceId = await getDeviceId();
+  //     const ipAddress = await getUserIP();
+
+  //     const { data, error } = await anonymousLogin(deviceId);
+
+  //     if (error) {
+  //       throw error;
+  //     }
+
+  //     if (data?.user) {
+  //       // Create or update user profile with device ID and IP
+  //       await createUserProfile(data.user.id, deviceId, ipAddress);
+
+  //       set({
+  //         user: {
+  //           id: data.user.id,
+  //           anonymous: true,
+  //           deviceId,
+  //         },
+  //         loading: false,
+  //         initialized: true,
+  //       });
+  //     }
+  //   } catch (err) {
+  //     console.error("Authentication initialization error:", err);
+  //     set({ loading: false, initialized: true });
+  //   }
+  // },
 }));

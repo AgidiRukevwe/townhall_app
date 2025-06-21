@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowDown2, Logout } from "iconsax-react";
 import { Icon } from "./icon";
 import { handleLogout } from "@/utils/handle-logout";
+import { useAuthStore } from "@/store/auth-store";
 
 interface UserAvatarProps {
   username: string;
@@ -15,8 +16,10 @@ export const UserAvatar = ({
   className = "",
 }: UserAvatarProps) => {
   const displayName = username || "Guest";
-  const initials = displayName.charAt(0).toUpperCase();
+  // const initials = displayName.charAt(0).toUpperCase();
 
+  const { user } = useAuthStore();
+  const initials = user?.id.charAt(0).toUpperCase() ?? "Guest";
   return (
     <div className={`relative group ${className}`}>
       <div className="flex items-center space-x-1 bg-surface-secondary py-1.5 px-2 rounded-full cursor-pointer">

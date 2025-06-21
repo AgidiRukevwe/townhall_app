@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useLocation } from "wouter";
 import { THLogo } from "@/components/ui/th-logo";
+import { useAuthStore } from "@/store/auth-store.ts";
 
 // Form validation schema
 const loginSchema = z.object({
@@ -31,7 +32,9 @@ export default function LoginPage() {
   const [focusedField, setFocusedField] = useState<string | null>(null);
 
   const auth = useAuth();
-  const user = auth.user;
+  // const user = auth.user;
+
+  const { user } = useAuthStore();
 
   // Safely access mutation
   const loginMutation = auth?.loginMutation;
@@ -39,10 +42,12 @@ export default function LoginPage() {
   const [, navigate] = useLocation();
 
   // If user is already logged in, redirect to home
-  if (user) {
-    navigate("/");
-    return null;
-  }
+  useEffect(() => {
+    console.log(user);
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   // Login form
   const form = useForm<LoginFormValues>({

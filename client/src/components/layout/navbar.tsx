@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { SearchInput } from "@/components/ui/search-input";
 import { UserAvatar } from "@/components/ui/user-avatar";
@@ -7,7 +7,10 @@ import { useBreakpoint } from "@/hooks/use-breakpoints";
 import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
 import { useScrollFade } from "@/hooks/use-scroll-fade";
-import { useAuth } from "@/hooks/use-auth";
+// import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
+import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
+// import { useAuth } from "@/hooks/use-auth";
 
 interface NavbarProps {
   onSearch?: (query: string) => void;
@@ -30,7 +33,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   showBackButton,
   onLogout = () => {},
 }) => {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const isMobile = useBreakpoint();
   const isScrolling = useScrollFade(1000); // fade in after 150ms of inactivity
 
@@ -42,12 +45,27 @@ export const Navbar: React.FC<NavbarProps> = ({
     navigate("/");
   };
 
-  console.log("Navbar rendered with user:", user);
+  const { loginWithGoogle, user, loading } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await loginWithGoogle();
+      // Redirect handled by useEffect
+    } catch (error: any) {
+      alert("Google sign-in failed: " + error.message);
+    }
+  };
 
   const renderDesktopNav = () => (
     // <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
     <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center ">
         <Link href="/">
           <THLogo />
         </Link>
@@ -60,10 +78,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               initialValue={initialSearchValue}
             />
           )}
-          {user ? (
-            <Button variant="default" size="sm">
-              <Icon name="Google" size={16} color="#f5f5f5" variant="Bold" />
-              Sign in with Google
+          {!user ? (
+            <Button variant="outline" size="sm" onClick={handleGoogleSignIn}>
+              <Icon name="Google" size={16} color="#007aff" variant="Bold" />
+              Sign in
             </Button>
           ) : (
             <UserAvatar

@@ -13,6 +13,9 @@ import RegisterPage from "./pages/register-page";
 import { BrowserRouter } from "react-router-dom";
 import OfficialsCategoryPage from "./pages/officials-by-category.tsx";
 import SearchPage from "./pages/search-page.tsx";
+import TestPage from "./pages/testPage.tsx";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/auth-store.ts";
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   // We don't need to pass props here since the Navbar in Home will handle search/user functionality
@@ -20,14 +23,19 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 };
 
 function Router() {
+  const { initialize } = useAuthStore();
+  useEffect(() => {
+    // handleOAuthRedirect();
+    initialize();
+  }, []);
+
   return (
     <Switch>
       <Route path="/auth" component={LoginPage} />
       <Route path="/register" component={RegisterPage} />
+      <Route path="/test" component={TestPage} />
       <Route path="/">
-        <ProtectedLayout>
-          <Home />
-        </ProtectedLayout>
+        <Home />
       </Route>
       <Route path="/profile/:id">
         {(params) => (
