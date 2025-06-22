@@ -22,6 +22,7 @@ import { useSelectedOfficialStore } from "@/store/selected-official-store";
 import { useAuthStore } from "@/store/auth-store";
 import { useGoogleAuth } from "@/hooks/auth-hooks/use-google-auth";
 import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
+import { SignInModal } from "@/components/shared/sigin-in-modal";
 
 export default function Home() {
   const [, navigate] = useLocation();
@@ -159,12 +160,7 @@ export default function Home() {
 
       <ProfileModal open={isOpen} onOpenChange={closeModal} />
 
-      {/* <ProfileModal
-        open={isOpen}
-        onOpenChange={closeModal}
-        sectors={official.sectors}
-        officialId={official.id}
-      /> */}
+      <SignInModal />
     </main>
   );
 }

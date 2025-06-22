@@ -37,6 +37,7 @@ import { useOfficialModalStore } from "@/store/official-modal-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
 import { useRatingModalStore } from "@/store/rating-store";
 import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
+import { useSignInModalStore } from "@/store/signin-modal-store";
 
 interface ProfileModalProps {
   open: boolean;
@@ -71,6 +72,11 @@ export default function ProfileModal({
   const { user } = useAuth();
 
   const { openModal: openRatingModal } = useRatingModalStore();
+  const { openModal: openSignInModal } = useSignInModalStore();
+
+  const handleRatingModal = () => {
+    user ? openRatingModal() : openSignInModal();
+  };
 
   // Get username or use default
   const userName: string =
@@ -193,7 +199,7 @@ export default function ProfileModal({
           <ProfileHeader official={official} />
           <Button
             size="sm"
-            onClick={openRatingModal}
+            onClick={handleRatingModal}
             className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
           >
             Rate this leader
