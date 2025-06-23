@@ -9,6 +9,7 @@ import EmptyState from "../shared/empty-state";
 import { Loading } from "../shared/loading";
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
 
 interface OfficialsListProps {
   officials: Official[];
@@ -62,6 +63,17 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
       atEnd: false,
     };
 
+    const { setOfficial } = useSelectedOfficialStore();
+
+    const handleSelectOfficial = (official: Official) => {
+      setOfficial(official);
+      console.log(official);
+
+      isMobile
+        ? navigate(`/profile/${official.id}`)
+        : openProfileModal(official.id);
+    };
+
     return (
       <div className=" md:mb-10" key={category}>
         <div className="flex w-full justify-between items-center mb-2">
@@ -85,12 +97,12 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
             <div
               key={official.id}
               className="md:h-full w-[170px] md:min-w-[200px] md:w-[100px] flex-shrink-0 cursor-auto"
-              // onClick={() => (window.location.href = `/profile/${official.id}`)}
-              onClick={
-                isMobile
-                  ? () => navigate(`/profile/${official.id}`)
-                  : () => openProfileModal(official.id)
-              }
+              onClick={() => handleSelectOfficial(official)}
+              // onClick={
+              //   isMobile
+              //     ? () => navigate(`/profile/${official.id}`)
+              //     : () => openProfileModal(official.id)
+              // }
             >
               <OfficialCard official={official} compact />
             </div>

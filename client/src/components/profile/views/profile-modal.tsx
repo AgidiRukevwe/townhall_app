@@ -7,7 +7,7 @@ import {
   useTimeBasedRatings,
 } from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
-import { RatingModal } from "@/components/rating/rating-modal";
+// import { RatingModal } from "@/components/rating/rating-modal";
 import { useEffect, useState } from "react";
 import { useToast } from "@/hooks/util-hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";

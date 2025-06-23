@@ -66,9 +66,9 @@ export default function Home() {
       ? (user.username as string)
       : "";
 
-  useEffect(() => {
-    console.log("Avatar URL from home:", user?.avatar_url);
-  }, [user]);
+  // useEffect(() => {
+  //   console.log("Avatar URL from home:", user?.avatar_url);
+  // }, [user]);
 
   const { isOpen, closeModal } = useOfficialModalStore();
   const {
@@ -123,9 +123,9 @@ export default function Home() {
       <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-6  ">
         {/* Main Content */}
 
-        <div className="flex flex-row gap-2 justify-between items-start md:items-center py-8">
+        <div className="flex flex-row gap-2 justify-between items-center md:items-center py-8">
           <div className="flex flex-col gap-3 pb-2 md:pb-8 ">
-            <h1 className="font-medium text-5xl leading-[56px] flex flex-col">
+            <h1 className="font-medium text-2xl md:text-5xl md:leading-[56px] flex flex-col">
               <span className="text-text-secondary">See how your</span> leaders
               are doing.
             </h1>

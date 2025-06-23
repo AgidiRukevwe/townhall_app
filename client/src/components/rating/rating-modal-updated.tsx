@@ -12,6 +12,11 @@ import { Icon } from "../ui/icon";
 import { useRatingModalStore } from "@/store/rating-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
 import { useAuthStore } from "@/store/auth-store";
+import { useOfficialsStore } from "@/store/officials-store";
+import { truncateText } from "@/utils/truncate-text";
+import { toTitleCase } from "@/utils/to-title-case";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
+import { OfficialAvatar } from "../officials/official-avatar";
 
 interface RatingModalProps {
   open: boolean;
@@ -69,11 +74,6 @@ const mockSectors: Sector[] = [
 ];
 
 export function RatingModal({
-  officialId = "mock-official",
-  officialName = "Pres. Bola Tinubu",
-  officialTitle = "President",
-  officialLocation = "Nigeria",
-  officialAvatar,
   sectors = mockSectors as any,
 }: Partial<RatingModalProps>) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -81,7 +81,6 @@ export function RatingModal({
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
-  //   const [overallRating, setOverallRating] = useState(50);
 
   const totalSteps = sectors.length;
   const currentSector = sectors[currentStep];
@@ -93,6 +92,7 @@ export function RatingModal({
   const { isOpen: open, closeModal } = useRatingModalStore();
 
   const { official } = useSelectedOfficialStore();
+  const isMobile = useBreakpoint();
 
   // Initialize sector ratings when modal opens`
   useEffect(() => {
@@ -105,6 +105,10 @@ export function RatingModal({
       setCurrentStep(0);
     }
   }, [open, sectors]);
+
+  useEffect(() => {
+    console.log(official), [];
+  });
 
   const handleRatingSelect = (sectorId: string, value: number) => {
     setSectorRatings((prev) => ({ ...prev, [sectorId]: value }));
@@ -139,7 +143,7 @@ export function RatingModal({
         onSuccess: () => {
           toast({
             title: "Rating submitted",
-            description: `Your rating for ${officialName} has been recorded.`,
+            description: `Your rating for ${official?.name} has been recorded.`,
           });
           resetModal();
         },
@@ -216,19 +220,42 @@ export function RatingModal({
         <div className="relative px-6 pb-2">
           {/* Leader Profile */}
           <div className="flex items-center gap-2 mb-6">
-            <div className="relative">
+            {/* <div className="relative">
               <div className="w-20 h-20 bg-surface-brand/10 rounded-full border-2 border-white flex items-center justify-center">
                 <span className="text-surface-brand text-2xl font-medium">
                   🇳🇬
                 </span>
               </div>
-            </div>
+            </div> */}
+            {official && (
+              <div className="w-16 h-16 rounded-full overflow-hidden bg-transparent relative">
+                <img
+                  src={official.imageUrl ?? ""}
+                  alt={official.name}
+                  className={`absolute w-full h-full rounded-full scale-150 bg-surface-brand/20 left-1/2 top-1/2 brightness-120   group-hover:border-white group-hover:border-[4px] transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-in-out`}
+                  style={{
+                    objectFit: "cover",
+                    objectPosition: "center 20%",
+                  }}
+                />
+              </div>
+              // <OfficialAvatar
+              //   official={{
+              //     name: official?.name,
+              //     approvalRating: official?.approvalRating,
+              //     imageUrl: official.imageUrl,
+              //   }}
+              //   height={isMobile ? "h-16" : "h-32"}
+              //   width={isMobile ? "w-16" : "w-32"}
+              //   showAvatar={true}
+              // />
+            )}
             <div>
               <h2 className="text-base font-semibold text-text-primary">
-                {officialName}
+                {truncateText(toTitleCase(official?.name ?? ""), 50)}
               </h2>
               <p className="text-text-secondary text-sm">
-                {officialTitle}, {officialLocation}
+                {truncateText(official?.location ?? "", isMobile ? 20 : 30)}
               </p>
             </div>
           </div>
@@ -240,7 +267,7 @@ export function RatingModal({
             <div className="pb-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs  font-medium text-text-secondary">
-                  Survey {currentStep + 1} of {totalSteps}
+                  Sectors {currentStep + 1} of {totalSteps}
                 </span>
               </div>
               <div className="w-full bg-gray-100 rounded-full h-1">

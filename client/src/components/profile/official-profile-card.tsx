@@ -47,7 +47,7 @@ export function OfficialProfileCard({
       className={`flex flex-col items-center text-center mb-12 ${classname}`}
     >
       {/* Profile image */}
-      {!isMobile && !profileModal && <ProfileHeader official={official} />}
+      {!isMobile && !profileModal && <ProfileHeader />}
 
       {/* Profile information in accordions */}
 

@@ -11,6 +11,7 @@ import EmptyState from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import useHandleRatingModal from "@/hooks/rating-hooks/use-handle-rating-modal";
 import { tabTriggerClass } from "./profile-modal";
+import { ArrowLeft } from "iconsax-react";
 
 interface ProfileMobileViewProps {
   official: Official;
@@ -37,17 +38,34 @@ function ProfileMobileView({
   chartEmpty,
   setRatingModalOpen,
 }: ProfileMobileViewProps) {
-  // const tabTriggerClass = cn(
-  //   "relative pt-4 px-1 pr-4 text-text-secondary text-sm rounded-none",
-  //   "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-white  data-[state=active]:font-bold",
-  //   "data-[state=active]:border-b-2 data-[state=active]:border-text-primary data-[state=active]:-mb-px rounded-none"
-  // );
-
   const handleRatingModal = useHandleRatingModal();
+
+  if (!official) {
+    return (
+      <div className="flex-1 bg-white z-50">
+        <div className="bg-white py-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Link
+              href="/home"
+              className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 mb-6"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+            </Link>
+
+            <EmptyState
+              type="no-content"
+              title="No official found"
+              description="We couldn't find the official you're looking for."
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-20 px-4 pb-40">
-      <ProfileHeader official={official} />
+      <ProfileHeader />
 
       <Tabs defaultValue="performance">
         <TabsList className="flex justify-start bg-white rouunded-none w-full border-b-[1px] border-[#EAECF0] rounded-none mb-8">
