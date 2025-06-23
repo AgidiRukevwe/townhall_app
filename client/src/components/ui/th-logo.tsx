@@ -1,6 +1,6 @@
 import React from "react";
 import thLogo from "../../public/assets/th_logo_v2.png"; // Adjust the path as necessary
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 
 export const THLogo = ({ className = "" }: { className?: string }) => {
   const isMobile = useBreakpoint();

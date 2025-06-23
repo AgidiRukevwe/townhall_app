@@ -1,4 +1,4 @@
-import { SimpleOfficialsList } from "@/components/officials/simple-officials-list";
+// import { SimpleOfficialsList } from "@/components/officials/simple-officials-list";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { Link, useLocation, useParams } from "wouter";

@@ -8,7 +8,7 @@ import { Icon } from "@/components/ui/icon";
 import EmptyState from "@/components/shared/empty-state";
 import { Navbar } from "@/components/layout/navbar";
 import { handleLogout } from "@/utils/handle-logout";
-import { useSearchHandler } from "@/hooks/use-search";
+import { useSearchHandler } from "@/hooks/util-hooks/use-search";
 import { Button } from "@/components/ui/button";
 
 function SearchPage() {

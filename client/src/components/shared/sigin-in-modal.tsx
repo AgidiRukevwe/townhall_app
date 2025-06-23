@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import GoogleLogo from "@/public/assets/illustrations/google-logo";
 import SignInImage from "../../public/assets/sign-in-display.svg";
 import { THLogo } from "../ui/th-logo";
@@ -31,9 +31,9 @@ export function SignInModal() {
         style={{ borderRadius: isMobile ? "1.2rem" : "1.5rem" }}
         showClose={false}
       >
-        <div className="flex flex-col md:flex-row min-h-[400px] md:min-h-[450px]">
+        <div className="flex flex-col md:flex-row min-h-[300px] md:min-h-[450px]">
           {/* Left side - Image placeholder */}
-          <div className="w-full h-full md:w-1/2 relative bg-red-100 rounded-[16px]">
+          <div className="w-full h-full md:w-1/2 hidden md:flex relative bg-red-100 rounded-[16px]">
             {/* <div className="w-full h-48 md:h-full bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-400 relative overflow-hidden"></div> */}
 
             <div className="w-full h-full rounded-2xl overflow-hidden">
@@ -63,7 +63,7 @@ export function SignInModal() {
                 <div className="w-full flex justify-center md:pt-4">
                   <Button onClick={handleGoogleSignIn}>
                     <GoogleLogo />
-                    Sign in
+                    Continue with Google
                   </Button>
                 </div>
               </div>

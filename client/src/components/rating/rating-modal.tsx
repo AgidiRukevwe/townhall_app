@@ -11,7 +11,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useSubmitRating } from "@/hooks/use-ratings";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/util-hooks/use-toast";
 import { Sector } from "@shared/schema";
 // import { useAuth } from "@/hooks/use-auth.tsx";
 import { Icon } from "../ui/icon";

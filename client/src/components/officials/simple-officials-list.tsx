@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 import EmptyState from "../shared/empty-state";
 import { Loading } from "../shared/loading";
 import { useOfficialModalStore } from "@/store/official-modal-store";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 
 interface OfficialsListProps {
   officials: Official[];

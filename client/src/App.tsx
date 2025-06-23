@@ -6,10 +6,10 @@ import Home from "./pages/home";
 import Profile from "./pages/profile";
 import OfficialsDebug from "./pages/officials-debug";
 import { Navbar } from "./components/layout/navbar";
-import { AuthProvider } from "./hooks/use-auth.tsx";
+// import { AuthProvider } from "./hooks/use-auth.tsx";
 import { ProtectedRoute } from "./lib/protected-route";
-import LoginPage from "./pages/login-page";
-import RegisterPage from "./pages/register-page";
+// import LoginPage from "./pages/login-page";
+// import RegisterPage from "./pages/register-page";
 import { BrowserRouter } from "react-router-dom";
 import OfficialsCategoryPage from "./pages/officials-by-category.tsx";
 import SearchPage from "./pages/search-page.tsx";
@@ -26,7 +26,7 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 function Router() {
   return (
     <Switch>
-      <Route path="/auth" component={LoginPage} />
+      {/* <Route path="/auth" component={LoginPage} /> */}
       {/* <Route path="/register" component={RegisterPage} /> */}
       <Route path="/test" component={TestPage} />
       <Route path="/">
@@ -57,10 +57,10 @@ function Router() {
 function App() {
   return (
     <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Router />
-      </AuthProvider>
+      {/* <AuthProvider> */}
+      <Toaster />
+      <Router />
+      {/* </AuthProvider> */}
     </TooltipProvider>
   );
 }

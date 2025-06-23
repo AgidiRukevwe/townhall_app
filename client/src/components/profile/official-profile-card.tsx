@@ -13,8 +13,9 @@ import { EducationHistoryItem } from "./education-item";
 import { CareerTimelineProps } from "./career-timeline";
 import { toTitleCase } from "@/utils/to-title-case";
 import ProfileHeader from "./profile-card-header";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import { useOfficialModalStore } from "@/store/official-modal-store";
+import EmptyState from "../shared/empty-state";
 
 interface OfficialProfileCardProps {
   official: Official;
@@ -32,6 +33,15 @@ export function OfficialProfileCard({
   const isMobile = useBreakpoint();
 
   const { isOpen: profileModal, closeModal } = useOfficialModalStore();
+
+  return (
+    <EmptyState
+      type="no-content"
+      title=" Not much to see here (yet)"
+      description="This leader’s bio isn’t available right now. We’ll update this section once we find something solid."
+      showButton={false}
+    />
+  );
   return (
     <div
       className={`flex flex-col items-center text-center mb-12 ${classname}`}

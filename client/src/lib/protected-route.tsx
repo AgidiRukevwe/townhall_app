@@ -1,7 +1,8 @@
 import React from "react";
-import { useAuth } from "../hooks/use-auth.tsx";
+// import { useAuth } from "../hooks/archive/use-auth.tsxauth.ts";
 import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
+import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
 
 export function ProtectedRoute({
   path,
@@ -11,10 +12,16 @@ export function ProtectedRoute({
   component: () => React.JSX.Element;
 }) {
   const auth = useAuth();
+
   // Handle both auth implementations (isLoading from username/password auth and loading from anonymous auth)
-  const isLoading = 'isLoading' in auth ? auth.isLoading : ('loading' in auth ? auth.loading : false);
+  const isLoading =
+    "isLoading" in auth
+      ? auth.isLoading
+      : "loading" in auth
+      ? auth.loading
+      : false;
   const user = auth.user;
-  
+
   // Debug auth state
   console.log("ProtectedRoute - Auth state:", { isLoading, user });
 

@@ -3,13 +3,14 @@ import { Link, useLocation } from "wouter";
 import { SearchInput } from "@/components/ui/search-input";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { THLogo } from "@/components/ui/th-logo";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import { Icon } from "../ui/icon";
 import { Button } from "../ui/button";
-import { useScrollFade } from "@/hooks/use-scroll-fade";
+// import { useScrollFade } from "@/hooks/use-scroll-fade";
 // import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
-import { toast } from "@/hooks/use-toast";
+// import { toast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
+import { useScrollFade } from "@/hooks/util-hooks/use-scroll-fade";
 // import { useAuth } from "@/hooks/use-auth";
 
 interface NavbarProps {
@@ -54,7 +55,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   const handleGoogleSignIn = async () => {
     try {
       await loginWithGoogle();
-      // Redirect handled by useEffect
     } catch (error: any) {
       alert("Google sign-in failed: " + error.message);
     }

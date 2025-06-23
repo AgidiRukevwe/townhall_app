@@ -7,10 +7,10 @@ import {
   useTimeBasedRatings,
 } from "@/hooks/use-ratings";
 import { Loading } from "@/components/shared/loading";
-import { RatingModal } from "@/components/rating/rating-modal";
-import { RatingModal as TestRatingModal } from "@/components/rating/rating-modal-updated";
+// import { RatingModal } from "@/components/rating/rating-modal";
+import { RatingModal } from "@/components/rating/rating-modal-updated";
 import { useEffect, useState } from "react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/util-hooks/use-toast";
 import { ArrowLeft, User } from "lucide-react";
 import { Navbar } from "@/components/layout/navbar";
 // import { useAuth } from "@/hooks/use-auth.tsx";
@@ -24,7 +24,7 @@ import {
 import { Icon } from "@/components/ui/icon";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import ProfileHeader from "@/components/profile/profile-card-header";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 import EmptyState from "@/components/shared/empty-state";
@@ -32,8 +32,10 @@ import ProfileMobileView from "@/components/profile/views/mobile-view";
 import ProfileDesktopView from "@/components/profile/views/desktop-view";
 import { char } from "drizzle-orm/mysql-core";
 import { handleLogout } from "@/utils/handle-logout";
-import { useSearchHandler } from "@/hooks/use-search";
+import { useSearchHandler } from "@/hooks/util-hooks/use-search";
 import { useAuthStore } from "@/store/auth-store";
+import { useRatingModalStore } from "@/store/rating-store";
+import { SignInModal } from "@/components/shared/sigin-in-modal";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
@@ -63,6 +65,12 @@ export default function Profile() {
   const handlePeriodChange = (period: Granularity) => {
     setSelectedApprovalRatingPeriod(period);
   };
+
+  const {
+    openModal: openRatingModal,
+    isOpen: isRatingModalOpen,
+    closeModal: closeRatingModal,
+  } = useRatingModalStore();
 
   const { data: fullData } = useFullRatingsData(id);
 
@@ -187,30 +195,14 @@ export default function Profile() {
       )}
 
       {/* Rating Modal */}
+
       <RatingModal
-        open={ratingModalOpen}
-        onOpenChange={setRatingModalOpen}
-        officialId={official.id}
-        officialName={official.name}
-        sectors={official.sectors}
+        open={isRatingModalOpen}
+        onOpenChange={closeRatingModal}
+        sectors={official?.sectors ?? []}
       />
 
-      <TestRatingModal
-        open={openTestRatingModal}
-        onOpenChange={setTestRatingModal}
-        sectors={official.sectors}
-        officialId={official.id}
-      />
-      {/* {isMobile && (
-        <div className="fixed bottom-0 inset-x-0 bg-white border-t border-gray-200 p-4 z-50 backdrop-blur-md bg-white/70">
-          <Button
-            onClick={() => setRatingModalOpen(true)}
-            className="w-full bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
-          >
-            Rate this leader
-          </Button>
-        </div>
-      )} */}
+      <SignInModal />
     </main>
   );
 }

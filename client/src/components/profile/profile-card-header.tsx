@@ -1,3 +1,4 @@
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { toTitleCase } from "@/utils/to-title-case";
 import { truncateText } from "@/utils/truncate-text";
@@ -10,13 +11,14 @@ interface ProfileHeaderProps {
 
 function ProfileHeader({ official }: ProfileHeaderProps) {
   const { isOpen: profileModal } = useOfficialModalStore();
+  const isMobile = useBreakpoint();
 
   return (
     <>
       {!profileModal ? (
         <div className="flex flex-row md:flex-col items-center gap-x-2 ">
           {official.imageUrl ? (
-            <div className="w-24 h-24 bg-red- md:w-40 md:h-40 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
+            <div className="w-24 h-24 bg-red- md:w-32 md:h-32 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
               <img
                 src={official.imageUrl ?? ""}
                 alt={official.name ?? "Official Image"}
@@ -32,19 +34,19 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
           )}
 
           {/* Official name and position */}
-          <div className="">
+          <div className="flex flex-col gap-2">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">
               {toTitleCase(official.name)}
             </h2>
             <p className="text-text-secondary mb-6 text-sm truncate">
-              {official.location}
+              {truncateText(official.location, isMobile ? 30 : 50)}
             </p>
           </div>
         </div>
       ) : (
         <div className="flex flex-row items-center gap-x-4">
           {official.imageUrl ? (
-            <div className="w-24 h-24 bg-red- md:w-28 md:h-28 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3">
+            <div className="w-24 h-24 bg-red- md:w-24 md:h-24 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3">
               <img
                 src={official.imageUrl ?? ""}
                 alt={official.name ?? "Official Image"}
@@ -53,8 +55,8 @@ function ProfileHeader({ official }: ProfileHeaderProps) {
             </div>
           ) : (
             <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
-              <span className="text-[#1476FF] text-2xl font-bold">
-                {truncateText(official.name, 15)}
+              <span className="text-[#1476FF] text-xl font-bold">
+                {truncateText(official.name, 20)}
               </span>
             </div>
           )}

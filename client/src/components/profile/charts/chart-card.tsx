@@ -5,7 +5,7 @@ import { Icon } from "@/components/ui/icon";
 import DottedGridChart from "./dotted-chart";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 import { Loading } from "@/components/shared/loading";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 
 export type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
 
@@ -83,10 +83,11 @@ export const ChartCard = ({
 
   return (
     // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
-    <div className="bg-white/0 w-full mb-6 relative">
+    <div className="bg-surface-secondary w-full p-4 rounded-3xl mb-6 relative">
+      {/* <div className="bg-white w-full mb-6 relative"> */}
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
-          <Icon name="Chart2" size={16} color="#BFBFBF" variant="Bold" />
+          {/* <Icon name="Chart2" size={16} color="#BFBFBF" variant="Bold" /> */}
           <span className="text-sm md:text-base font-medium text-text-primary">
             {chartName}
           </span>
@@ -94,15 +95,15 @@ export const ChartCard = ({
 
         <div className="md:ml-auto flex items-center">
           {showGranularity && (
-            <div className="bg-gray-100 rounded-full p-1 flex items-center">
+            <div className="bg-white rounded-full p-1 flex items-center">
               {granularityOptions.map((option) => (
                 <button
                   key={option}
                   className={cn(
                     "px-3 py-1 text-xs font-medium rounded-full transition-colors",
                     granularity === option
-                      ? "bg-white text-black shadow-sm"
-                      : "text-gray-600"
+                      ? "bg-surface-secondary text-text-primary font-bold shadow-sm"
+                      : "text-text-secondary"
                   )}
                   onClick={() => {
                     setGranularity(option);
@@ -119,7 +120,7 @@ export const ChartCard = ({
       </div>
 
       <div className="mb-4">
-        <h2 className="text-xl md:text-5xl font-medium md:font-medium text-gray-900">
+        <h2 className="text-4xl md:text-5xl font-medium md:font-medium text-text-primary">
           {selectedDataset?.overallRating}%
         </h2>
         {/* <div className="text-sm flex items-center mt-2">
@@ -130,7 +131,8 @@ export const ChartCard = ({
         </div> */}
       </div>
 
-      <div className="h-[400px] w-full">
+      {/* <div className="h-[400px] w-full"> */}
+      <div className="h-auto w-full">
         <DottedGridChart
           type={chartType}
           labels={truncatedLabels}

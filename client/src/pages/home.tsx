@@ -9,7 +9,7 @@ import { Navbar } from "@/components/layout/navbar";
 import EmptyState from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
 import { handleLogout } from "@/utils/handle-logout";
-import { useSearchHandler } from "@/hooks/use-search";
+import { useSearchHandler } from "@/hooks/util-hooks/use-search";
 import { WelcomeModal } from "@/components/shared/welcome-modal";
 import { useWelcomeModal } from "@/hooks/use-welcome-modal";
 import { Chart } from "iconsax-react";
@@ -111,7 +111,7 @@ export default function Home() {
   }
 
   return (
-    <main className="pt-16 md:pt-16 flex-1 min-h-screen bg-white">
+    <main className="pt-10 md:pt-16 flex-1 min-h-screen bg-white">
       <Navbar
         onSearch={handleSearch}
         initialSearchValue={searchInput}
@@ -124,16 +124,17 @@ export default function Home() {
         {/* Main Content */}
 
         <div className="flex flex-row gap-2 justify-between items-start md:items-center py-8">
-          <div className="flex flex-col gap-3 pb-8 ">
-            <h1 className="font-medium text-4xl">
-              See how your leaders are doing.
+          <div className="flex flex-col gap-3 pb-2 md:pb-8 ">
+            <h1 className="font-medium text-5xl leading-[56px] flex flex-col">
+              <span className="text-text-secondary">See how your</span> leaders
+              are doing.
             </h1>
-            <p className="text-text-secondary font-normal">
+            {/* <p className="text-text-secondary font-normal">
               Start by checking who represents you and how they’re performing.
-            </p>
+            </p> */}
           </div>
 
-          <ChartIllustration className="w-16 h-16 md:w-32 md:h-32" />
+          <ChartIllustration className="w-24 h-24 md:w-36 md:h-36" />
         </div>
         {isLoading || isRefetching ? (
           <div className="flex flex-col items-center justify-center">

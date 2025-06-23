@@ -9,7 +9,8 @@ import { CareerHistory, Official } from "@shared/schema";
 import { cn } from "@/lib/utils";
 import EmptyState from "@/components/shared/empty-state";
 import { Button } from "@/components/ui/button";
-import { useBreakpoint } from "@/hooks/use-breakpoints";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
+import useHandleRatingModal from "@/hooks/rating-hooks/use-handle-rating-modal";
 
 interface ProfileDesktopViewProps {
   official: Official;
@@ -37,6 +38,7 @@ function ProfileDesktopView({
   setRatingModalOpen,
 }: ProfileDesktopViewProps) {
   const isMobile = useBreakpoint();
+  const handleRatingModal = useHandleRatingModal();
 
   return (
     <>
@@ -83,7 +85,8 @@ function ProfileDesktopView({
                   description="Your rating helps others understand this leader’s impact.."
                   customAction={{
                     label: "Rate this leader",
-                    onClick: () => setRatingModalOpen(true),
+                    // onClick: () => setRatingModalOpen(true),
+                    onClick: handleRatingModal,
                   }}
                 />
               </div>

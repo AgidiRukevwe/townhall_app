@@ -5,7 +5,7 @@ import { X, ChevronLeft, ChevronRight, SkipForward, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useSubmitRating } from "@/hooks/use-ratings";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/util-hooks/use-toast";
 // import { useAuth } from "@/hooks/use-auth.tsx";
 import { Sector } from "@shared/schema";
 import { Icon } from "../ui/icon";
