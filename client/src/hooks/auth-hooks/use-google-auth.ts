@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuthStore } from "@/store/auth-store";
 import { getDeviceId } from "@/lib/fingerprint";
+import { SUPABASE_URL } from "@/lib/config";
 
 export function useGoogleAuth() {
   const [loading, setLoading] = useState(false);
@@ -16,8 +17,12 @@ export function useGoogleAuth() {
       const { data, error: signInError } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          // redirectTo: `${window.location.origin}/`,
-          redirectTo: `${window.location.origin}/auth/v1/callback`,
+          redirectTo:
+            `${window.location.origin}/` ||
+            `https://townhall-app-8pjy.onrender.com/` ||
+            `${SUPABASE_URL}/` ||
+            `${window.location.origin}/auth/v1/callback`,
+          // redirectTo: `${window.location.origin}/auth/v1/callback`,
         },
       });
 
