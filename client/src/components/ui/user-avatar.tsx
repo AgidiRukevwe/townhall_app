@@ -100,7 +100,8 @@ export const UserAvatar = ({
             </div>
           )}
         </div>
-        <ArrowDown2 size={16} variant="Bold" className="text-gray-500" />
+        {/* <ArrowDown2 size={16} variant="Bold" className="text-gray-500" /> */}
+        <Icon name="ArrowDown2" size={12} color="#737373" />
       </div>
 
       {/* User dropdown menu */}

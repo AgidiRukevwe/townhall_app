@@ -1,4 +1,4 @@
-import { OfficialsList } from "@/components/officials/simple-officials-list";
+import { OfficialsList } from "@/components/officials/officials-list";
 import { useOfficials } from "@/hooks/use-officials";
 import { Loading } from "@/components/shared/loading";
 import { useEffect, useState } from "react";
@@ -33,7 +33,6 @@ export default function Home() {
 
   const { searchInput, handleSearch, setSearchInput } = useSearchHandler();
   const { showWelcome, markWelcomeAsSeen } = useWelcomeModal();
-  const [openTestRatingModal, setTestRatingModal] = useState(true);
 
   // Use our enhanced useOfficials hook with search parameter
   const {
@@ -56,7 +55,7 @@ export default function Home() {
   const { handleOAuthRedirect } = useGoogleAuth();
   useEffect(() => {
     handleOAuthRedirect();
-    initialize();
+    // initialize(
     // console.log(user?.avatar_url);
   }, [user?.avatar_url]);
 
@@ -123,9 +122,9 @@ export default function Home() {
       <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 py-6  ">
         {/* Main Content */}
 
-        <div className="flex flex-row gap-2 justify-between items-center md:items-center py-8">
+        <div className="flex flex-row md:gap-2 justify-between items-center md:items-center py-8">
           <div className="flex flex-col gap-3 pb-2 md:pb-8 ">
-            <h1 className="font-medium text-2xl md:text-5xl md:leading-[56px] flex flex-col">
+            <h1 className="font-medium text-3xl md:text-5xl md:leading-[56px] flex flex-col">
               <span className="text-text-secondary">See how your</span> leaders
               are doing.
             </h1>
@@ -134,7 +133,7 @@ export default function Home() {
             </p> */}
           </div>
 
-          <ChartIllustration className="w-24 h-24 md:w-36 md:h-36" />
+          <ChartIllustration className="w-20 h-20 md:w-36 md:h-36" />
         </div>
         {isLoading || isRefetching ? (
           <div className="flex flex-col items-center justify-center">

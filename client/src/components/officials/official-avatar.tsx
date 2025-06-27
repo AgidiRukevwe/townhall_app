@@ -19,31 +19,48 @@ export const OfficialAvatar: React.FC<OfficialAvatarProps> = ({
   official,
   className,
 }) => {
-  const noRating =
-    official.approvalRating === 0 || official.approvalRating === null;
-  const lowRating = official.approvalRating < 20;
+  const noRating = !official.approvalRating;
+
+  const lowRating = !noRating && official.approvalRating < 20;
   const midRating =
-    official.approvalRating >= 20 && official.approvalRating < 70;
-  const highRating = official.approvalRating >= 70;
+    !noRating && official.approvalRating >= 20 && official.approvalRating < 70;
+  const highRating = !noRating && official.approvalRating >= 70;
+
+  const badgeColors = {
+    high: "bg-[#EBFAEF] border border-[#34C759] text-[#34C759]",
+    mid: "bg-[#FFFBEA] border border-[#FFC107] text-[#FFC107]",
+    low: "bg-[#FFF0F0] border border-[#FF3B30] text-[#FF3B30]",
+    none: "bg-[#E0E0E0] border border-[#A0A0A0] text-[#A0A0A0]",
+  };
 
   const badgeClass = cn(
     "absolute translate-x-1/4 z-50 bottom-3 right-3 translate-y-1/4",
-    highRating &&
-      "bg-[#EBFAEF] border border-[#34C759] hover:bg-[#EBFAEF] hover:border-[#34C759] text-[#34C759]",
-    midRating &&
-      "bg-[#FFFBEA] border border-[#FFC107] hover:bg-[#FFFBEA] hover:border-[#FFC107] text-[#FFC107]",
-    lowRating &&
-      "bg-[#FFF0F0] border border-[#FF3B30] hover:bg-[#FFF0F0] hover:border-[#FF3B30] text-[#FF3B30]",
-    noRating && "hidden"
+    highRating && badgeColors.high,
+    midRating && badgeColors.mid,
+    lowRating && badgeColors.low,
+    noRating && badgeColors.none
   );
+  // const badgeClass = cn(
+  //   "absolute translate-x-1/4 z-50 bottom-3 right-3 translate-y-1/4",
+  //   highRating &&
+  //     "bg-[#EBFAEF] border border-[#34C759] hover:bg-[#EBFAEF] hover:border-[#34C759] text-[#34C759]",
+  //   midRating &&
+  //     "bg-[#FFFBEA] border border-[#FFC107] hover:bg-[#FFFBEA] hover:border-[#FFC107] text-[#FFC107]",
+  //   lowRating &&
+  //     "bg-[#FFF0F0] border border-[#FF3B30] hover:bg-[#FFF0F0] hover:border-[#FF3B30] text-[#FF3B30]",
+  //   noRating &&
+  //     "bg-[#FFF0F0] border border-[#FF3B30] hover:bg-[#FFF0F0] hover:border-[#FF3B30] text-[#FF3B30]"
+  //   // noRating && "hidden"
+  // );
 
   return (
     <div className="flex items-center justify-center">
       {!showAvatar ? (
         <div className="w-32 h-32 rounded-full overflow-hidden bg-transparent relative">
-          {official.approvalRating && (
-            <Badge className={badgeClass}>{official.approvalRating}</Badge>
-          )}
+          {/* <Badge className={`${badgeClass}, z-50`}>
+            {official.approvalRating}
+          </Badge> */}
+
           <img
             src={official.imageUrl ?? ""}
             alt={official.name}

@@ -40,9 +40,9 @@ function Router() {
         )}
       </Route>
       <Route path="/officials/:category">
-        <ProtectedLayout>
+        {/* <ProtectedLayout>
           <OfficialsCategoryPage />
-        </ProtectedLayout>
+        </ProtectedLayout> */}
       </Route>
       <Route path="/search">
         <ProtectedLayout>

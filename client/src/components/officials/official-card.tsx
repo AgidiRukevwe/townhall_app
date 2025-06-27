@@ -42,7 +42,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   }, [official.imageUrl]);
 
   return (
-    <div className="group overflow-hidden bg-white cursor-pointer border-[1px] border-[#EAECF0] rounded-2xl md:rounded-[32px] p-6 hover:border-surface-brand hover:bg-surface-brand/10 transition-all duration-300 ease-in-out">
+    <div className="group overflow-hidden bg-white cursor-pointer border-[1px] border-[#EAECF0] rounded-3xl md:rounded-[32px] p-6 hover:border-surface-brand hover:bg-surface-brand/10 transition-all duration-300 ease-in-out">
       <div className="flex items-center justify-center">
         <div>
           <OfficialAvatar
