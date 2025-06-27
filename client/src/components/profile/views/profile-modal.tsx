@@ -89,12 +89,15 @@ export default function ProfileModal({
   const {
     sectors,
     overallSectorRating,
+    isRefetching: isRefetchingSectorRatings,
+    refetch: refetchSectorRatings,
     isLoading: isLoadingSectorRatings,
   } = useSectorRatings(selectedOfficialId ?? "");
   const {
     timeLabels,
     data: approvalRatingData,
     isLoading: isLoadingApproval,
+    isRefetching: isRefetchingApprovalData,
     refetch: refetchApprovalData,
   } = useTimeBasedRatings(
     selectedOfficialId ?? "",
@@ -105,14 +108,27 @@ export default function ProfileModal({
     data: official,
     isLoading,
     error,
+    refetch,
+    isRefetching: isRefetchingOfficial,
   } = useOfficialDetails(selectedOfficialId ?? "");
 
-  const { setOfficial } = useSelectedOfficialStore();
+  const {
+    setOfficial,
+    setRefetchOfficial,
+    setRefetchRatingData,
+    isRefetchingRatingData,
+    setRefetchingOfficial,
+  } = useSelectedOfficialStore();
   useEffect(() => {
     if (official) {
       setOfficial(official as Official);
     }
   }, [official, setOfficial]);
+
+  useEffect(() => {
+    setRefetchOfficial(refetch);
+    setRefetchRatingData(refetchSectorRatings);
+  }, [isRefetchingRatingData]);
 
   const approvaDataSet: DataMap = {
     overallRating: approvalRating,
@@ -177,91 +193,102 @@ export default function ProfileModal({
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={closeProfileModal}
       />
-      <div className="absolute right-5 top-5 h-[95%] w-[40%] z-50 bg-white backdrop-blur-lg border-2 border-white rounded-3xl p-6 overflow-y-auto hide-scrollbar scrollar-hide scrollbar-none">
-        <div className="flex flex-row justify-between items-center pb-6">
-          <h4>Official's profile</h4>{" "}
-          <Icon
-            name="CloseCircle"
-            color="#737373"
-            onClick={closeProfileModal}
-            className="cursor-pointer"
-          />
-        </div>
-        <div className="flex flex-row justify-between items-center">
-          <ProfileHeader />
-          <Button
-            size="sm"
-            onClick={handleRatingModal}
-            className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
-          >
-            <Icon name="Like1" />
-            Rate this official
-          </Button>
-        </div>
-        <Tabs defaultValue="performance">
-          <TabsList className="flex justify-start bg-transparent w-full border-b-[1px] border-[#EAECF0] rounded-none mb-8">
-            <TabsTrigger value="performance" className={tabTriggerClass}>
-              Performance
-            </TabsTrigger>
-            <TabsTrigger value="about" className={tabTriggerClass}>
-              About
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="performance">
-            {chartEmpty ? (
-              <div className="flex  md:w-[100%] py-8 items-center justify-center rounded-3xl">
-                <EmptyState
-                  type="no-content"
-                  title="No one has rated this leader yet."
-                  description="Your rating helps others understand this leader’s impact.."
-                  showButton={false}
-                  //   customAction={{
-                  //     label: "Rate this leader",
-                  //     onClick: () => setRatingModalOpen(true),
-                  //   }}
-                />
-              </div>
-            ) : (
-              <div className="w-full">
-                <ChartCard
-                  chartName="Approval rating"
-                  dataMap={approvaDataSet}
-                  chartType="line"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                  autoSkipXAxisLabels={true}
-                />
-
-                <ChartCard
-                  chartName="Performance by sectors"
-                  dataMap={sectorDataSet}
-                  chartType="bar"
-                  chartKey="4"
-                  valueChange={2.5}
-                  isLoading={
-                    isLoadingApproval || isLoadingApprovalRatingOverall
-                  }
-                  handlePeriodChange={handlePeriodChange}
-                  showGranularity={false}
-                  autoSkipXAxisLabels={false}
-                />
-              </div>
-            )}
-          </TabsContent>
-          <TabsContent value="about">
-            <OfficialProfileCard
-              official={official}
-              educationData={educationData}
-              careerData={careerData}
-              classname="w-full md:w-[100%]"
+      {isRefetchingRatingData ? (
+        <Loading />
+      ) : (
+        <div className="absolute right-5 top-5 h-[95%] w-[40%] z-50 bg-white backdrop-blur-lg border-2 border-white rounded-3xl p-6 overflow-y-auto hide-scrollbar scrollar-hide scrollbar-none">
+          <div className="flex flex-row justify-between items-center pb-6">
+            <h4 className="text-xl">Official's profile</h4>{" "}
+            <Icon
+              name="CloseCircle"
+              color="#737373"
+              onClick={closeProfileModal}
+              className="cursor-pointer"
             />
-          </TabsContent>
-        </Tabs>
-      </div>
+          </div>
+          <div className="flex flex-row justify-between items-center">
+            <ProfileHeader />
+            <Button
+              size="sm"
+              onClick={handleRatingModal}
+              className="bg-surface-dark hover:bg-surface-dark/95 text-white rounded-full text-sm py-3"
+            >
+              <Icon name="Like1" />
+              Rate this official
+            </Button>
+          </div>
+          <Tabs defaultValue="performance">
+            <TabsList className="flex justify-start bg-transparent w-full border-b-[1px] border-[#EAECF0] rounded-none mb-8">
+              <TabsTrigger value="performance" className={tabTriggerClass}>
+                Performance
+              </TabsTrigger>
+              <TabsTrigger value="about" className={tabTriggerClass}>
+                About
+              </TabsTrigger>
+            </TabsList>
+
+            {isRefetchingApprovalData ? (
+              <Loading />
+            ) : (
+              <>
+                <TabsContent value="performance">
+                  {chartEmpty ? (
+                    <div className="flex  md:w-[100%] py-8 items-center justify-center rounded-3xl">
+                      <EmptyState
+                        type="no-content"
+                        title="No one has rated this leader yet."
+                        description="Your rating helps others understand this leader’s impact.."
+                        showButton={false}
+                        //   customAction={{
+                        //     label: "Rate this leader",
+                        //     onClick: () => setRatingModalOpen(true),
+                        //   }}
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-full">
+                      <ChartCard
+                        chartName="Approval rating"
+                        dataMap={approvaDataSet}
+                        chartType="line"
+                        chartKey="4"
+                        valueChange={2.5}
+                        isLoading={
+                          isLoadingApproval || isLoadingApprovalRatingOverall
+                        }
+                        handlePeriodChange={handlePeriodChange}
+                        autoSkipXAxisLabels={true}
+                      />
+
+                      <ChartCard
+                        chartName="Performance by sectors"
+                        dataMap={sectorDataSet}
+                        chartType="bar"
+                        chartKey="4"
+                        valueChange={2.5}
+                        isLoading={
+                          isLoadingApproval || isLoadingApprovalRatingOverall
+                        }
+                        handlePeriodChange={handlePeriodChange}
+                        showGranularity={false}
+                        autoSkipXAxisLabels={false}
+                      />
+                    </div>
+                  )}
+                </TabsContent>
+                <TabsContent value="about">
+                  <OfficialProfileCard
+                    official={official}
+                    educationData={educationData}
+                    careerData={careerData}
+                    classname="w-full md:w-[100%]"
+                  />
+                </TabsContent>
+              </>
+            )}
+          </Tabs>
+        </div>
+      )}
     </div>
   );
 }

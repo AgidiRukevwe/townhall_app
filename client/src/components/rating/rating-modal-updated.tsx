@@ -17,6 +17,7 @@ import { truncateText } from "@/utils/truncate-text";
 import { toTitleCase } from "@/utils/to-title-case";
 import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import { OfficialAvatar } from "../officials/official-avatar";
+import { Loading } from "../shared/loading";
 
 interface RatingModalProps {
   open: boolean;
@@ -91,7 +92,8 @@ export function RatingModal({
   const { user, loading } = useAuthStore();
   const { isOpen: open, closeModal } = useRatingModalStore();
 
-  const { official } = useSelectedOfficialStore();
+  const { official, isLoading, refetchOfficial, isRefetching } =
+    useSelectedOfficialStore();
   const isMobile = useBreakpoint();
 
   // Initialize sector ratings when modal opens`
@@ -106,15 +108,13 @@ export function RatingModal({
     }
   }, [open, sectors]);
 
-  useEffect(() => {
-    console.log(official), [];
-  });
-
   const handleRatingSelect = (sectorId: string, value: number) => {
     setSectorRatings((prev) => ({ ...prev, [sectorId]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+
     const sectorRatingsArray = Object.entries(sectorRatings).map(
       ([sectorId, rating]) => ({ sectorId, rating })
     );
@@ -122,41 +122,105 @@ export function RatingModal({
     const overallRating =
       sectorRatingsArray.length > 0
         ? Math.round(
-            sectorRatingsArray.reduce((sum, rating) => sum + rating.rating, 0) /
+            sectorRatingsArray.reduce((sum, r) => sum + r.rating, 0) /
               sectorRatingsArray.length
           )
         : 50;
 
-    console.log(
-      "Submitting ratings",
-      official?.id,
-      overallRating,
-      sectorRatingsArray
-    );
-    submitRating(
-      {
-        officialId: official?.id ?? "",
-        overallRating,
-        sectorRatings: sectorRatingsArray,
-      },
-      {
-        onSuccess: () => {
-          toast({
-            title: "Rating submitted",
-            description: `Your rating for ${official?.name} has been recorded.`,
-          });
-          resetModal();
-        },
-        onError: (error) => {
-          toast({
-            title: "Error submitting rating",
-            description: error.message,
-            variant: "destructive",
-          });
-        },
+    try {
+      await new Promise<void>((resolve, reject) => {
+        submitRating(
+          {
+            officialId: official?.id ?? "",
+            overallRating,
+            sectorRatings: sectorRatingsArray,
+          },
+          {
+            onSuccess: resolve,
+            onError: reject,
+          }
+        );
+      });
+
+      toast({
+        title: "Rating submitted",
+        description: `Your rating for ${official?.name} has been recorded.`,
+      });
+
+      // ✅ Refetch and update store
+      const { refetchOfficial, refetchRatingData, setOfficial } =
+        useSelectedOfficialStore.getState();
+
+      if (refetchOfficial) {
+        const result = await refetchOfficial();
+        if (result?.data) {
+          setOfficial(result.data);
+        }
       }
-    );
+
+      if (refetchRatingData) {
+        await refetchRatingData();
+      }
+
+      resetModal();
+    } catch (error: any) {
+      toast({
+        title: "Error submitting rating",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  // const handleSubmit = async () => {
+  //   setIsSubmitting(true);
+  //   const sectorRatingsArray = Object.entries(sectorRatings).map(
+  //     ([sectorId, rating]) => ({ sectorId, rating })
+  //   );
+
+  //   const overallRating =
+  //     sectorRatingsArray.length > 0
+  //       ? Math.round(
+  //           sectorRatingsArray.reduce((sum, rating) => sum + rating.rating, 0) /
+  //             sectorRatingsArray.length
+  //         )
+  //       : 50;
+
+  //   console.log(
+  //     "Submitting ratings",
+  //     official?.id,
+  //     overallRating,
+  //     sectorRatingsArray
+  //   );
+  //   submitRating(
+  //     {
+  //       officialId: official?.id ?? "",
+  //       overallRating,
+  //       sectorRatings: sectorRatingsArray,
+  //     },
+  //     {
+  //       onSuccess: () => {
+  //         toast({
+  //           title: "Rating submitted",
+  //           description: `Your rating for ${official?.name} has been recorded.`,
+  //         });
+  //         setIsSubmitting(false);
+  //         // refetchOfficial?.();
+
+  //         resetModal();
+  //       },
+  //       onError: (error) => {
+  //         toast({
+  //           title: "Error submitting rating",
+  //           description: error.message,
+  //           variant: "destructive",
+  //         });
+  //       },
+  //     }
+  //   );
+  // };
 
   const handleNext = () => {
     if (isLastStep) {
@@ -205,7 +269,7 @@ export function RatingModal({
       >
         {/* Header */}
 
-        <div className="flex items-center justify-between p-6 pb-6">
+        <div className="flex items-center justify-between p-4 md:p-6 md:pb-6">
           <h1 className="text-xl font-semibold text-text-primary">
             Rate your leader
           </h1>
@@ -217,7 +281,7 @@ export function RatingModal({
           />
         </div>
 
-        <div className="relative px-6 pb-2">
+        <div className="relative px-2 pb-2">
           {/* Leader Profile */}
           <div className="flex items-center gap-2 mb-6">
             {/* <div className="relative">
@@ -228,27 +292,15 @@ export function RatingModal({
               </div>
             </div> */}
             {official && (
-              <div className="w-16 h-16 rounded-full overflow-hidden bg-transparent relative">
-                <img
-                  src={official.imageUrl ?? ""}
-                  alt={official.name}
-                  className={`absolute w-full h-full rounded-full scale-150 bg-surface-brand/20 left-1/2 top-1/2 brightness-120   group-hover:border-white group-hover:border-[4px] transform -translate-x-1/2 -translate-y-1/2 transition-all duration-300 ease-in-out`}
-                  style={{
-                    objectFit: "cover",
-                    objectPosition: "center 20%",
-                  }}
-                />
-              </div>
-              // <OfficialAvatar
-              //   official={{
-              //     name: official?.name,
-              //     approvalRating: official?.approvalRating,
-              //     imageUrl: official.imageUrl,
-              //   }}
-              //   height={isMobile ? "h-16" : "h-32"}
-              //   width={isMobile ? "w-16" : "w-32"}
-              //   showAvatar={true}
-              // />
+              <OfficialAvatar
+                official={{
+                  name: official?.name,
+                  approvalRating: official?.approvalRating,
+                  imageUrl: official.imageUrl,
+                }}
+                showAvatar={false}
+                size="sm"
+              />
             )}
             <div>
               <h2 className="text-base font-semibold text-text-primary">
@@ -347,7 +399,7 @@ export function RatingModal({
                 className="flex items-center gap-2 bg-black text-white hover:bg-gray-800 rounded-full px-6"
               >
                 {isSubmitting ? (
-                  "Submitting..."
+                  <span className="animate-pulse flex">Submitting...</span>
                 ) : isLastStep ? (
                   "Submit"
                 ) : (

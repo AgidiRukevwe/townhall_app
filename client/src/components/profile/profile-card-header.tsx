@@ -1,10 +1,12 @@
 import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 import { useOfficialModalStore } from "@/store/official-modal-store";
 import { useSelectedOfficialStore } from "@/store/selected-official-store";
+import { getInitials } from "@/utils/get-initials";
 import { toTitleCase } from "@/utils/to-title-case";
 import { truncateText } from "@/utils/truncate-text";
 import { Official } from "@shared/schema";
 import React from "react";
+import { OfficialAvatar } from "../officials/official-avatar";
 
 interface ProfileHeaderProps {
   official: Official;
@@ -18,21 +20,15 @@ function ProfileHeader() {
     <>
       {!profileModal ? (
         <div className="flex flex-row md:flex-col items-center gap-x-2 ">
-          {official?.imageUrl ? (
-            <div className="w-24 h-24 bg-red- md:w-32 md:h-32 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3 border-4 border-white shadow-sm">
-              <img
-                src={official.imageUrl ?? ""}
-                alt={official.name ?? "Official Image"}
-                className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover md:mx-auto"
-              />
-            </div>
-          ) : (
-            <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
-              <span className="text-[#1476FF] text-2xl font-bold">
-                {official?.name}
-              </span>
-            </div>
-          )}
+          <OfficialAvatar
+            official={{
+              imageUrl: official?.imageUrl,
+              approvalRating: official?.approvalRating as number,
+              name: official?.name as string,
+            }}
+            size={isMobile ? "md" : "lg"}
+            showAvatar={false}
+          />
 
           {/* Official name and position */}
           <div className="flex flex-col gap-2">
@@ -57,7 +53,7 @@ function ProfileHeader() {
           ) : (
             <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
               <span className="text-[#1476FF] text-xl font-bold">
-                {truncateText(official?.name ?? "", 20)}
+                {truncateText(getInitials(official?.name ?? ""), 20)}
               </span>
             </div>
           )}

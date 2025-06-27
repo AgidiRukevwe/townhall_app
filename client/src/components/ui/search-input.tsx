@@ -33,7 +33,7 @@ export const SearchInput = ({
           <input
             type="search"
             placeholder={placeholder}
-            className={`input-standard w-full bg-red-200 focus:ring-1 focus:ring-surface-brand placeholder:text-text-secondary ${className}`}
+            className={`input-standard w-full focus:ring-1 focus:ring-surface-brand placeholder:text-text-secondary ${className}`}
             style={{ paddingLeft: "48px", border: "none" }}
             value={value}
             onChange={(e) => setValue(e.target.value)}

@@ -20,7 +20,7 @@ interface OfficialsListProps {
 export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
   const [, navigate] = useLocation();
   const { openModal: openProfileModal } = useOfficialModalStore();
-  const { setOfficial } = useSelectedOfficialStore();
+  const { setOfficial, refetchOfficial } = useSelectedOfficialStore();
   const isMobile = useBreakpoint();
 
   const defaultLimit = 12;
@@ -71,22 +71,33 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
     return <EmptyState type="not-found" title="No officials found" />;
 
   return (
-    <Tabs defaultValue={selectedTab} className="w-full space-y-4">
-      <TabsList className="flex justify-start bg-white  w-full border-b-[1px] border-[#EAECF0] rounded-none gap-2 mb-8 ">
-        {allCategories.map((category) => (
-          <TabsTrigger
-            key={category}
-            value={category}
-            className={tabTriggerClass}
-            onClick={() => setSelectedTab(category)}
-          >
-            {category}
-            {selectedTab === category && (
-              <Icon name="People" size={16} color="#007aff" className="ml-1" />
-            )}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+    <Tabs
+      defaultValue={selectedTab}
+      onValueChange={setSelectedTab}
+      className="w-full space-y-4"
+    >
+      <div className="w-full overflow-x-auto overflow-y-hidden hide-scrollbar">
+        <TabsList className="flex justify-start bg-white  w-full border-b-[1px] border-[#EAECF0] rounded-none gap-2 mb-8  ">
+          {allCategories.map((category) => (
+            <TabsTrigger
+              key={category}
+              value={category}
+              className={tabTriggerClass}
+              // onClick={() => setSelectedTab(category)}
+            >
+              {category}
+              {selectedTab === category && (
+                <Icon
+                  name="People"
+                  size={16}
+                  color="#007aff"
+                  className="ml-1"
+                />
+              )}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
 
       {allCategories.map((category) => {
         const limit = limits[category] || defaultLimit;

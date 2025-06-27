@@ -3,6 +3,7 @@ import {
   Toast,
   ToastClose,
   ToastDescription,
+  ToastIcon,
   ToastProvider,
   ToastTitle,
   ToastViewport,
@@ -13,11 +14,24 @@ export function Toaster() {
 
   return (
     <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
+      {toasts.map(function ({
+        id,
+        title,
+        description,
+        action,
+        variant = "default",
+        ...props
+      }) {
         return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
+          <Toast
+            key={id}
+            variant={variant}
+            {...props}
+            className="flex items-start justify-start"
+          >
+            <ToastIcon variant={variant ?? "success"} />
+            <div className="flex flex-col">
+              {title && <ToastTitle className="">{title}</ToastTitle>}
               {description && (
                 <ToastDescription>{description}</ToastDescription>
               )}

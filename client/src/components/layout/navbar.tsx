@@ -57,7 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const renderDesktopNav = () => (
-    // <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
+    // <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
     <div className="max-w-[95%] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-2">
       <div className="flex justify-between items-center ">
         <Link href="/">
@@ -135,7 +135,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             onSearch={onSearch}
             placeholder={searchPlaceholder}
             initialValue={initialSearchValue}
-            className="bg-red-100"
           />
           <Button
             variant="ghost"

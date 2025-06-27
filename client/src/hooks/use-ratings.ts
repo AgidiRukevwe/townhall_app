@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 
 // Simple hook to get just the overall approval rating
 export function useApprovalRating(officialId: string) {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: [`/api/officials/${officialId}/approval-ratings`],
     queryFn: async () => {
       const res = await apiRequest(
@@ -22,13 +22,15 @@ export function useApprovalRating(officialId: string) {
   return {
     approvalRating: data?.overallApprovalRating || 0,
     isLoading,
+    refetch,
+    isRefetching,
     error,
   };
 }
 
 // Simple hook to get just sector ratings (overall scores)
 export function useSectorRatings(officialId: string) {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: [`/api/officials/${officialId}/approval-ratings`],
     queryFn: async () => {
       const res = await apiRequest(
@@ -62,6 +64,8 @@ export function useSectorRatings(officialId: string) {
     sectors,
     overallSectorRating,
     isLoading,
+    refetch,
+    isRefetching,
     error,
   };
 }
@@ -72,7 +76,7 @@ export function useTimeBasedRatings(
   period: string = "1 Wk",
   sector?: string
 ) {
-  const { data, isLoading, refetch, error } = useQuery({
+  const { data, isLoading, refetch, error, isRefetching } = useQuery({
     queryKey: [`/api/officials/${officialId}/approval-ratings`],
     queryFn: async () => {
       const res = await apiRequest(
@@ -99,6 +103,7 @@ export function useTimeBasedRatings(
     data: timeData?.data || [],
     isLoading,
     refetch,
+    isRefetching,
     error,
   };
 }

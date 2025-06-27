@@ -11,8 +11,8 @@ export const THLogo = ({ className = "" }: { className?: string }) => {
           src={thLogo}
           alt="Townhall Logo"
           className="object-cover"
-          width={isMobile ? 100 : 150}
-          height={isMobile ? 100 : 150}
+          width={isMobile ? 150 : 150}
+          height={isMobile ? 150 : 150}
         />
 
         {/* <span className="text-white font-bold text-lg">TH</span> */}

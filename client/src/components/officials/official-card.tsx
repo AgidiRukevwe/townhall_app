@@ -7,6 +7,7 @@ import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { getInitials } from "@/utils/get-initials";
 import { OfficialAvatar } from "./official-avatar";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
 
 interface OfficialCardProps {
   official: Official;
@@ -15,6 +16,7 @@ interface OfficialCardProps {
 
 export function OfficialCard({ official, compact = false }: OfficialCardProps) {
   const [showAvatar, setShowAvatar] = useState(!official.imageUrl);
+  const isMobile = useBreakpoint();
 
   // Function to capitalize first letter of each word
   const toTitleCase = (str: string) => {

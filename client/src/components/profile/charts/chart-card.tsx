@@ -74,7 +74,7 @@ export const ChartCard = ({
 
   if (isLoading || !selectedDataset) {
     return (
-      <div className=" md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
+      <div className=" md:border md:border-gray-200 rounded-2xl md:rounded-3xl md:p-4 w-full mb-4 relative">
         {/* Your loading placeholder */}
         <Loading message="Loading data..." />
       </div>
@@ -83,7 +83,7 @@ export const ChartCard = ({
 
   return (
     // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
-    <div className="bg-surface-secondary w-full p-4 rounded-3xl mb-6 relative">
+    <div className="bg-surface-secondary/50 w-full px-4 py-3 rounded-3xl md:rounded-3xl mb-4 relative">
       {/* <div className="bg-white w-full mb-6 relative"> */}
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">

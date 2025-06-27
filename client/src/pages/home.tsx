@@ -125,8 +125,8 @@ export default function Home() {
         <div className="flex flex-row md:gap-2 justify-between items-center md:items-center py-8">
           <div className="flex flex-col gap-3 pb-2 md:pb-8 ">
             <h1 className="font-medium text-3xl md:text-5xl md:leading-[56px] flex flex-col">
-              <span className="text-text-secondary">See how your</span> leaders
-              are doing.
+              <span className="text-[#8c8c8c]">See how your</span> leaders are
+              doing.
             </h1>
             {/* <p className="text-text-secondary font-normal">
               Start by checking who represents you and how they’re performing.
