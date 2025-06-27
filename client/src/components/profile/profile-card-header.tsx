@@ -36,27 +36,21 @@ function ProfileHeader() {
               {toTitleCase(official?.name ?? "")}
             </h2>
             <p className="text-text-secondary mb-6 text-sm truncate">
-              {truncateText(official?.location ?? "", isMobile ? 30 : 50)}
+              jj {truncateText(official?.location ?? "", isMobile ? 30 : 50)}
             </p>
           </div>
         </div>
       ) : (
         <div className="flex flex-row items-center gap-x-4">
-          {official?.imageUrl ? (
-            <div className="w-24 h-24 bg-red- md:w-24 md:h-24 rounded-full overflow-hidden relative bg-[#e6f4ff] mb-3">
-              <img
-                src={official.imageUrl ?? ""}
-                alt={official.name ?? "Official Image"}
-                className="absolute w-[150%] h-[150%] left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 object-cover md:mx-auto"
-              />
-            </div>
-          ) : (
-            <div className="w-32 h-32 rounded-full bg-[#e6f4ff] flex items-center justify-center mb-3 border-4 border-white shadow-sm">
-              <span className="text-[#1476FF] text-xl font-bold">
-                {truncateText(getInitials(official?.name ?? ""), 20)}
-              </span>
-            </div>
-          )}
+          <OfficialAvatar
+            official={{
+              imageUrl: official?.imageUrl,
+              approvalRating: official?.approvalRating as number,
+              name: official?.name as string,
+            }}
+            size={isMobile ? "md" : "lg"}
+            showAvatar={false}
+          />
 
           {/* Official name and position */}
           <div className="flex flex-col gap-2">

@@ -36,6 +36,7 @@ import { useSearchHandler } from "@/hooks/util-hooks/use-search";
 import { useAuthStore } from "@/store/auth-store";
 import { useRatingModalStore } from "@/store/rating-store";
 import { SignInModal } from "@/components/shared/sigin-in-modal";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
@@ -48,7 +49,12 @@ export default function Profile() {
   const [chartEmpty, setChartEmpty] = useState<boolean>(true);
 
   const { id } = useParams<{ id: string }>();
-  const { data: official, isLoading, error } = useOfficialDetails(id);
+  const {
+    data: official,
+    isLoading,
+    error,
+    refetch: refetchOfficialDetails,
+  } = useOfficialDetails(id);
 
   const { toast } = useToast();
   const { user } = useAuthStore();
@@ -80,6 +86,7 @@ export default function Profile() {
     sectors,
     overallSectorRating,
     isLoading: isLoadingSectorRatings,
+    refetch: refetchSectorRatings,
   } = useSectorRatings(id);
   const {
     timeLabels,
@@ -99,10 +106,17 @@ export default function Profile() {
     labels: sectors.map((sector) => sector.name),
     data: sectors.map((sector) => sector.rating),
   };
+  const { setRefetchOfficial, setRefetchRatingData } =
+    useSelectedOfficialStore();
 
   useEffect(() => {
     refetchApprovalData();
   }, [selectedApprovalRatingPeriod]);
+
+  useEffect(() => {
+    setRefetchOfficial(refetchOfficialDetails);
+    setRefetchRatingData(refetchSectorRatings);
+  }, []);
 
   useEffect(() => {
     console.log(fullData);
