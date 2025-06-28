@@ -48,10 +48,11 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
       <div className="flex items-center justify-center">
         <div>
           <OfficialAvatar
-            showAvatar={showAvatar}
+            // showAvatar={true}
             official={{
               imageUrl: official.imageUrl,
               approvalRating: official.approvalRating,
+
               name: official.name,
             }}
           />

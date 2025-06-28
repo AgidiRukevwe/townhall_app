@@ -10,6 +10,14 @@ import { Navbar } from "@/components/layout/navbar";
 import { handleLogout } from "@/utils/handle-logout";
 import { useSearchHandler } from "@/hooks/util-hooks/use-search";
 import { Button } from "@/components/ui/button";
+import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
+import { useOfficialModalStore } from "@/store/official-modal-store";
+import { useSelectedOfficialStore } from "@/store/selected-official-store";
+import { Official } from "@shared/schema";
+import { RatingModal } from "@/components/rating/rating-modal-updated";
+import ProfileModal from "@/components/profile/views/profile-modal";
+import { SignInModal } from "@/components/shared/sigin-in-modal";
+import { useRatingModalStore } from "@/store/rating-store";
 
 function SearchPage() {
   const [location, navigate] = useLocation();
@@ -18,6 +26,30 @@ function SearchPage() {
 
   const { officials, isLoading } = useOfficials({ search: searchQuery });
   const { searchInput, handleSearch } = useSearchHandler();
+
+  const isMobile = useBreakpoint();
+  const { openModal: openProfileModal } = useOfficialModalStore();
+  const { setOfficial, official } = useSelectedOfficialStore();
+
+  const { isOpen, closeModal } = useOfficialModalStore();
+  const {
+    openModal: openRatingModal,
+    isOpen: isRatingModalOpen,
+    closeModal: closeRatingModal,
+  } = useRatingModalStore();
+
+  const handleSelectOfficial = (official: Official) => {
+    try {
+      setOfficial(official);
+      isMobile
+        ? navigate(`/profile/${official.id}`)
+        : openProfileModal(official.id);
+      // : openProfileModal(official.id);
+    } catch (error) {
+      console.log("selecting official error", error);
+    }
+    console.log("test");
+  };
 
   const { id: pageTitle } = useParams<{ id: string }>();
   // const [searchInput, setSearchInput] = useState("");
@@ -77,9 +109,7 @@ function SearchPage() {
                   <div
                     key={official.id}
                     className="md:h-full w-[170px] md:min-w-[200px] md:w-[100px] flex-shrink-0 cursor-auto"
-                    onClick={() =>
-                      (window.location.href = `/profile/${official.id}`)
-                    }
+                    onClick={() => handleSelectOfficial(official)}
                   >
                     <OfficialCard official={official} compact />
                   </div>
@@ -96,6 +126,16 @@ function SearchPage() {
           </div>
         )}
       </div>
+
+      <RatingModal
+        open={isRatingModalOpen}
+        onOpenChange={closeRatingModal}
+        sectors={official?.sectors ?? []}
+      />
+
+      <ProfileModal open={isOpen} onOpenChange={closeModal} />
+
+      <SignInModal />
     </main>
   );
 }

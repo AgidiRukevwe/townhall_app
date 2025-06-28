@@ -57,6 +57,7 @@ export function OfficialsList({ officials, isLoading }: OfficialsListProps) {
     isMobile
       ? navigate(`/profile/${official.id}`)
       : openProfileModal(official.id);
+    // : openProfileModal(official.id);
   };
 
   const handleLoadMore = (category: string) => {

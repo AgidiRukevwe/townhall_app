@@ -27,16 +27,17 @@ function ProfileHeader() {
               name: official?.name as string,
             }}
             size={isMobile ? "md" : "lg"}
-            showAvatar={false}
+            // showAvatar={true}
           />
 
           {/* Official name and position */}
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col md:gap-2">
             <h2 className="text-lg md:text-xl font-bold text-gray-900">
               {toTitleCase(official?.name ?? "")}
             </h2>
-            <p className="text-text-secondary mb-6 text-sm truncate">
-              jj {truncateText(official?.location ?? "", isMobile ? 30 : 50)}
+            <p className="text-text-secondary md:mb-6 text-sm truncate">
+              {truncateText(official?.location ?? "", isMobile ? 30 : 50)}
+              {/* jj */}
             </p>
           </div>
         </div>
@@ -49,7 +50,7 @@ function ProfileHeader() {
               name: official?.name as string,
             }}
             size={isMobile ? "md" : "lg"}
-            showAvatar={false}
+            // showAvatar={false}
           />
 
           {/* Official name and position */}

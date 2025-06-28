@@ -298,7 +298,7 @@ export function RatingModal({
                   approvalRating: official?.approvalRating,
                   imageUrl: official.imageUrl,
                 }}
-                showAvatar={false}
+                // showAvatar={false}
                 size="sm"
               />
             )}
