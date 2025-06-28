@@ -39,6 +39,7 @@ import { useRatingModalStore } from "@/store/rating-store";
 import { useAuth } from "@/hooks/auth-hooks/use-auth-updated";
 import { useSignInModalStore } from "@/store/signin-modal-store";
 import useHandleRatingModal from "@/hooks/rating-hooks/use-handle-rating-modal";
+import { SectorChartCard } from "../charts/sector-chart-card";
 
 interface ProfileModalProps {
   open: boolean;
@@ -155,6 +156,10 @@ export default function ProfileModal({
     }
   }, [approvalRating, overallSectorRating, fullData]);
 
+  useEffect(() => {
+    console.log("Labels by Granularity:", fullData?.sectorPeriodRating);
+  }, []);
+
   // Determine education and career data from official
   const educationData = official?.education || [];
   const careerData = official?.careerHistory || [];
@@ -198,7 +203,7 @@ export default function ProfileModal({
       ) : (
         <div className="absolute right-5 top-5 h-[95%] w-[40%] z-50 bg-white backdrop-blur-lg border-2 border-white rounded-3xl p-6 overflow-y-auto hide-scrollbar scrollar-hide scrollbar-none">
           <div className="flex flex-row justify-between items-center pb-6">
-            <h4 className="text-xl">Official's profile</h4>{" "}
+            <h4 className="text-xl">Official's profile</h4>
             <Icon
               name="CloseCircle"
               color="#737373"
@@ -226,66 +231,86 @@ export default function ProfileModal({
                 About
               </TabsTrigger>
             </TabsList>
-
-            {isRefetchingApprovalData ? (
+            {/* {isRefetchingApprovalData ? (
               <Loading />
-            ) : (
-              <>
-                <TabsContent value="performance">
-                  {chartEmpty ? (
-                    <div className="flex  md:w-[100%] py-8 items-center justify-center rounded-3xl">
-                      <EmptyState
-                        type="no-content"
-                        title="No one has rated this leader yet."
-                        description="Your rating helps others understand this leader’s impact.."
-                        showButton={false}
-                        //   customAction={{
-                        //     label: "Rate this leader",
-                        //     onClick: () => setRatingModalOpen(true),
-                        //   }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full">
-                      <ChartCard
-                        chartName="Approval rating"
-                        dataMap={approvaDataSet}
-                        chartType="line"
-                        chartKey="4"
-                        valueChange={2.5}
-                        isLoading={
-                          isLoadingApproval || isLoadingApprovalRatingOverall
-                        }
-                        handlePeriodChange={handlePeriodChange}
-                        autoSkipXAxisLabels={true}
-                      />
+            ) : ( */}
+            <>
+              <TabsContent value="performance">
+                {chartEmpty ? (
+                  <div className="flex  md:w-[100%] py-8 items-center justify-center rounded-3xl">
+                    <EmptyState
+                      type="no-content"
+                      title="No one has rated this leader yet."
+                      description="Your rating helps others understand this leader’s impact.."
+                      showButton={false}
+                      //   customAction={{
+                      //     label: "Rate this leader",
+                      //     onClick: () => setRatingModalOpen(true),
+                      //   }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full">
+                    <ChartCard
+                      chartName="Approval rating"
+                      dataMap={approvaDataSet}
+                      chartType="line"
+                      chartKey="4"
+                      valueChange={2.5}
+                      isLoading={
+                        isLoadingApproval || isLoadingApprovalRatingOverall
+                      }
+                      handlePeriodChange={handlePeriodChange}
+                      autoSkipXAxisLabels={true}
+                    />
 
-                      <ChartCard
-                        chartName="Performance by sectors"
-                        dataMap={sectorDataSet}
-                        chartType="bar"
-                        chartKey="4"
-                        valueChange={2.5}
-                        isLoading={
-                          isLoadingApproval || isLoadingApprovalRatingOverall
-                        }
-                        handlePeriodChange={handlePeriodChange}
-                        showGranularity={false}
-                        autoSkipXAxisLabels={false}
-                      />
-                    </div>
-                  )}
-                </TabsContent>
-                <TabsContent value="about">
-                  <OfficialProfileCard
-                    official={official}
-                    educationData={educationData}
-                    careerData={careerData}
-                    classname="w-full md:w-[100%]"
-                  />
-                </TabsContent>
-              </>
-            )}
+                    <ChartCard
+                      chartName="Performance by sectors"
+                      dataMap={sectorDataSet}
+                      chartType="bar"
+                      chartKey="4"
+                      valueChange={2.5}
+                      isLoading={
+                        isLoadingApproval || isLoadingApprovalRatingOverall
+                      }
+                      handlePeriodChange={handlePeriodChange}
+                      showGranularity={false}
+                      autoSkipXAxisLabels={false}
+                    />
+
+                    {fullData?.sectorPeriodRating && (
+                      <div>
+                        {Object.entries(fullData.sectorPeriodRating).map(
+                          ([sectorName, periodData]) => {
+                            const sectorData = periodData as Record<
+                              Granularity,
+                              { data: number[]; labels: string[] }
+                            >;
+
+                            return (
+                              <SectorChartCard
+                                key={sectorName}
+                                sectorName={sectorName}
+                                sectorData={sectorData}
+                                isLoading={false}
+                              />
+                            );
+                          }
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </TabsContent>
+              <TabsContent value="about">
+                <OfficialProfileCard
+                  official={official}
+                  educationData={educationData}
+                  careerData={careerData}
+                  classname="w-full md:w-[100%]"
+                />
+              </TabsContent>
+            </>
           </Tabs>
         </div>
       )}

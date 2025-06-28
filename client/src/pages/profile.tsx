@@ -85,6 +85,7 @@ export default function Profile() {
   const {
     sectors,
     overallSectorRating,
+
     isLoading: isLoadingSectorRatings,
     refetch: refetchSectorRatings,
   } = useSectorRatings(id);

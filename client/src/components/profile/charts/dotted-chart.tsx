@@ -107,7 +107,7 @@ export default function DottedGridChart({
             maxRotation: 0,
             minRotation: 0,
             maxTicksLimit: isMobile ? 8 : 15,
-            autoSkip: labels.length < 10 ? false : true,
+            autoSkip: labels.length < 5 ? false : true,
           },
         },
         y: {

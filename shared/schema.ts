@@ -178,6 +178,30 @@ export type Official = {
   }>;
 };
 
+export interface ApprovalData {
+  officialId: string;
+  overallApprovalRating: number;
+  overallRatingsByPeriod: {
+    [key: string]: {
+      timeLabels: string[];
+      data: number[];
+    };
+  };
+  sectorRatings: {
+    [sectorName: string]: {
+      sectorId: string;
+      color: string;
+      overallRating: number;
+      ratingsByPeriod: {
+        [key: string]: {
+          timeLabels: string[];
+          data: number[];
+        };
+      };
+    };
+  };
+}
+
 export type InsertOfficial = InsertLeader;
 
 export type Sector = typeof sectors.$inferSelect;
@@ -249,6 +273,15 @@ export interface RatingSummary {
       "This year": TimeDataBySector;
     };
   };
+  sectorPeriodRating: Record<
+    string,
+    {
+      "1 Dy": number[];
+      "1 Wk": number[];
+      "1 Yr": number[];
+      "This year": number[];
+    }
+  >;
 }
 
 // Supabase database types
