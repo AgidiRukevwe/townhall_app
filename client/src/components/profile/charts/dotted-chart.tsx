@@ -121,7 +121,7 @@ export default function DottedGridChart({
             callback: (value) => `${value}`,
             stepSize: 20,
           },
-          grace: "10%", // Adds space above the highest Y point
+          grace: "0%", // Adds space above the highest Y point
         },
       },
       plugins: {
@@ -158,7 +158,8 @@ export default function DottedGridChart({
         if (!chartArea) return;
 
         ctx.save();
-        ctx.fillStyle = "#D9D9D9";
+        // ctx.fillStyle = "#CCE4FF";
+        ctx.fillStyle = "#d9d9d9";
 
         // 🔁 Spacing responds to screen size
         const xStep = isMobile ? chartArea.width / 17 : chartArea.width / 45;
@@ -243,7 +244,7 @@ export default function DottedGridChart({
     <div
       ref={scrollContainerRef}
       style={{ height: chartHeight, overflowX: "auto" }}
-      className="w-full rounded-2xl overflow-hidden"
+      className="w-full pt-4 bg-white rounded-2xl overflow-hidden"
     >
       <div
         className="overflow-hidden md:min-w-full z-50"

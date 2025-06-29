@@ -84,9 +84,9 @@ export const ChartCard = ({
 
   return (
     // <div className="bg-white md:border md:border-gray-200 rounded-3xl md:p-4 w-full mb-4 relative">
-    <div className="bg-surface-secondary/50 w-full px-4 py-3 rounded-3xl md:rounded-3xl mb-4 relative">
+    <div className="bg-surface-secondary/50 w-full  rounded-3xl md:rounded-3xl mb-4 relative">
       {/* <div className="bg-white w-full mb-6 relative"> */}
-      <div className="flex w-full items-center justify-between flex-row mb-7">
+      <div className="flex w-full items-center px-4 pt-3 justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
           {/* <Icon name="Chart2" size={16} color="#BFBFBF" variant="Bold" /> */}
           <span className="text-sm md:text-base text-text-secondary flex items-center gap-2">
@@ -121,11 +121,11 @@ export const ChartCard = ({
         </div>
       </div>
 
-      <div className="mb-4">
-        <h2 className="text-4xl md:text-5xl font-medium md:font-medium text-text-primary">
+      <div className="mb-4 flex items-end gap-2 px-4">
+        <h2 className="text-4xl md:text-5xl font-medium md:font-medium leading-none text-text-primary">
           {selectedDataset?.overallRating}%
         </h2>
-        <div className="text-sm rounded-full bg-[#4caf50]/10 w-auto inline-flex items-center p-1 px-1 mt-2">
+        <div className="text-sm rounded-full bg-[#4caf50]/10 w-auto inline-flex items-center py-1 px-2 mt-2">
           <Icon name="ArrowUp2" size={16} color="#4caf50" variant="Bold" />
           <span className="font-medium text-xs text-[#4caf50]">
             {valueChange}%
@@ -134,7 +134,7 @@ export const ChartCard = ({
       </div>
 
       {/* <div className="h-[400px] w-full"> */}
-      <div className="h-auto w-full">
+      <div className="h-auto w-full p-2 overflow-hidden">
         <DottedGridChart
           type={chartType}
           labels={truncatedLabels}
