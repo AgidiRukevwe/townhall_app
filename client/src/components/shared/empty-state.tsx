@@ -1,10 +1,10 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-import NoContent from "../../public/assets/empty-state-illustrations/no-content.svg";
-import NoInternetData from "../../public/assets/empty-state-illustrations/no-internet-data.svg";
-import NoSearchResult from "../../public/assets/empty-state-illustrations/no-result.svg";
-import PoorConnection from "../../public/assets/empty-state-illustrations/poor-connection.svg";
+import NoContent from "../../public/assets/empty-state-illustrations/no-content-2.svg";
+import NoInternetData from "../../public/assets/empty-state-illustrations/no-internet-data-2.svg";
+import NoSearchResult from "../../public/assets/empty-state-illustrations/no-result-2.svg";
+import PoorConnection from "../../public/assets/empty-state-illustrations/poor-connection-2.svg";
 import NoNotifications from "../../public/assets/empty-state-illustrations/no-notifications.svg";
 import { Button } from "../ui/button";
 
@@ -100,10 +100,12 @@ function EmptyState({
 
   return (
     <div className="flex flex-col items-center text-center p-4 space-y-4">
-      <img src={imageSrc} alt={title} className="w-32 h-32 mb-4" />
-      <div className="space-y-2 mb-4">
-        <h2 className="text-sm font-semibold">{title}</h2>
-        <p className="text-xs text-text-secondary w-56">{description}</p>
+      <div className="">
+        <img src={imageSrc} alt={title} className="w-40 h-40" />
+      </div>
+      <div className="space-y-2 mb-4 flex flex-col items-center justify-center">
+        <h2 className="text-base font-semibold">{title}</h2>
+        <p className="text-sm text-text-secondary w-64">{description}</p>
       </div>
       <div className="mt-4">{renderCTA()}</div>
     </div>

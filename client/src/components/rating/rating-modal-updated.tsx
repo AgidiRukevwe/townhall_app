@@ -264,12 +264,12 @@ export function RatingModal({
     <Dialog open={open} onOpenChange={closeModal}>
       <DialogContent
         showClose={false}
-        className="w-auto flex flex-col h-auto  bg-surface-secondary border-2 border-white rounded-3xl p-0 gap-0 overflow-y-auto hide-scrollbar"
+        className="w-[358px] md:w-[450px] flex flex-col h-auto  bg-surface-secondary border-2 border-white rounded-3xl p-0 gap-0 overflow-y-auto hide-scrollbar"
         style={{ borderRadius: "1.5rem" }}
       >
         {/* Header */}
 
-        <div className="flex items-center justify-between p-4 md:p-6 md:pb-6">
+        <div className="flex items-center justify-between p-4 md:p-6 pb-8 md:pb-6">
           <h1 className="text-xl font-semibold text-text-primary">
             Rate your leader
           </h1>
@@ -282,91 +282,95 @@ export function RatingModal({
         </div>
 
         <div className="relative px-2 pb-2">
-          {/* Leader Profile */}
-          <div className="flex items-center gap-2 mb-6">
-            {/* <div className="relative">
+          <div className="bg-white rounded-2xl pt-4 px-4">
+            {/* Leader Profile */}
+
+            <div className="flex items-center gap-2 mb-6 pb-3 border-1 border-b border-surface-secondary">
+              {/* <div className="relative">
               <div className="w-20 h-20 bg-surface-brand/10 rounded-full border-2 border-white flex items-center justify-center">
                 <span className="text-surface-brand text-2xl font-medium">
                   🇳🇬
                 </span>
               </div>
             </div> */}
-            {official && (
-              <OfficialAvatar
-                official={{
-                  name: official?.name,
-                  approvalRating: official?.approvalRating,
-                  imageUrl: official.imageUrl,
-                }}
-                // showAvatar={false}
-                size="sm"
-              />
-            )}
-            <div>
-              <h2 className="text-base font-semibold text-text-primary">
-                {truncateText(toTitleCase(official?.name ?? ""), 50)}
-              </h2>
-              <p className="text-text-secondary text-sm">
-                {truncateText(official?.location ?? "", isMobile ? 20 : 30)}
-              </p>
-            </div>
-          </div>
-
-          {/* The Survey section */}
-
-          <div className="bg-white rounded-2xl p-4 mb-6 h-96 overflow-y-auto flex-grow hide-scrollbar">
-            {/* Progress */}
-            <div className="pb-4 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-xs  font-medium text-text-secondary">
-                  Sectors {currentStep + 1} of {totalSteps}
-                </span>
-              </div>
-              <div className="w-full bg-gray-100 rounded-full h-1">
-                <div
-                  className="bg-blue-500 h-1 rounded-full transition-all duration-300"
-                  style={{
-                    width: `${((currentStep + 1) / totalSteps) * 100}%`,
+              {official && (
+                <OfficialAvatar
+                  official={{
+                    name: official?.name,
+                    approvalRating: official?.approvalRating,
+                    imageUrl: official.imageUrl,
                   }}
+                  showRatingBadge={true}
+                  // showAvatar={false}
+                  size="sm"
                 />
+              )}
+              <div>
+                <h2 className="text-base font-semibold text-text-primary">
+                  {truncateText(toTitleCase(official?.name ?? ""), 50)}
+                </h2>
+                <p className="text-text-secondary text-[13px] md:text-sm">
+                  {truncateText(official?.location ?? "", isMobile ? 20 : 30)}
+                </p>
               </div>
             </div>
 
-            {/* Question Content */}
-            <div className="pb-4">
-              <h3 className="text-base font-semibold text-text-primary mb-8">
-                How would you rate their performance in{" "}
-                {currentSector.name.toLowerCase()}
-              </h3>
+            {/* The Survey section */}
 
-              {/* Rating Options */}
-              <div className="flex flex-col space-y-2 ">
-                {ratingOptions.map((option) => {
-                  const isSelected =
-                    sectorRatings[currentSector.id] === option.value;
-                  return (
-                    <button
-                      key={option.value}
-                      onClick={() =>
-                        handleRatingSelect(currentSector.id, option.value)
-                      }
-                      className={`w-[50%] px-4 py-3 rounded-full border-[1px] text-left font-medium transition-all ${
-                        isSelected
-                          ? "bg-blue-50 border-surface-brand  text-text-brand"
-                          : "bg-transparent border-gray-200 text-text-primary hover:border-gray-300"
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium">
-                          {option.label}
-                        </span>
-                        {isSelected && (
-                          <Icon name="TickCircle" size={16} color="#007aff" />
-                        )}
-                      </div>
-                    </button>
-                  );
-                })}
+            <div className="bg-white  mb-6 px-0 h-96 overflow-y-auto flex-grow hide-scrollbar">
+              {/* Progress */}
+              <div className="pb-4 rounded-lg">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-xs  md:font-medium text-[#8c8c8c]">
+                    Sectors {currentStep + 1} of {totalSteps}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-100 rounded-full h-1">
+                  <div
+                    className="bg-blue-500 h-1 rounded-full transition-all duration-300"
+                    style={{
+                      width: `${((currentStep + 1) / totalSteps) * 100}%`,
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Question Content */}
+              <div className="pb-4">
+                <h3 className="text-base font-semibold text-text-primary mb-8">
+                  How would you rate their performance in{" "}
+                  {currentSector.name.toLowerCase()}
+                </h3>
+
+                {/* Rating Options */}
+                <div className="flex flex-col space-y-2 ">
+                  {ratingOptions.map((option) => {
+                    const isSelected =
+                      sectorRatings[currentSector.id] === option.value;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() =>
+                          handleRatingSelect(currentSector.id, option.value)
+                        }
+                        className={`w-[50%] px-4 py-3 rounded-full border-[1px] text-left font-medium transition-all ${
+                          isSelected
+                            ? "bg-blue-50 border-surface-brand  text-text-brand"
+                            : "bg-transparent border-gray-200 text-text-primary hover:border-gray-300"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">
+                            {option.label}
+                          </span>
+                          {isSelected && (
+                            <Icon name="TickCircle" size={16} color="#007aff" />
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -375,22 +379,22 @@ export function RatingModal({
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
-              onClick={handlePrevious}
-              disabled={currentStep === 0}
+              onClick={handleSkip}
               className="flex items-center gap-2 text-text-secondary hover:text-text-primary"
             >
-              <Icon name="ArrowCircleLeft" size={16} color="#737373" />
-              Previous
+              Skip
+              <Icon name="Forward" size={16} color="#737373" />
             </Button>
 
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
-                onClick={handleSkip}
+                disabled={currentStep === 0}
+                onClick={handlePrevious}
                 className="flex items-center gap-2 rounded-full px-6"
               >
-                Skip
-                <Icon name="Forward" size={16} color="#737373" />
+                {/* <Icon name="ArrowCircleLeft" size={16} color="#737373" /> */}
+                Previous
               </Button>
 
               <Button
