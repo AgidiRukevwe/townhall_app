@@ -102,11 +102,11 @@ export default function DottedGridChart({
           grid: { display: false },
           border: { display: false },
           ticks: {
-            padding: 10,
+            padding: 8,
             font: { size: 10, family: "Satoshi" },
             maxRotation: 0,
             minRotation: 0,
-            maxTicksLimit: isMobile ? 8 : 15,
+            maxTicksLimit: isMobile ? 5 : 15,
             autoSkip: labels.length < 5 ? false : true,
           },
         },
@@ -119,6 +119,7 @@ export default function DottedGridChart({
             padding: 10,
             font: { size: 10, family: "Satoshi" },
             callback: (value) => `${value}`,
+            stepSize: 20,
           },
           grace: "10%", // Adds space above the highest Y point
         },
@@ -149,45 +150,91 @@ export default function DottedGridChart({
     });
   }, [labels]);
 
-  // Custom plugin that draws a dotted background (visual grid)
-  const dottedBackgroundPlugin = {
-    id: "dottedBackground",
-    beforeDatasetsDraw(chart: any) {
-      const { ctx, chartArea } = chart;
-      if (!chartArea) return;
+  useEffect(() => {
+    const dottedBackgroundPlugin = {
+      id: "dottedBackground",
+      beforeDatasetsDraw(chart: any) {
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
 
-      ctx.save();
-      ctx.fillStyle = "#D9D9D9";
-      const xStep = chartArea.width / 45;
-      const yStep = chartArea.height / 20;
+        ctx.save();
+        ctx.fillStyle = "#D9D9D9";
 
-      // Draw small dots in a grid layout across chart area
-      for (let x = chartArea.left; x <= chartArea.right; x += xStep) {
-        for (let y = chartArea.top; y <= chartArea.bottom; y += yStep) {
-          ctx.beginPath();
-          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-          ctx.fill();
+        // 🔁 Spacing responds to screen size
+        const xStep = isMobile ? chartArea.width / 17 : chartArea.width / 45;
+        const yStep = isMobile ? chartArea.height / 17 : chartArea.height / 20;
+
+        for (let x = chartArea.left; x <= chartArea.right; x += xStep) {
+          for (let y = chartArea.top; y <= chartArea.bottom; y += yStep) {
+            ctx.beginPath();
+            ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
         }
-      }
 
-      // Optional: draw vertical line to highlight a data point
-      if (chart.options.highlightIndex !== undefined) {
-        const xPos = chart.scales.x.getPixelForValue(
-          chart.options.highlightIndex
-        );
-        ctx.beginPath();
-        ctx.strokeStyle = "rgba(0,0,0,0.2)";
-        ctx.moveTo(xPos, chartArea.top);
-        ctx.lineTo(xPos, chartArea.bottom);
-        ctx.stroke();
-      }
+        // Optional highlight line
+        if (chart.options.highlightIndex !== undefined) {
+          const xPos = chart.scales.x.getPixelForValue(
+            chart.options.highlightIndex
+          );
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(0,0,0,0.2)";
+          ctx.moveTo(xPos, chartArea.top);
+          ctx.lineTo(xPos, chartArea.bottom);
+          ctx.stroke();
+        }
 
-      ctx.restore();
-    },
-  };
+        ctx.restore();
+      },
+    };
 
-  // Register the plugin so it affects the chart
-  ChartJS.register(dottedBackgroundPlugin);
+    ChartJS.unregister({ id: "dottedBackground" } as any); // safe unregister
+    ChartJS.register(dottedBackgroundPlugin);
+
+    return () => {
+      ChartJS.unregister(dottedBackgroundPlugin);
+    };
+  }, [isMobile]);
+
+  // // Custom plugin that draws a dotted background (visual grid)
+  // const dottedBackgroundPlugin = {
+  //   id: "dottedBackground",
+  //   beforeDatasetsDraw(chart: any) {
+  //     const { ctx, chartArea } = chart;
+  //     if (!chartArea) return;
+
+  //     ctx.save();
+  //     ctx.fillStyle = "#D9D9D9";
+  //     const xStep = isMobile ? chartArea.width / 100 : chartArea.width / 45;
+  //     const yStep = isMobile ? chartArea.height / 100 : chartArea.height / 20;
+
+  //     // Draw small dots in a grid layout across chart area
+  //     for (let x = chartArea.left; x <= chartArea.right; x += xStep) {
+  //       for (let y = chartArea.top; y <= chartArea.bottom; y += yStep) {
+  //         ctx.beginPath();
+  //         ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+  //         ctx.fill();
+  //       }
+  //     }
+
+  //     // Optional: draw vertical line to highlight a data point
+  //     if (chart.options.highlightIndex !== undefined) {
+  //       const xPos = chart.scales.x.getPixelForValue(
+  //         chart.options.highlightIndex
+  //       );
+  //       ctx.beginPath();
+  //       ctx.strokeStyle = "rgba(0,0,0,0.2)";
+  //       ctx.moveTo(xPos, chartArea.top);
+  //       ctx.lineTo(xPos, chartArea.bottom);
+  //       ctx.stroke();
+  //     }
+
+  //     ctx.restore();
+  //   },
+  // };
+
+  // // Register the plugin so it affects the chart
+  // ChartJS.register(dottedBackgroundPlugin);
 
   // Select chart component type based on "type" prop
   const ChartComponent = type === "line" ? Line : Bar;
@@ -196,10 +243,10 @@ export default function DottedGridChart({
     <div
       ref={scrollContainerRef}
       style={{ height: chartHeight, overflowX: "auto" }}
-      className="w-full"
+      className="w-full rounded-2xl overflow-hidden"
     >
       <div
-        className="min-w-[768px] overflow-hidden md:min-w-full z-50"
+        className="overflow-hidden md:min-w-full z-50"
         style={{ height: "100%" }}
       >
         <ChartComponent ref={chartRef} data={chartData} options={options} />

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import useHandleRatingModal from "@/hooks/rating-hooks/use-handle-rating-modal";
 import { tabTriggerClass } from "./profile-modal";
 import { ArrowLeft } from "iconsax-react";
+import { SectorChartCard } from "../charts/sector-chart-card";
 
 interface ProfileMobileViewProps {
   official: Official;
@@ -23,6 +24,7 @@ interface ProfileMobileViewProps {
   educationData: any;
   careerData: CareerHistory;
   chartEmpty?: boolean;
+  fullData: any;
   setRatingModalOpen: (value: boolean) => void;
 }
 
@@ -36,6 +38,7 @@ function ProfileMobileView({
   educationData,
   careerData,
   chartEmpty,
+  fullData,
   setRatingModalOpen,
 }: ProfileMobileViewProps) {
   const handleRatingModal = useHandleRatingModal();
@@ -72,13 +75,13 @@ function ProfileMobileView({
           <TabsTrigger value="performance" className={tabTriggerClass}>
             <div className="flex gap-2 items-center justify-center">
               Performance
-              <Icon name="Chart2" size={16} color={"#8c8c8c"} />
+              {/* <Icon name="Chart2" size={16} color={"#8c8c8c"} /> */}
             </div>
           </TabsTrigger>
           <TabsTrigger value="about" className={tabTriggerClass}>
             <div className="flex gap-2 items-center justify-center">
               About
-              <Icon name="Profile" size={16} color={"#8c8c8c"} />
+              {/* <Icon name="Profile" size={16} color={"#8c8c8c"} /> */}
             </div>
           </TabsTrigger>
         </TabsList>
@@ -97,7 +100,7 @@ function ProfileMobileView({
             </div>
           ) : (
             <div className="w-full">
-              <ChartCard
+              {/* <ChartCard
                 chartName="Approval rating"
                 dataMap={approvaDataSet}
                 chartType="line"
@@ -106,9 +109,31 @@ function ProfileMobileView({
                 isLoading={isLoadingApproval || isLoadingApprovalRatingOverall}
                 handlePeriodChange={handlePeriodChange}
                 autoSkipXAxisLabels={true}
-              />
+              /> */}
 
-              <ChartCard
+              {fullData?.sectorPeriodRating && (
+                <div>
+                  {Object.entries(fullData.sectorPeriodRating).map(
+                    ([sectorName, periodData]) => {
+                      const sectorData = periodData as Record<
+                        Granularity,
+                        { data: number[]; labels: string[] }
+                      >;
+
+                      return (
+                        <SectorChartCard
+                          key={sectorName}
+                          sectorName={sectorName}
+                          sectorData={sectorData}
+                          isLoading={false}
+                        />
+                      );
+                    }
+                  )}
+                </div>
+              )}
+
+              {/* <ChartCard
                 chartName="Performance by sectors"
                 dataMap={sectorDataSet}
                 chartType="bar"
@@ -118,7 +143,7 @@ function ProfileMobileView({
                 handlePeriodChange={handlePeriodChange}
                 showGranularity={false}
                 autoSkipXAxisLabels={false}
-              />
+              /> */}
 
               <div className="fixed flex items-center justify-center bottom-5 inset-x-0 p-4 z-50">
                 <Button

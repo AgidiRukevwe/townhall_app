@@ -34,19 +34,20 @@ export function OfficialProfileCard({
 
   const { isOpen: profileModal, closeModal } = useOfficialModalStore();
 
-  return (
-    <EmptyState
-      type="no-content"
-      title=" Not much to see here (yet)"
-      description="This leader’s bio isn’t available right now. We’ll update this section once we find something solid."
-      showButton={false}
-    />
-  );
+  // return (
+  //   <EmptyState
+  //     type="no-content"
+  //     title=" Not much to see here (yet)"
+  //     description="This leader’s bio isn’t available right now. We’ll update this section once we find something solid."
+  //     showButton={false}
+  //   />
+  // );
   return (
     <div
       className={`flex flex-col items-center text-center mb-12 ${classname}`}
     >
       {/* Profile image */}
+      {/* {!isMobile && !profileModal && <ProfileHeader />} */}
       {!isMobile && !profileModal && <ProfileHeader />}
 
       {/* Profile information in accordions */}

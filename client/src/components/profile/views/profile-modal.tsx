@@ -251,7 +251,7 @@ export default function ProfileModal({
                   </div>
                 ) : (
                   <div className="w-full">
-                    <ChartCard
+                    {/* <ChartCard
                       chartName="Approval rating"
                       dataMap={approvaDataSet}
                       chartType="line"
@@ -262,9 +262,9 @@ export default function ProfileModal({
                       }
                       handlePeriodChange={handlePeriodChange}
                       autoSkipXAxisLabels={true}
-                    />
+                    /> */}
 
-                    <ChartCard
+                    {/* <ChartCard
                       chartName="Performance by sectors"
                       dataMap={sectorDataSet}
                       chartType="bar"
@@ -276,7 +276,7 @@ export default function ProfileModal({
                       handlePeriodChange={handlePeriodChange}
                       showGranularity={false}
                       autoSkipXAxisLabels={false}
-                    />
+                    /> */}
 
                     {fullData?.sectorPeriodRating && (
                       <div>

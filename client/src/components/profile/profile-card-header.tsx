@@ -36,7 +36,7 @@ function ProfileHeader() {
               {toTitleCase(official?.name ?? "")}
             </h2>
             <p className="text-text-secondary md:mb-6 text-sm truncate">
-              {truncateText(official?.location ?? "", isMobile ? 30 : 50)}
+              {truncateText(official?.location ?? "", 30)}
               {/* jj */}
             </p>
           </div>

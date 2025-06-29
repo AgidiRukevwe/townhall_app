@@ -120,7 +120,6 @@ export default function Profile() {
   }, []);
 
   useEffect(() => {
-    console.log(fullData);
     if (approvalRating === 0 && overallSectorRating === 0) {
       setChartEmpty(true);
     } else {
@@ -198,6 +197,7 @@ export default function Profile() {
         <ProfileMobileView
           official={official}
           approvaDataSet={approvaDataSet}
+          fullData={fullData}
           sectorDataSet={sectorDataSet}
           isLoadingApproval={isLoadingApproval}
           isLoadingApprovalRatingOverall={isLoadingApprovalRatingOverall}

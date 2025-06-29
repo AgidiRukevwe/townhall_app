@@ -6,6 +6,7 @@ import DottedGridChart from "./dotted-chart";
 import { useFullRatingsData, usePerformance } from "@/hooks/use-performance";
 import { Loading } from "@/components/shared/loading";
 import { useBreakpoint } from "@/hooks/util-hooks/use-breakpoints";
+import { truncateText } from "@/utils/truncate-text";
 
 export type Granularity = "1 Dy" | "1 Wk" | "1 Yr";
 
@@ -88,8 +89,9 @@ export const ChartCard = ({
       <div className="flex w-full items-center justify-between flex-row mb-7">
         <div className="flex items-center space-x-2 md:pb-0">
           {/* <Icon name="Chart2" size={16} color="#BFBFBF" variant="Bold" /> */}
-          <span className="text-sm md:text-base font-medium text-text-primary">
-            {chartName}
+          <span className="text-sm md:text-base text-text-secondary flex items-center gap-2">
+            <Icon name="Chart2" size={16} color="#007aff" />{" "}
+            {truncateText(chartName, 20)}
           </span>
         </div>
 
@@ -123,12 +125,12 @@ export const ChartCard = ({
         <h2 className="text-4xl md:text-5xl font-medium md:font-medium text-text-primary">
           {selectedDataset?.overallRating}%
         </h2>
-        {/* <div className="text-sm flex items-center mt-2">
-          <Icon name="ArrowUp" size={20} color="#4caf50" />
+        <div className="text-sm rounded-full bg-[#4caf50]/10 w-auto inline-flex items-center p-1 px-1 mt-2">
+          <Icon name="ArrowUp2" size={16} color="#4caf50" variant="Bold" />
           <span className="font-medium text-xs text-[#4caf50]">
             {valueChange}%
           </span>
-        </div> */}
+        </div>
       </div>
 
       {/* <div className="h-[400px] w-full"> */}
