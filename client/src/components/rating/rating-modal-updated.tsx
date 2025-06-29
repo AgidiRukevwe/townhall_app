@@ -285,7 +285,7 @@ export function RatingModal({
           <div className="bg-white rounded-2xl pt-4 px-4">
             {/* Leader Profile */}
 
-            <div className="flex items-center gap-2 mb-6 pb-3 border-1 border-b border-surface-secondary">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-1 border-b border-surface-secondary">
               {/* <div className="relative">
               <div className="w-20 h-20 bg-surface-brand/10 rounded-full border-2 border-white flex items-center justify-center">
                 <span className="text-surface-brand text-2xl font-medium">
@@ -317,11 +317,30 @@ export function RatingModal({
 
             {/* The Survey section */}
 
-            <div className="bg-white  mb-6 px-0 h-96 overflow-y-auto flex-grow hide-scrollbar">
+            {/* Progress */}
+            <div className="pb-4 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-xs  md:font-medium text-[#8c8c8c] flex gap-1">
+                  <Icon name="ClipboardText" size={16} color="#AF52DE" />
+                  Sectors {currentStep + 1} of {totalSteps}
+                </span>
+              </div>
+              <div className="w-full bg-gray-100 rounded-full h-1">
+                <div
+                  className="bg-blue-500 h-1 rounded-full transition-all duration-300"
+                  style={{
+                    width: `${((currentStep + 1) / totalSteps) * 100}%`,
+                  }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-white  mb-6 px-0 h-80 overflow-y-auto flex-grow hide-scrollbar">
               {/* Progress */}
-              <div className="pb-4 rounded-lg">
+              {/* <div className="pb-4 rounded-lg">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-xs  md:font-medium text-[#8c8c8c]">
+                  <span className="text-xs  md:font-medium text-[#8c8c8c] flex gap-1">
+                    <Icon name="ClipboardText" size={16} color="#AF52DE" />
                     Sectors {currentStep + 1} of {totalSteps}
                   </span>
                 </div>
@@ -333,7 +352,7 @@ export function RatingModal({
                     }}
                   />
                 </div>
-              </div>
+              </div> */}
 
               {/* Question Content */}
               <div className="pb-4">

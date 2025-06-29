@@ -47,7 +47,7 @@ interface ProfileModalProps {
 }
 
 export const tabTriggerClass = cn(
-  "relative pt-4 px-1 mr-4 text-text-secondary text-sm font-medium rounded-none transition-all duration-300 ease-in-out",
+  "relative pt-4 px-1 mr-4 text-[#8c8c8c] text-sm rounded-none transition-all duration-300 ease-in-out",
   "data-[state=active]:text-text-primary data-[state=active]:text-sm data-[state=active]:bg-transparent  data-[state=active]:font-bold",
   "data-[state=active]:border-b-2 data-[state=active]:border-surface-brand data-[state=active]:-mb-px rounded-none"
 );
