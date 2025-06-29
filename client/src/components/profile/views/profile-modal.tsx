@@ -148,7 +148,7 @@ export default function ProfileModal({
   }, [selectedApprovalRatingPeriod]);
 
   useEffect(() => {
-    console.log(fullData);
+    // console.log(fullData);
     if (approvalRating === 0 && overallSectorRating === 0) {
       setChartEmpty(true);
     } else {
@@ -156,9 +156,9 @@ export default function ProfileModal({
     }
   }, [approvalRating, overallSectorRating, fullData]);
 
-  useEffect(() => {
-    console.log("Labels by Granularity:", fullData?.sectorPeriodRating);
-  }, []);
+  // useEffect(() => {
+  //   console.log("Labels by Granularity:", fullData?.sectorPeriodRating);
+  // }, []);
 
   // Determine education and career data from official
   const educationData = official?.education || [];

@@ -18,6 +18,13 @@ import { useEffect } from "react";
 import { useAuthStore } from "./store/auth-store.ts";
 import { useGoogleAuth } from "./hooks/auth-hooks/use-google-auth.ts";
 
+if (process.env.NODE_ENV === "production") {
+  console.log = () => {};
+  console.warn = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+}
+
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   // We don't need to pass props here since the Navbar in Home will handle search/user functionality
   return <div className="flex flex-col min-h-screen">{children}</div>;

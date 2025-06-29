@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface OfficialAvatarProps {
   className?: string;
-  size?: "sm" | "md" | "lg" | "xl";
+  size?: "sm" | "md" | "lg" | "xl" | "base";
   variant?: "circle" | "rounded" | "square";
   showRatingBadge?: boolean;
   official: {
@@ -19,6 +19,7 @@ const sizeMap = {
   xs: { container: "w-8 h-8", text: "text-base" },
   sm: { container: "w-12 h-12", text: "text-base" },
   md: { container: "w-20 h-20", text: "text-2xl" },
+  base: { container: "w-24 h-24", text: "text-base" },
   lg: { container: "w-32 h-32", text: "text-4xl" },
   xl: { container: "w-40 h-40", text: "text-5xl" },
 };

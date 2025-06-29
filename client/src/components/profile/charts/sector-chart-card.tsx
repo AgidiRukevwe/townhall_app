@@ -26,7 +26,7 @@ export const SectorChartCard = ({
   const safeData = currentPeriod?.data ?? [];
   const safeLabels = currentPeriod?.labels ?? [];
 
-  useEffect(() => console.log(safeLabels), []);
+  //   useEffect(() => console.log(safeLabels), []);
   const dataMap: ChartCardProps["dataMap"] = {
     overallRating: safeData.length
       ? Math.round(
@@ -40,9 +40,9 @@ export const SectorChartCard = ({
     data: safeData,
   };
 
-  useEffect(() => {
-    console.log("Loaded sector data:", sectorData?.["1 Dy"]);
-  }, [sectorData]);
+  //   useEffect(() => {
+  //     console.log("Loaded sector data:", sectorData?.["1 Dy"]);
+  //   }, [sectorData]);
 
   return (
     <ChartCard

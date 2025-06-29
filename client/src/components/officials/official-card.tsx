@@ -55,6 +55,7 @@ export function OfficialCard({ official, compact = false }: OfficialCardProps) {
 
               name: official.name,
             }}
+            size={isMobile ? "base" : undefined}
           />
         </div>
       </div>
