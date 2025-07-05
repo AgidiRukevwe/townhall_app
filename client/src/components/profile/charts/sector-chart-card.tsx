@@ -19,18 +19,22 @@ export const SectorChartCard = ({
   sectorData,
   isLoading,
 }: SectorChartCardProps) => {
-  const [granularity, setGranularity] = useState<Granularity>("1 Dy");
+  const [granularity, setGranularity] = useState<Granularity>("1 Wk");
 
   const currentPeriod = sectorData?.[granularity];
 
   const safeData = currentPeriod?.data ?? [];
   const safeLabels = currentPeriod?.labels ?? [];
 
+  //remove days with 0
+  const validDataPoints = safeData.filter((val) => val > 0);
+
   //   useEffect(() => console.log(safeLabels), []);
   const dataMap: ChartCardProps["dataMap"] = {
-    overallRating: safeData.length
+    overallRating: validDataPoints.length
       ? Math.round(
-          safeData.reduce((sum, val) => sum + val, 0) / safeData.length
+          validDataPoints.reduce((sum, val) => sum + val, 0) /
+            validDataPoints.length
         )
       : 0,
     labels:

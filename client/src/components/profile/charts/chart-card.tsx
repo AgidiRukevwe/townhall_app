@@ -61,7 +61,7 @@ export const ChartCard = ({
   autoSkipXAxisLabels,
 }: ChartCardProps) => {
   const [granularity, setGranularity] = useState<Granularity>(
-    granularityOptions[0]
+    granularityOptions[1]
   );
 
   // const selectedDataset = dataMap[granularity];

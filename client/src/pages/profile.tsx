@@ -40,7 +40,6 @@ import { useSelectedOfficialStore } from "@/store/selected-official-store";
 
 export default function Profile() {
   const [ratingModalOpen, setRatingModalOpen] = useState(false);
-  const [openTestRatingModal, setTestRatingModal] = useState(true);
 
   // State to track the selected period and sector
   const [selectedApprovalRatingPeriod, setSelectedApprovalRatingPeriod] =
@@ -113,6 +112,10 @@ export default function Profile() {
   useEffect(() => {
     refetchApprovalData();
   }, [selectedApprovalRatingPeriod]);
+
+  useEffect(() => {
+    console.log(fullData);
+  }, []);
 
   useEffect(() => {
     setRefetchOfficial(refetchOfficialDetails);
