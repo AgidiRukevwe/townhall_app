@@ -142,6 +142,8 @@ export function RatingModal({
         );
       });
 
+      resetModal();
+
       toast({
         title: "Rating submitted",
         description: `Your rating for ${official?.name} has been recorded.`,
@@ -162,7 +164,7 @@ export function RatingModal({
         await refetchRatingData();
       }
 
-      resetModal();
+      // resetModal();
     } catch (error: any) {
       toast({
         title: "Error submitting rating",
