@@ -114,6 +114,7 @@ export function RatingModal({
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    // resetModal();
 
     const sectorRatingsArray = Object.entries(sectorRatings).map(
       ([sectorId, rating]) => ({ sectorId, rating })
@@ -146,7 +147,9 @@ export function RatingModal({
 
       toast({
         title: "Rating submitted",
-        description: `Your rating for ${official?.name} has been recorded.`,
+        description: `Your rating for ${toTitleCase(
+          official?.name as string
+        )} has been recorded.`,
       });
 
       // ✅ Refetch and update store

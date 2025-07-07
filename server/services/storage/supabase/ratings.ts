@@ -202,21 +202,67 @@ export const Ratings = {
     };
   },
 
+  // async submitRating(
+  //   ratingData: RatingPayload & { userId: string }
+  // ): Promise<{ success: boolean }> {
+  //   const { data: existingRatings } = await supabase
+  //     .from("ratings")
+  //     .select("id")
+  //     .eq("leader_id", ratingData.officialId)
+  //     .eq("user_id", ratingData.userId);
+
+  //   if (existingRatings?.length) {
+  //     for (const r of existingRatings) {
+  //       await supabase.from("ratings").delete().eq("id", r.id);
+  //     }
+  //   }
+
+  //   const { data: sectors, error: sectorErr } = await supabase
+  //     .from("sectors")
+  //     .select("id, name");
+
+  //   if (sectorErr) throw sectorErr;
+
+  //   const defaultSector = sectors.find((s) => s.name === "Overall") || {
+  //     id: "00000000-0000-0000-0000-000000000000",
+  //   };
+
+  //   await supabase.from("ratings").insert({
+  //     id: randomUUID(),
+  //     leader_id: ratingData.officialId,
+  //     user_id: ratingData.userId,
+  //     rating: ratingData.overallRating,
+  //     sector_id: defaultSector.id,
+  //     created_at: new Date().toISOString(),
+  //   });
+
+  //   for (const sr of ratingData.sectorRatings || []) {
+  //     if (sr.sectorId === defaultSector.id) continue;
+  //     await supabase.from("ratings").insert({
+  //       id: randomUUID(),
+  //       leader_id: ratingData.officialId,
+  //       user_id: ratingData.userId,
+  //       rating: sr.rating,
+  //       sector_id: sr.sectorId,
+  //       created_at: new Date().toISOString(),
+  //     });
+  //   }
+
+  //   return { success: true };
+  // },
+
   async submitRating(
     ratingData: RatingPayload & { userId: string }
   ): Promise<{ success: boolean }> {
-    const { data: existingRatings } = await supabase
+    const { officialId, userId, overallRating, sectorRatings } = ratingData;
+
+    // 1. Delete all previous ratings for this user + official in one go
+    await supabase
       .from("ratings")
-      .select("id")
-      .eq("leader_id", ratingData.officialId)
-      .eq("user_id", ratingData.userId);
+      .delete()
+      .match({ leader_id: officialId, user_id: userId });
 
-    if (existingRatings?.length) {
-      for (const r of existingRatings) {
-        await supabase.from("ratings").delete().eq("id", r.id);
-      }
-    }
-
+    // 2. Get sector list once
     const { data: sectors, error: sectorErr } = await supabase
       .from("sectors")
       .select("id, name");
@@ -227,26 +273,30 @@ export const Ratings = {
       id: "00000000-0000-0000-0000-000000000000",
     };
 
-    await supabase.from("ratings").insert({
-      id: randomUUID(),
-      leader_id: ratingData.officialId,
-      user_id: ratingData.userId,
-      rating: ratingData.overallRating,
-      sector_id: defaultSector.id,
-      created_at: new Date().toISOString(),
-    });
-
-    for (const sr of ratingData.sectorRatings || []) {
-      if (sr.sectorId === defaultSector.id) continue;
-      await supabase.from("ratings").insert({
+    // 3. Prepare all ratings for bulk insert
+    const allRatings = [
+      {
         id: randomUUID(),
-        leader_id: ratingData.officialId,
-        user_id: ratingData.userId,
-        rating: sr.rating,
-        sector_id: sr.sectorId,
+        leader_id: officialId,
+        user_id: userId,
+        rating: overallRating,
+        sector_id: defaultSector.id,
         created_at: new Date().toISOString(),
-      });
-    }
+      },
+      ...sectorRatings
+        .filter((sr) => sr.sectorId !== defaultSector.id)
+        .map((sr) => ({
+          id: randomUUID(),
+          leader_id: officialId,
+          user_id: userId,
+          rating: sr.rating,
+          sector_id: sr.sectorId,
+          created_at: new Date().toISOString(),
+        })),
+    ];
+
+    // 4. Insert all ratings at once
+    await supabase.from("ratings").insert(allRatings);
 
     return { success: true };
   },
